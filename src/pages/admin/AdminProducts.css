@@ -1,0 +1,38 @@
+.admin-product-form {
+  max-width: 100%;
+}
+
+.admin-form-group--row {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.admin-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #475569;
+  cursor: pointer;
+}
+
+.admin-file-input {
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.admin-form-inline-wrap {
+  padding: 0.5rem 0;
+}
+
+.admin-form-inline-wrap .admin-form-actions {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0.75rem;
+}
+
+.admin-products .admin-empty {
+  margin: 0;
+  border-radius: 0;
+}

@@ -1,0 +1,109 @@
+import { useState, useCallback } from 'react';
+import { z } from 'zod';
+
+/**
+ * Run Zod schema validation and return the first error message or null.
+ * @param {import('zod').ZodType} schema - Zod schema (e.g. z.string().email())
+ * @param {unknown} value - Value to validate
+ * @returns {string|null}
+ */
+export function getValidationError(schema, value) {
+  if (!schema) return null;
+  const result = schema.safeParse(value);
+  if (result.success) return null;
+  const issue = result.error.issues?.[0];
+  return issue?.message ?? 'Invalid value';
+}
+
+/**
+ * Reusable form input with label, optional error, and optional Zod validation.
+ * @param {string} [label] - Label text
+ * @param {string} [type='text'] - Input type (text, email, password, etc.)
+ * @param {string} [id] - Input id (for label htmlFor)
+ * @param {string} [className] - Extra classes for wrapper
+ * @param {string} [error] - Error message from parent (e.g. form-level validation)
+ * @param {import('zod').ZodType} [schema] - Optional Zod schema for this field (validates on blur and when value changes)
+ * @param {object} [inputProps] - Rest props passed to the native input (value, onChange, etc.)
+ */
+export default function Input({
+  label,
+  type = 'text',
+  id,
+  className = '',
+  error: errorProp,
+  schema,
+  onChange,
+  ...inputProps
+}) {
+  const [touchedError, setTouchedError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const inputId = id || (label ? `input-${label.replace(/\s+/g, '-').toLowerCase()}` : undefined);
+  const value = inputProps.value ?? '';
+  const isPassword = type === 'password';
+  const inputType = isPassword ? (showPassword ? 'text' : 'password') : type;
+
+  const validate = useCallback(() => {
+    if (!schema) return null;
+    return getValidationError(schema, value);
+  }, [schema, value]);
+
+  const handleBlur = useCallback(
+    (e) => {
+      const message = validate();
+      setTouchedError(message || null);
+      inputProps.onBlur?.(e);
+    },
+    [validate, inputProps.onBlur]
+  );
+
+  const handleChange = useCallback(
+    (e) => {
+      onChange?.(e);
+      if (touchedError) {
+        const nextMessage = getValidationError(schema, e.target.value);
+        setTouchedError(nextMessage || null);
+      }
+    },
+    [onChange, touchedError, schema]
+  );
+
+  const error = (errorProp && String(errorProp).trim()) ? errorProp : touchedError;
+
+  return (
+    <div className={className || 'mb-4'}>
+      {label && (
+        <label htmlFor={inputId} className="block font-medium mb-1.5 text-text dark:text-gray-300">
+          {label}
+        </label>
+      )}
+      <div className="relative">
+        <input
+          id={inputId}
+          type={inputType}
+          className={`w-full py-3 text-base border rounded-[10px] bg-white dark:bg-gray-700 text-text dark:text-gray-200 transition-colors ${isPassword ? 'pl-4 pr-11' : 'px-4'} ${error ? 'border-red-500 dark:border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 focus:outline-none dark:focus:border-red-400 dark:focus:ring-red-400/20' : 'border-border dark:border-gray-600 focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20'}`}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${inputId}-error` : undefined}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          {...inputProps}
+        />
+        {isPassword && (
+          <button
+            type="button"
+            onClick={() => setShowPassword((s) => !s)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-9 h-9 rounded text-text-muted dark:text-gray-400 hover:text-text dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-secondary/20"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            tabIndex={-1}
+          >
+            <span className={showPassword ? 'icon-[ph--eye-closed-duotone] text-[26px]' : 'icon-[streamline--eye-optic] text-[22px]'} aria-hidden />
+          </button>
+        )}
+      </div>
+      {error && (
+        <p id={`${inputId}-error`} className="mt-1 text-sm text-red-500 dark:text-red-400" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}

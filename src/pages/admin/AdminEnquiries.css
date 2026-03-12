@@ -1,0 +1,79 @@
+.admin-enquiries-desc {
+  color: #64748B;
+  font-size: 0.9rem;
+  margin: -0.5rem 0 1rem 0;
+}
+
+.enquiry-filters {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.enquiry-filters a {
+  padding: 0.5rem 1rem;
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  color: #64748B;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.enquiry-filters a:hover {
+  background: #E2E8F0;
+  color: #334155;
+}
+
+.enquiry-filters a.active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.enquiry-detail-modal {
+  max-width: 480px;
+}
+
+.enquiry-detail-list {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 0.35rem 1rem;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.enquiry-detail-list dt {
+  color: #64748B;
+  font-weight: 500;
+}
+
+.enquiry-detail-list dd {
+  margin: 0;
+  color: #334155;
+}
+
+.enquiry-detail-hr {
+  margin: 1rem 0;
+  border: none;
+  border-top: 1px solid #E2E8F0;
+}
+
+.enquiry-detail-modal .admin-form-group {
+  margin-bottom: 0;
+}
+
+/* Legacy status badges (if used elsewhere) */
+.status-badge {
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.status-New { background: rgba(31, 182, 182, 0.15); color: #0D9488; }
+.status-Contacted { background: rgba(18, 62, 115, 0.12); color: var(--color-primary); }
+.status-Closed { background: rgba(34, 197, 94, 0.15); color: #16A34A; }
