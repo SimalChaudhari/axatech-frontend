@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { Button } from '../common';
+import { useEffect, useState } from 'react';
+import { Link, NavLink } from 'react-router-dom';
 import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CloseIcon,
   DashboardIcon,
   HomeContentIcon,
   LicensesIcon,
@@ -17,7 +18,8 @@ import {
 const NAV_LINKS = [
   { to: '/admin', end: true, label: 'Dashboard', Icon: DashboardIcon },
   { to: '/admin/home', label: 'Home Content', Icon: HomeContentIcon },
-  { to: '/admin/licenses', label: 'Licenses', Icon: LicensesIcon },
+  // { to: '/admin/licenses', label: 'Licenses', Icon: LicensesIcon },
+  { to: '/admin/licenses', label: 'Tally', Icon: LicensesIcon },
   { to: '/admin/categories', label: 'Categories', Icon: CategoriesIcon },
   { to: '/admin/products', label: 'Products', Icon: ProductsIcon },
   { to: '/admin/services', label: 'Services', Icon: ServicesIcon },
@@ -26,17 +28,16 @@ const NAV_LINKS = [
   { to: '/admin/blogs', label: 'Blogs', Icon: BlogsIcon },
 ];
 
-function getNavLinkClass(isActive) {
-  const base = 'flex items-center gap-3 rounded-lg px-4 py-2.5 text-[0.925rem] font-medium no-underline transition-all duration-200';
+function getNavLinkClass(isActive, collapsed) {
+  const base = `flex items-center rounded-lg py-2.5 font-medium no-underline transition-all duration-200 ${collapsed ? 'flex-col gap-1 px-1 text-[10px]' : 'flex-row gap-2 px-3 text-[0.925rem]'}`;
   const active = isActive
-    ? 'bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 [&_.nav-icon]:!text-emerald-600 dark:[&_.nav-icon]:!text-emerald-400'
+    ? 'bg-info-lighter text-info-dark dark:bg-info/20 dark:text-info-light [&_.nav-icon]:!text-info-dark dark:[&_.nav-icon]:!text-info-light'
     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 [&_.nav-icon]:text-gray-500 dark:[&_.nav-icon]:text-gray-400';
   return `${base} ${active}`;
 }
 
 export default function AdminSidebar({ open, onClose, onNavigate }) {
-  const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -56,17 +57,24 @@ export default function AdminSidebar({ open, onClose, onNavigate }) {
     onNavigate?.();
   };
 
-  const sidebarContent = (
+  const sidebarContent = (effectiveCollapsed) => (
     <>
-      {/* Logo + Admin + close (mobile) */}
-      <div className="flex shrink-0 items-center justify-between py-4 px-5 dark:border-gray-700">
+      {/* Logo + collapse toggle + close (mobile) */}
+      <div className="relative flex shrink-0 items-center justify-between gap-2 py-4 px-5 dark:border-gray-700">
+        <button
+          type="button"
+          onClick={() => setCollapsed((c) => !c)}
+          className="hidden md:flex absolute -right-3 top-4 h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-gray-200"
+          aria-label={effectiveCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {effectiveCollapsed ? <ChevronRightIcon className="text-xl" /> : <ChevronLeftIcon className="text-xl" />}
+        </button>
         <Link
           to="/admin"
           onClick={handleNavClick}
-          className="flex items-center gap-2.5 font-bold text-gray-900 no-underline transition-opacity duration-200 hover:opacity-80 dark:text-white"
+          className={`flex flex-1 items-center font-bold text-gray-900 no-underline transition-opacity duration-200 hover:opacity-80 dark:text-white min-w-0 ${effectiveCollapsed ? 'justify-center' : 'gap-2.5'}`}
         >
-          <img src="/logo.png" alt="Axatech" className="h-9 w-auto object-contain" />
-          {/* <span className="text-base font-bold tracking-wide text-gray-900 dark:text-white">Admin</span> */}
+          <img src="/logo.png" alt="Axatech" className= 'h-9 w-auto'/>
         </Link>
         <button
           type="button"
@@ -74,58 +82,34 @@ export default function AdminSidebar({ open, onClose, onNavigate }) {
           className="flex md:hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"
           aria-label="Close menu"
         >
-          <span className="icon-[mdi--close] text-xl" aria-hidden />
+          <CloseIcon className="text-xl" />
         </button>
       </div>
 
       {/* Section label + Nav */}
       <nav className="min-h-0 flex-1 overflow-y-auto py-4">
-        <p className="mb-2 px-4 text-[0.7rem] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-          Menu
-        </p>
-        <div className="space-y-0.5 px-3">
+        {!effectiveCollapsed && (
+          <p className="mb-2 px-4 text-[0.7rem] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            Menu
+          </p>
+        )}
+        <div className={`space-y-1 ${effectiveCollapsed ? 'px-1' : 'px-3'}`}>
           {NAV_LINKS.map(({ to, end, label, Icon }) => (
             <NavLink
               key={to}
               to={to}
               end={end}
-              className={({ isActive }) => getNavLinkClass(isActive)}
+              title={effectiveCollapsed ? label : undefined}
+              className={({ isActive }) => getNavLinkClass(isActive, effectiveCollapsed)}
               onClick={handleNavClick}
             >
               <Icon className="nav-icon text-[1.35rem] shrink-0" />
-              <span>{label}</span>
+              <span className={effectiveCollapsed ? 'whitespace-nowrap' : ''}>{label}</span>
             </NavLink>
           ))}
         </div>
       </nav>
 
-      {/* Bottom: View site, email, Logout */}
-      <div className="shrink-0 border-t border-gray-200 px-4 py-4 text-[0.85rem] dark:border-gray-700">
-        <div className="flex flex-col gap-2.5">
-          <Link
-            to="/"
-            className="font-medium text-emerald-600 no-underline hover:underline dark:text-emerald-400"
-            onClick={handleNavClick}
-          >
-            View site
-          </Link>
-          <span className="truncate text-gray-500 dark:text-gray-400" title={user?.email}>
-            {user?.email}
-          </span>
-          <Button
-            type="button"
-            variant="outline"
-            fullWidth
-            onClick={() => {
-              logout();
-              navigate('/');
-            }}
-            className="border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-          >
-            Logout
-          </Button>
-        </div>
-      </div>
     </>
   );
 
@@ -146,17 +130,17 @@ export default function AdminSidebar({ open, onClose, onNavigate }) {
           aria-hidden
         />
         <aside
-          className={`absolute left-0 top-0 ${asideBaseClass} w-[260px] max-w-[85vw] transition-transform duration-200 ease-out ${open ? 'translate-x-0' : '-translate-x-full'}`}
+          className={`absolute left-0 top-0 ${asideBaseClass} w-[260px] max-w-[85vw] transition-[transform] duration-200 ease-out ${open ? 'translate-x-0' : '-translate-x-full'}`}
         >
-          {sidebarContent}
+          {sidebarContent(false)}
         </aside>
       </div>
 
-      {/* Desktop: in flow, full height */}
+      {/* Desktop: in flow, full height; width depends on collapsed */}
       <aside
-        className={`hidden ${asideBaseClass} md:flex md:h-screen md:w-[260px] md:min-w-[260px]`}
+        className={`hidden ${asideBaseClass} md:flex md:h-screen transition-[width] duration-200 ease-out ${collapsed ? 'md:w-[88px] md:min-w-[88px]' : 'md:w-[300px] md:min-w-[300px]'}`}
       >
-        {sidebarContent}
+        {sidebarContent(collapsed)}
       </aside>
     </>
   );

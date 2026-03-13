@@ -54,7 +54,7 @@ export default function ResetPassword() {
         <section className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 bg-gray-100 dark:bg-gray-900/80">
           <div className="w-full max-w-[440px] text-center">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-              <p className="text-red-600 dark:text-red-400">Invalid or missing reset link.</p>
+              <p className="text-error dark:text-error-light">Invalid or missing reset link.</p>
               <Link to="/forgot-password" className="mt-4 inline-block font-semibold text-primary dark:text-secondary hover:underline">Request a new link</Link>
             </div>
           </div>
@@ -79,13 +79,13 @@ export default function ResetPassword() {
             </div>
 
             {success ? (
-              <div className="rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 px-4 py-3 text-sm text-green-700 dark:text-green-300 text-center">
+              <div className="rounded-lg bg-success-lighter dark:bg-success-darker/30 border border-success-light dark:border-success-dark px-4 py-3 text-sm text-success-dark dark:text-success-light text-center">
                 Your password has been reset. Redirecting to sign in...
               </div>
             ) : (
               <>
                 {error && (
-                  <div className="mb-6 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 px-4 py-3 text-sm text-red-700 dark:text-red-300" role="alert">
+                  <div className="mb-6 rounded-lg bg-error-lighter dark:bg-error-darker/30 border border-error-light dark:border-error-dark px-4 py-3 text-sm text-error-dark dark:text-error-light" role="alert">
                     {error}
                   </div>
                 )}

@@ -17,7 +17,7 @@ export default function DashboardTips() {
             key={i}
             className="flex gap-3 text-sm text-slate-600 dark:text-gray-300"
           >
-            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500 dark:bg-secondary" aria-hidden />
+            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-success dark:bg-secondary" aria-hidden />
             <span>{tip}</span>
           </li>
         ))}

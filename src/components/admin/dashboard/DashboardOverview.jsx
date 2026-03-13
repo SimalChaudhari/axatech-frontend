@@ -9,7 +9,7 @@ const OVERVIEW_ITEMS = [
     to: '/admin/home',
   },
   {
-    title: 'Products & Licenses',
+    title: 'Products & Tally',
     description: 'Add-ons and license plans',
     Icon: ProductsIcon,
     to: '/admin/products',

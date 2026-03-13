@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { TrashIcon, PenIcon, ChevronLeftIcon, ChevronRightIcon } from '../icons';
-import Dropdown from './Dropdown';
+import { TrashIcon, PenIcon, ChevronLeftIcon, ChevronRightIcon, ArrowUpIcon, CloseIcon } from '../icons';
+import {Dropdown, Checkbox} from './index';
 
 const tableClass = 'w-full border-collapse text-sm';
 const thBaseClass =
@@ -14,9 +14,9 @@ const actionMenuClass =
   'fixed z-11 min-w-[140px] rounded-lg border border-slate-200 bg-white p-1 shadow-lg dark:border-gray-600 dark:bg-gray-800';
 // they are mostly same classes, only color classes differ
 const baseActionMenuItemClass =
-  'flex w-full items-center gap-4 px-1 py-2.5 rounded-md text-left text-sm font-medium';
+  'flex w-full items-center gap-2 px-1 py-2.5 rounded-md text-left text-sm font-medium';
 const actionMenuItemClass = `${baseActionMenuItemClass} text-slate-700 hover:bg-slate-100 dark:text-gray-200 dark:hover:bg-gray-700`;
-const actionMenuDeleteClass = `${baseActionMenuItemClass} text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20`;
+const actionMenuDeleteClass = `${baseActionMenuItemClass} text-error hover:bg-error-lighter dark:hover:bg-gray-700`;
 
 
 function Table({ children, className = '' }) {
@@ -29,28 +29,33 @@ function Table({ children, className = '' }) {
   );
 }
 
-function Head({ children, columns, selectAll }) {
+function Head({ children, columns, selectAll, sortState, onSort }) {
   return (
     <thead>
       <tr>
         {selectAll && (
           <th className={`${thBaseClass} w-10 px-2 text-center`}>
-            <input
-              type="checkbox"
-              checked={selectAll.checked}
+            <Checkbox
               ref={selectAll.indeterminateRef}
+              checked={selectAll.checked}
+              indeterminate={selectAll.indeterminate}
               onChange={selectAll.onChange}
               aria-label="Select all rows"
-              className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary/20 dark:border-gray-500 dark:text-secondary"
+              size="sm"
+              className="justify-center"
             />
           </th>
         )}
         {columns
-          ? columns.map((col, i) => (
-              <Th key={col.key ?? i} align={col.align} className={col.className}>
-                {col.label}
-              </Th>
-            ))
+          ? columns.map((col, i) => {
+              const key = col.key ?? i;
+              const isSortable = col.sortable && typeof onSort === 'function';
+              const isSorted = sortState && sortState.key === key;
+              const direction = isSorted ? sortState.direction : null;
+              return (
+                <Th key={key} align={col.align} className={col.className} isSortable={isSortable} isSorted={isSorted} direction={direction} onSort={isSortable ? () => onSort(key) : undefined} label={col.label} />
+              );
+            })
           : children}
       </tr>
     </thead>
@@ -69,11 +74,33 @@ function Row({ children, className = '', hover = true }) {
   );
 }
 
-function Th({ children, align = 'left', className = '' }) {
+function Th({ children, align = 'left', className = '', isSortable, isSorted, direction, onSort, label }) {
   const alignClass = align === 'right' ? 'text-right' : 'text-left';
+  const buttonClass = align === 'right' ? 'justify-end text-right' : 'justify-start text-left';
+  const content = label != null ? (
+    isSortable ? (
+      <button
+        type="button"
+        onClick={onSort}
+        className={`inline-flex items-center gap-1 w-full font-inherit text-inherit uppercase tracking-wider ${buttonClass} hover:text-slate-700 dark:hover:text-gray-200`}
+        aria-sort={isSorted ? (direction === 'asc' ? 'ascending' : 'descending') : 'none'}
+      >
+        {label}
+        {isSorted && (
+          <span className={`inline-block transition-transform duration-100 ease-in-out ${direction === 'asc' ? '-rotate-180' : ''}`}>
+            <ArrowUpIcon className="text-base  shrink-0" />
+          </span>
+        )}
+      </button>
+    ) : (
+      label
+    )
+  ) : (
+    children
+  );
   return (
     <th className={`${thBaseClass} ${alignClass}${className ? ` ${className}` : ''}`}>
-      {children}
+      {content}
     </th>
   );
 }
@@ -90,11 +117,32 @@ function Td({ children, align, colSpan, className = '' }) {
   );
 }
 
+/**
+ * Cell that wraps the row selection checkbox. Use when table has selectAll in Head.
+ * @param {boolean} checked - Whether the row is selected
+ * @param {function(): void} onChange - Called when checkbox is toggled
+ * @param {string} [ariaLabel] - Accessible label, e.g. "Select Plan name"
+ */
+function SelectionCell({ checked, onChange, ariaLabel = 'Select row', className = '' }) {
+  return (
+    <td className={`${tdBaseClass} w-10 px-2 text-center ${className}`.trim()}>
+      <Checkbox
+        size="sm"
+        checked={checked}
+        onChange={onChange}
+        aria-label={ariaLabel}
+        className="justify-center"
+      />
+    </td>
+  );
+}
+
 Table.Head = Head;
 Table.Body = Body;
 Table.Row = Row;
 Table.Th = Th;
 Table.Td = Td;
+Table.SelectionCell = SelectionCell;
 
 /**
  * Bulk selection bar shown above table body when rows are selected.
@@ -113,16 +161,9 @@ function SelectionBar({
   label = 'selected',
   className = '',
 }) {
-  const checkboxRef = useRef(null);
   const allSelected = totalCount != null && totalCount > 0 && selectedCount === totalCount;
   const indeterminate = totalCount != null && selectedCount > 0 && selectedCount < totalCount;
   const showChecked = totalCount == null ? true : allSelected;
-
-  useEffect(() => {
-    if (checkboxRef.current) {
-      checkboxRef.current.indeterminate = !!indeterminate;
-    }
-  }, [indeterminate]);
 
   if (selectedCount === 0) return null;
 
@@ -131,20 +172,19 @@ function SelectionBar({
       role="region"
       aria-live="polite"
       aria-label={`${selectedCount} ${label}`}
-      className={`flex items-center justify-between gap-3 border-b border-green-200 bg-green-50 px-4 py-2.5 text-sm font-medium text-green-800 dark:border-green-800 dark:bg-green-900/30 dark:text-green-200 ${className}`.trim()}
+      className={`flex items-center justify-between gap-3 border-b border-success-light bg-success-lighter px-4 py-2.5 text-sm font-medium text-success-dark dark:border-success-dark dark:bg-success-darker/30 dark:text-success-light ${className}`.trim()}
     >
       <button
         type="button"
         onClick={onClearSelection}
-        className="flex items-center gap-2 rounded-md hover:bg-green-100 dark:hover:bg-green-800/50"
+        className="flex items-center gap-2 rounded-md hover:bg-success-lighter dark:hover:bg-success-darker/30"
         aria-label="Clear selection"
       >
-        <input
-          ref={checkboxRef}
-          type="checkbox"
+        <Checkbox
           checked={showChecked}
+          indeterminate={indeterminate}
           readOnly
-          className="h-4 w-4 rounded border-green-600 bg-green-600 text-white focus:ring-green-500 dark:border-green-500 dark:bg-green-500"
+          size="sm"
           aria-hidden
         />
         <span>{selectedCount} {label}</span>
@@ -154,7 +194,7 @@ function SelectionBar({
           type="button"
           onClick={onBulkDelete}
           aria-label="Delete selected"
-          className="inline-flex items-center justify-center rounded-lg p-2 text-green-700 hover:bg-red-100 hover:text-red-700 dark:text-green-300 dark:hover:bg-red-900/30 dark:hover:text-red-300"
+          className="inline-flex items-center justify-center rounded-lg p-2 text-success-dark hover:bg-error-lighter hover:text-error dark:text-success-light dark:hover:bg-error-lighter/30 dark:hover:text-error-light"
         >
           <TrashIcon className="text-xl" />
         </button>
@@ -164,6 +204,63 @@ function SelectionBar({
 }
 
 Table.SelectionBar = SelectionBar;
+
+/**
+ * Active filters bar: shows applied filters as removable chips, result count, and Clear all.
+ * @param {Array<{ id: string, label: string, value: string, onRemove: function(): void }>} filters - Active filter chips to show
+ * @param {number} resultCount - Number of results after filtering (e.g. "0 results found")
+ * @param {function(): void} onClearAll - Called when user clicks Clear to remove all filters
+ * @param {string} [className] - Extra classes for the bar wrapper
+ */
+function ActiveFilters({ filters = [], resultCount, onClearAll, className = '' }) {
+  if (filters.length === 0) return null;
+
+  return (
+    <div
+      role="region"
+      aria-label="Active filters"
+      className={`flex flex-wrap items-center gap-2 border-b border-slate-200 bg-slate-50/50 px-4 py-3 text-sm dark:border-gray-600 dark:bg-gray-700/20 ${className}`.trim()}
+    >
+      <span className="font-medium text-slate-600 dark:text-gray-400" aria-live="polite">
+        {resultCount === 0 ? '0' : resultCount} results found
+      </span>
+      <div className="flex flex-wrap items-center gap-2">
+        {filters.map((f) => (
+          <span
+            key={f.id}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-slate-200 pl-3 pr-1.5 py-1.5 text-slate-700 dark:border-gray-600 dark:text-gray-200"
+          >
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium leading-none">
+              {f.label}:
+              <span className="inline-flex items-center gap-1 rounded-md bg-gray-200 px-1.5 py-1 dark:bg-gray-600">
+                <span className="text-[11px] leading-none">{f.value}</span>
+                <button
+                  type="button"
+                  onClick={f.onRemove}
+                  aria-label={`Remove ${f.label} filter`}
+                  className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-gray-400 text-slate-700 hover:bg-gray-500 dark:bg-gray-500 dark:text-gray-200 dark:hover:bg-gray-400"
+                >
+                  <CloseIcon className="text-[10px] text-white" />
+                </button>
+              </span>
+            </span>
+          </span>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={onClearAll}
+        className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-error bg-transparent text-error hover:bg-error/10"
+        aria-label="Clear all filters"
+      >
+        <TrashIcon className="text-lg" />
+        Clear
+      </button>
+    </div>
+  );
+}
+
+Table.ActiveFilters = ActiveFilters;
 
 /**
  * Table footer pagination: rows per page dropdown, "start-end of total", prev/next buttons.
@@ -203,6 +300,7 @@ function TablePagination({
         <span className="font-medium">Rows per page:</span>
         <Dropdown
           // placeholder="Rows per page"
+          showPlaceholderOption={false}
           value={String(rowsPerPage)}
           onChange={(v) => onRowsPerPageChange(Number(v))}
           options={rowsPerPageOptionsList}

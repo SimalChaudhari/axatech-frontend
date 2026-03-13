@@ -3,7 +3,7 @@ import { AdminLayout } from '../components/layout';
 import AdminDashboard from '../pages/admin/dashboard/AdminDashboard';
 import AdminHome from '../pages/admin/home/AdminHome';
 import AdminLicenses from '../pages/admin/licenses/AdminLicenses';
-import AdminCategories from '../pages/admin/AdminCategories';
+import AdminCategories from '../pages/admin/categories/AdminCategories';
 import AdminProducts from '../pages/admin/AdminProducts';
 import AdminServices from '../pages/admin/AdminServices';
 import AdminCloud from '../pages/admin/AdminCloud';

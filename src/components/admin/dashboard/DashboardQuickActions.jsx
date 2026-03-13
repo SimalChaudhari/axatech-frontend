@@ -1,4 +1,5 @@
 import { Button } from '../../common';
+import { HomeContentIcon, EnquiriesIcon, LicensesIcon, ProductsIcon } from '../../icons';
 
 export default function DashboardQuickActions() {
   return (
@@ -8,16 +9,44 @@ export default function DashboardQuickActions() {
       </div>
       <div className="p-5">
         <div className="flex flex-wrap gap-3">
-          <Button to="/admin/home" variant="outline" fullWidth={false} className="min-w-[140px]">
+          <Button
+            to="/admin/home"
+            variant="outline"
+            fullWidth={false}
+            className="min-w-[140px]"
+            icon={<HomeContentIcon />}
+            iconPosition="left"
+          >
             Edit Home Content
           </Button>
-          <Button to="/admin/enquiries" variant="primary" fullWidth={false} className="min-w-[140px]">
+          <Button
+            to="/admin/enquiries"
+            variant="outline"
+            fullWidth={false}
+            className="min-w-[140px]"
+            icon={<EnquiriesIcon />}
+            iconPosition="left"
+          >
             View Enquiries
           </Button>
-          <Button to="/admin/licenses" variant="outline" fullWidth={false} className="min-w-[140px]">
-            License Plans
+          <Button
+            to="/admin/licenses"
+            variant="outline"
+            fullWidth={false}
+            className="min-w-[140px]"
+            icon={<LicensesIcon />}
+            iconPosition="left"
+          >
+            Tally Plans
           </Button>
-          <Button to="/admin/products" variant="outline" fullWidth={false} className="min-w-[140px]">
+          <Button
+            to="/admin/products"
+            variant="outline"
+            fullWidth={false}
+            className="min-w-[140px]"
+            icon={<ProductsIcon />}
+            iconPosition="left"
+          >
             Products
           </Button>
         </div>

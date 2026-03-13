@@ -13,7 +13,7 @@ const contactSchema = z.object({
 const textareaBaseClass =
   'w-full py-3 px-4 text-base border rounded-[10px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 transition-colors min-h-[120px] resize-y';
 const textareaErrorClass =
-  'border-red-500 dark:border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 focus:outline-none dark:focus:border-red-400 dark:focus:ring-red-400/20';
+  'border-error dark:border-error-light focus:border-error focus:ring-2 focus:ring-error/20 focus:outline-none dark:focus:border-error-light dark:focus:ring-error-light/20';
 const textareaNormalClass =
   'border-gray-200 dark:border-gray-600 focus:border-primary dark:focus:border-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-secondary/20';
 const labelClass = 'block font-medium mb-1.5 text-gray-700 dark:text-gray-300';
@@ -92,7 +92,7 @@ export default function ContactForm({ form, onChange, onSubmit, error, loading }
 
           {error && (
             <div
-              className="mb-6 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 px-4 py-3 text-sm text-red-700 dark:text-red-300"
+              className="mb-6 rounded-lg bg-error-lighter dark:bg-error-darker/30 border border-error-light dark:border-error-dark px-4 py-3 text-sm text-error-dark dark:text-error-light"
               role="alert"
             >
               {error}
@@ -168,7 +168,7 @@ export default function ContactForm({ form, onChange, onSubmit, error, loading }
                 aria-describedby={messageError ? 'contact-message-error' : undefined}
               />
               {messageError && (
-                <p id="contact-message-error" className="mt-1 text-sm text-red-500 dark:text-red-400" role="alert">
+                <p id="contact-message-error" className="mt-1 text-sm text-error dark:text-error-light" role="alert">
                   {messageError}
                 </p>
               )}

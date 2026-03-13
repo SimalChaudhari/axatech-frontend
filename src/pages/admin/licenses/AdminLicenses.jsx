@@ -10,7 +10,7 @@ import {
 
 const initialForm = {
   planName: '',
-  type: 'single',
+  type: '', // empty so user must select Single or Multi; validation shows error if none selected
   price: '',
   description: '',
   features: '',
@@ -64,7 +64,6 @@ export default function AdminLicenses() {
   };
 
   const remove = async (id) => {
-    if (!confirm('Delete this plan?')) return;
     try {
       await api.admin.licenses.delete(id);
       api.admin.licenses.list().then(setPlans);

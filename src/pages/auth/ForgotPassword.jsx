@@ -55,13 +55,13 @@ export default function ForgotPassword() {
             </div>
 
             {sent ? (
-              <div className="rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 px-4 py-3 text-sm text-green-700 dark:text-green-300 text-center">
+              <div className="rounded-lg bg-success-lighter dark:bg-success-darker/30 border border-success-light dark:border-success-dark px-4 py-3 text-sm text-success-dark dark:text-success-light text-center">
                 Check your email for a link to reset your password. If it doesn’t appear, check your spam folder.
               </div>
             ) : (
               <>
                 {error && (
-                  <div className="mb-6 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 px-4 py-3 text-sm text-red-700 dark:text-red-300" role="alert">
+                  <div className="mb-6 rounded-lg bg-error-lighter dark:bg-error-darker/30 border border-error-light dark:border-error-dark px-4 py-3 text-sm text-error-dark dark:text-error-light" role="alert">
                     {error}
                   </div>
                 )}

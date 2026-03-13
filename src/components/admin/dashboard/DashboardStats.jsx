@@ -18,9 +18,9 @@ export default function DashboardStats({ counts }) {
           </Link>
           <Link
             to="/admin/enquiries?status=New"
-            className="flex flex-col rounded-lg border border-emerald-300/50 bg-emerald-500/5 p-5 no-underline text-inherit transition-all duration-200 hover:border-emerald-400 hover:shadow-md hover:shadow-emerald-500/15 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:hover:border-emerald-400 dark:hover:shadow-emerald-500/20"
+            className="flex flex-col rounded-lg border border-success-light/50 bg-success/5 p-5 no-underline text-inherit transition-all duration-200 hover:border-success hover:shadow-md hover:shadow-success/15 dark:border-success/30 dark:bg-success/10 dark:hover:border-success dark:hover:shadow-success/20"
           >
-            <span className="text-[1.75rem] font-bold leading-tight text-emerald-600 dark:text-emerald-400">
+            <span className="text-[1.75rem] font-bold leading-tight text-success-dark dark:text-success-light">
               {counts.newEnquiries}
             </span>
             <span className="mt-1 text-sm text-slate-500 dark:text-gray-400">

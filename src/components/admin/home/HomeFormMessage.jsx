@@ -5,8 +5,8 @@ export default function HomeFormMessage({ message }) {
     <div
       className={`rounded-lg border px-4 py-3 text-sm ${
         isSuccess
-          ? 'border-green-200 bg-green-50 text-green-800 dark:border-green-800/50 dark:bg-green-900/20 dark:text-green-300'
-          : 'border-red-200 bg-red-50 text-red-800 dark:border-red-800/50 dark:bg-red-900/20 dark:text-red-300'
+          ? 'border-success-light bg-success-lighter text-success-dark dark:border-success-dark dark:bg-success-darker/30 dark:text-success-light'
+          : 'border-error-light bg-error-lighter text-error-dark dark:border-error-dark dark:bg-error-darker/30 dark:text-error-light'
       }`}
     >
       {message}

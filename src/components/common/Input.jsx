@@ -80,7 +80,7 @@ export default function Input({
         <input
           id={inputId}
           type={inputType}
-          className={`w-full py-3 text-base border rounded-[10px] bg-white dark:bg-gray-700 text-text dark:text-gray-200 transition-colors ${isPassword ? 'pl-4 pr-11' : 'px-4'} ${error ? 'border-red-500 dark:border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 focus:outline-none dark:focus:border-red-400 dark:focus:ring-red-400/20' : 'border-border dark:border-gray-600 focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20'}`}
+          className={`w-full py-3 text-base border rounded-[10px] bg-white dark:bg-gray-700 text-text dark:text-gray-200 transition-colors ${isPassword ? 'pl-4 pr-11' : 'px-4'} ${error ? 'border-error focus:border-error focus:ring-2 focus:ring-error/20 focus:outline-none' : 'border-border focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20'}`}
           aria-invalid={!!error}
           aria-describedby={error ? `${inputId}-error` : undefined}
           onChange={handleChange}
@@ -100,7 +100,7 @@ export default function Input({
         )}
       </div>
       {error && (
-        <p id={`${inputId}-error`} className="mt-1 text-sm text-red-500 dark:text-red-400" role="alert">
+        <p id={`${inputId}-error`} className="mt-1 text-sm text-error" role="alert">
           {error}
         </p>
       )}

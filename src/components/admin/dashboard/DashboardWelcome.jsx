@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { Button } from '../../common';
+import { OpenInNewIcon, DashboardDuoIcon } from '../../icons';
 
 export default function DashboardWelcome() {
   return (
@@ -6,7 +7,7 @@ export default function DashboardWelcome() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary dark:bg-secondary/20 dark:text-secondary">
-            <span className="icon-[mdi--view-dashboard-outline] text-3xl" aria-hidden />
+            <DashboardDuoIcon className="text-3xl" />
           </div>
           <div>
             <h2 className="m-0 text-lg font-semibold text-slate-800 dark:text-white">
@@ -17,13 +18,17 @@ export default function DashboardWelcome() {
             </p>
           </div>
         </div>
-        <Link
+        <Button
           to="/"
-          className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 no-underline transition-colors hover:border-primary hover:bg-primary/5 hover:text-primary dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:border-secondary dark:hover:bg-secondary/20 dark:hover:text-secondary"
+          variant="outline"
+          size="sm"
+          fullWidth={false}
+          icon={<OpenInNewIcon className="text-lg" />}
+          iconPosition="left"
+          className="shrink-0"
         >
-          <span className="icon-[mdi--open-in-new] text-lg dark:text-secondary" aria-hidden />
           View site
-        </Link>
+        </Button>
       </div>
     </section>
   );

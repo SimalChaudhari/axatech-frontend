@@ -29,6 +29,11 @@ export function SearchIcon({ className = '' }) {
   return <Icon iconClass="icon-[mdi--magnify]" className={className} />;
 }
 
+// Close (modal / drawer)
+export function CloseIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--close]" className={className} />;
+}
+
 // Kebab / more actions (vertical three dots)
 export function DotsVerticalIcon({ className = '' }) {
   return <Icon iconClass="icon-[mdi--dots-vertical]" className={className} />;
@@ -37,6 +42,16 @@ export function DotsVerticalIcon({ className = '' }) {
 // Chevron down (dropdowns)
 export function ChevronDownIcon({ className = '' }) {
   return <Icon iconClass="icon-[mdi--chevron-down]" className={className} />;
+}
+
+// Chevron up (e.g. sort ascending)
+export function ChevronUpIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--chevron-up]" className={className} />;
+}
+
+// Arrow up (solar linear)
+export function ArrowUpIcon({ className = '' }) {
+  return <Icon iconClass="icon-[solar--arrow-up-linear]" className={className} />;
 }
 
 // Chevron left/right (pagination)
@@ -48,9 +63,24 @@ export function ChevronRightIcon({ className = '' }) {
   return <Icon iconClass="icon-[mdi--chevron-right]" className={className} />;
 }
 
+// Plus (add / new)
+export function PlusIcon({ className = '' }) {
+  return <Icon iconClass="icon-[pepicons-pop--plus]" className={className} />;
+}
+
+// Open in new / external link
+export function OpenInNewIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--open-in-new]" className={className} />;
+}
+
 // Admin nav
 export function DashboardIcon({ className = '' }) {
   return <Icon iconClass="icon-[line-md--speedometer-loop]" className={className} />;
+}
+
+// Admin dashboard welcome (duo style)
+export function DashboardDuoIcon({ className = '' }) {
+  return <Icon iconClass="icon-[duo-icons--dashboard]" className={className} />;
 }
 
 export function HomeContentIcon({ className = '' }) {
@@ -83,4 +113,53 @@ export function EnquiriesIcon({ className = '' }) {
 
 export function BlogsIcon({ className = '' }) {
   return <Icon iconClass="icon-[streamline-freehand--book-bookmark]" className={className} />;
+}
+
+// Header / layout
+export function PhoneIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--phone]" className={className} />;
+}
+
+export function EmailOutlineIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--email-outline]" className={className} />;
+}
+
+export function DownloadIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--download]" className={className} />;
+}
+
+export function WeatherSunnyIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--weather-sunny]" className={className} />;
+}
+
+export function WeatherNightIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--weather-night]" className={className} />;
+}
+
+export function ShieldAccountIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--shield-account]" className={className} />;
+}
+
+export function AccountCircleIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--account-circle]" className={className} />;
+}
+
+export function CogOutlineIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--cog-outline]" className={className} />;
+}
+
+export function AccountOutlineIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--account-outline]" className={className} />;
+}
+
+export function LogoutIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--logout]" className={className} />;
+}
+
+export function LoginIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--login]" className={className} />;
+}
+
+export function CartOutlineIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--cart-outline]" className={className} />;
 }

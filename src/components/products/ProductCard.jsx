@@ -25,21 +25,23 @@ export default function ProductCard({ product, index = 0 }) {
         <p className="flex-1 text-sm text-gray-500 dark:text-gray-400 mb-5 line-clamp-3 leading-relaxed">
           {descriptionSnippet}
         </p>
-        <div className="flex gap-3">
+        <div className="flex flex-nowrap items-center gap-3">
           <Button
+            size="sm"
             to={`/products/${product.slug}`}
             variant="outline"
             fullWidth={false}
-            className="flex-1 text-center rounded-xl border-2 border-gray-200 dark:border-gray-600 hover:border-primary/30 dark:hover:border-secondary/40 hover:-translate-y-0.5 transition-all duration-200"
+            className="flex-1 min-w-0 text-center rounded-xl border-2 border-gray-200 dark:border-gray-600 hover:border-primary/30 dark:hover:border-secondary/40 hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap"
           >
             Details
           </Button>
           <Button
+            size="sm"
             to="/contact"
             state={{ enquiryType: 'product', product: product._id, productName: product.name }}
             variant="primary"
             fullWidth={false}
-            className="flex-1 text-center rounded-xl hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
+            className="flex-1 min-w-0 text-center rounded-xl hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 whitespace-nowrap"
           >
             Buy Now
           </Button>

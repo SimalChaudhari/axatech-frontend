@@ -45,7 +45,7 @@ export default function HomeLicenseHighlights({ licenses }) {
         <div className="mt-10 text-center animate-[home-fadeInUp_0.5s_ease-out_0.6s_both]">
           <Button to="/licenses" variant="outline" fullWidth={false} className="inline-flex items-center justify-center gap-2">
             <span className="icon-[mdi--format-list-bulleted] text-[20px] shrink-0" aria-hidden />
-            All License Plans
+            All Tally Plans
           </Button>
         </div>
       </div>

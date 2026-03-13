@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useCallback } from 'react';
+import { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
 import api from '../api';
 
 const AuthContext = createContext(null);
@@ -35,6 +35,10 @@ export function AuthProvider({ children }) {
       dispatch({ type: 'LOGOUT' });
     }
   }, []);
+
+  useEffect(() => {
+    loadUser();
+  }, [loadUser]);
 
   const login = useCallback(async (email, password) => {
     const data = await api.auth.login(email, password);

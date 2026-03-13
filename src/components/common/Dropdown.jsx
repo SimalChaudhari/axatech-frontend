@@ -12,6 +12,9 @@ import { ChevronDownIcon } from '../icons';
  * @param {string} [className] - Extra classes for the wrapper
  * @param {string} [id] - Optional id for the trigger (for label htmlFor)
  * @param {boolean} [disabled] - Disable the dropdown
+ * @param {function()} [onBlur] - Called when the trigger loses focus (e.g. for on-touch validation)
+ * @param {string} [error] - Error message to show below the trigger (same as Input; applies error border styling)
+ * @param {boolean} [showPlaceholderOption=true] - When false, the "Select" / clear option at the top of the list is hidden
  */
 export default function Dropdown({
   label,
@@ -22,6 +25,9 @@ export default function Dropdown({
   className = '',
   id: idProp,
   disabled = false,
+  onBlur,
+  error,
+  showPlaceholderOption = true,
 }) {
   const generatedId = useId();
   const id = idProp || (label ? `dropdown-${generatedId.replace(/:/g, '')}` : undefined);
@@ -116,14 +122,19 @@ export default function Dropdown({
           type="button"
           disabled={disabled}
           onClick={() => !disabled && setOpen((o) => !o)}
+          onBlur={onBlur}
           onKeyDown={handleKeyDown}
           aria-haspopup="listbox"
           aria-expanded={open}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${id}-error` : undefined}
           aria-label={label || placeholder || 'Select option'}
           className={`relative w-full flex items-center justify-between gap-3 pl-5 pr-4 py-3 rounded-xl border-2 bg-white dark:bg-gray-800 text-left text-gray-900 dark:text-white shadow-sm transition-[border-color,box-shadow] duration-75 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
-            open
-              ? 'border-primary dark:border-secondary ring-2 ring-primary/20 dark:ring-secondary/20'
-              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary dark:focus:ring-secondary dark:focus:border-secondary'
+            error
+              ? 'border-error focus:border-error focus:ring-2 focus:ring-error/20 focus:outline-none'
+              : open
+                ? 'border-primary dark:border-secondary ring-2 ring-primary/20 dark:ring-secondary/20'
+                : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary dark:focus:ring-secondary dark:focus:border-secondary'
           } ${!selectedOption ? 'text-gray-500 dark:text-gray-400' : ''}`}
         >
         <div className="w-full flex items-center justify-between gap-3">
@@ -146,7 +157,7 @@ export default function Dropdown({
             style={{ top: panelRect.top, left: panelRect.left, width: panelRect.width, minWidth: 'auto' }}
             aria-activedescendant={value ? `${id}-opt-${value}` : undefined}
           >
-            {placeholder && (
+            {showPlaceholderOption && (
               <button
                 type="button"
                 role="option"
@@ -159,7 +170,7 @@ export default function Dropdown({
                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
-                {placeholder}
+                {placeholder || 'Select'}
               </button>
             )}
             {normalizedOptions.map((opt) => {
@@ -186,6 +197,11 @@ export default function Dropdown({
           document.body
         )}
       </div>
+      {error && (
+        <p id={`${id}-error`} className="mt-1 text-sm text-error" role="alert">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

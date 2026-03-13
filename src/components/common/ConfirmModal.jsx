@@ -9,7 +9,7 @@ import Button from './Button';
  * @param {React.ReactNode} [message] - Body text or custom content
  * @param {string} [confirmLabel='Confirm'] - Confirm button label (e.g. "Delete", "Yes")
  * @param {string} [cancelLabel='Cancel'] - Cancel button label
- * @param {string} [confirmVariant='primary'] - Button variant for confirm: 'primary' | 'danger' | etc.
+ * @param {string} [confirmVariant='primary'] - Button variant for confirm: 'primary' | 'error' | etc.
  * @param {string} [className] - Extra classes for the modal panel
  */
 export default function ConfirmModal({

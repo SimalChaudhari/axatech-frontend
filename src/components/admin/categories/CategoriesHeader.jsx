@@ -1,15 +1,15 @@
 import { Button } from '../../common';
 import { PlusIcon } from '../../icons';
 
-export default function LicensesHeader({ onAddPlan }) {
+export default function CategoriesHeader({ onAddCategory }) {
   return (
     <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
       <h1 className="m-0 text-2xl font-bold tracking-tight text-slate-800 dark:text-white">
-        Tally Plans
+        Categories
       </h1>
       <div className="flex flex-wrap gap-2">
-        <Button type="button" variant="primary" fullWidth={false} onClick={onAddPlan} icon={<PlusIcon />}>
-          Add Plan
+        <Button type="button" variant="primary" fullWidth={false} onClick={onAddCategory} icon={<PlusIcon />}>
+          Add Category
         </Button>
       </div>
     </header>

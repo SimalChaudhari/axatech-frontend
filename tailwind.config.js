@@ -10,6 +10,38 @@ export default {
         'primary-hover': '#0F315C',
         secondary: '#1FB6B6',
         accent: '#3ED2C7',
+        /* Info */
+        info: {
+          lighter: '#CAFDF5',
+          light: '#61F3F3',
+          DEFAULT: '#00B8D9',
+          dark: '#006C9C',
+          darker: '#003768',
+        },
+        /* Success */
+        success: {
+          lighter: '#D3FCD2',
+          light: '#77ED8B',
+          DEFAULT: '#22C55E',
+          dark: '#118D57',
+          darker: '#065E49',
+        },
+        /* Warning */
+        warning: {
+          lighter: '#FFF5CC',
+          light: '#FFD666',
+          DEFAULT: '#FFAB00',
+          dark: '#B76E00',
+          darker: '#7A4100',
+        },
+        /* Error */
+        error: {
+          lighter: '#FFE9D5',
+          light: '#FFAC82',
+          DEFAULT: '#FF5630',
+          dark: '#B71D18',
+          darker: '#7A0916',
+        },
         /* Neutrals */
         bg: '#F5F7FA',
         text: '#2D3748',
@@ -33,6 +65,7 @@ export default {
       zIndex: {
         100: '100',
         110: '110',
+        1000: '1000',
       },
       container: {
         center: true,
@@ -81,6 +114,14 @@ export default {
           from: { opacity: '0', transform: 'translateY(20px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
+        'admin-fadeIn': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+        'admin-slideUp': {
+          from: { opacity: '0', transform: 'translateY(12px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       backgroundImage: {
         'hero-pattern':
@@ -95,6 +136,8 @@ export default {
         glassShine: 'glassShine 10s ease-in-out 2s infinite',
         fadeInUp: 'fadeInUp 0.5s ease-out both',
         fadeInUpSlow: 'fadeInUp 0.6s ease-out both',
+        'admin-fadeIn': 'admin-fadeIn 0.2s ease-out',
+        'admin-slideUp': 'admin-slideUp 0.25s ease-out',
       },
     },
   },

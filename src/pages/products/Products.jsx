@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import api from '../../api';
 import {
   ProductsHero,
+  ProductsSidebar,
   ProductsToolbar,
   ProductsGrid,
   ProductsPagination,
@@ -11,7 +12,7 @@ import {
 export default function Products() {
   const [data, setData] = useState({ products: [], total: 0, pages: 1 });
   const [categories, setCategories] = useState([]);
-  const [category, setCategory] = useState('');
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -22,11 +23,12 @@ export default function Products() {
 
   useEffect(() => {
     setLoading(true);
-    api.products({ page, limit: 12, category: category || undefined, search: search || undefined })
+    const categoryParam = selectedCategoryIds.length > 0 ? selectedCategoryIds.join(',') : undefined;
+    api.products({ page, limit: 12, category: categoryParam, search: search || undefined })
       .then(setData)
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [page, category, search]);
+  }, [page, selectedCategoryIds, search]);
 
   const doSearch = (e) => {
     e?.preventDefault();
@@ -43,21 +45,35 @@ export default function Products() {
       <ProductsHero />
 
       <section className="py-20 md:py-24 bg-white dark:bg-gray-900 border-y border-gray-100 dark:border-gray-800">
-        <div className="max-w-[1200px] mx-auto px-5">
-          <ProductsToolbar
-            search={search}
-            onSearchChange={setSearch}
-            onSearchSubmit={doSearch}
-            category={category}
-            onCategoryChange={(v) => { setCategory(v); setPage(1); }}
-            categories={categories}
-          />
-          <ProductsGrid products={data.products} loading={loading} />
-          <ProductsPagination
-            page={page}
-            pages={data.pages}
-            onPageChange={setPage}
-          />
+        <div className="max-w-[1280px] mx-auto px-5">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
+            {/* Left: Categories sidebar (Amazon-style) — hidden on small screens */}
+            <div className="hidden lg:block">
+              <ProductsSidebar
+                categories={categories}
+                selectedCategoryIds={selectedCategoryIds}
+                onCategoryChange={(ids) => { setSelectedCategoryIds(ids); setPage(1); }}
+              />
+            </div>
+            {/* Right: Search, grid, pagination */}
+            <div className="flex-1 min-w-0">
+              <ProductsToolbar
+                search={search}
+                onSearchChange={setSearch}
+                onSearchSubmit={doSearch}
+                selectedCategoryIds={selectedCategoryIds}
+                onCategoryChange={(ids) => { setSelectedCategoryIds(ids); setPage(1); }}
+                categories={categories}
+                showCategoryDropdown
+              />
+              <ProductsGrid products={data.products} loading={loading} />
+              <ProductsPagination
+                page={page}
+                pages={data.pages}
+                onPageChange={setPage}
+              />
+            </div>
+          </div>
         </div>
       </section>
     </>

@@ -65,7 +65,7 @@ export default function AdminHeader({ sidebarOpen, onMenuToggle }) {
             aria-expanded={profileOpen}
             aria-haspopup="true"
             >
-            <span className="icon-[la--user-secret] text-[25px] shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden />
+            <span className="icon-[la--user-secret] text-[25px] shrink-0 text-success-dark dark:text-success-light" aria-hidden />
             <span className="hidden sm:inline">Profile</span>
             <span
               className={`icon-[mdi--chevron-down] text-lg shrink-0 transition-transform duration-200 ${profileOpen ? 'rotate-180' : ''}`}
@@ -82,7 +82,7 @@ export default function AdminHeader({ sidebarOpen, onMenuToggle }) {
                 key={label}
                 to={to}
                 role="menuitem"
-                className="flex items-center gap-3 w-full px-4 py-2.5 text-[0.9375rem] font-medium text-gray-700 no-underline transition-colors hover:bg-emerald-500/10 hover:text-emerald-700 dark:text-gray-200 dark:hover:bg-emerald-500/20 dark:hover:text-emerald-300"
+                className="flex items-center gap-3 w-full px-4 py-2.5 text-[0.9375rem] font-medium text-gray-700 no-underline transition-colors hover:bg-success/10 hover:text-success-dark dark:text-gray-200 dark:hover:bg-success/20 dark:hover:text-success-light"
                 onClick={() => setProfileOpen(false)}
               >
                 <span className={`${icon} text-[20px] shrink-0 opacity-80`} aria-hidden />
@@ -93,7 +93,7 @@ export default function AdminHeader({ sidebarOpen, onMenuToggle }) {
             <button
               type="button"
               role="menuitem"
-              className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-[0.9375rem] font-medium text-gray-700 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-gray-200 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+              className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-[0.9375rem] font-medium text-gray-700 transition-colors hover:bg-error-lighter hover:text-error dark:text-gray-200 dark:hover:bg-error-lighter/30 dark:hover:text-error-light"
               onClick={handleLogout}
             >
               <span className="icon-[mdi--logout] text-[20px] shrink-0 opacity-80" aria-hidden />
