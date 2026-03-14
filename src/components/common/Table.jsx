@@ -1,7 +1,8 @@
 import { useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { TrashIcon, PenIcon, ChevronLeftIcon, ChevronRightIcon, ArrowUpIcon, CloseIcon } from '../icons';
-import {Dropdown, Checkbox} from './index';
+import { TrashIcon, PenIcon, ChevronLeftIcon, ChevronRightIcon, ArrowUpIcon, CloseIcon, SearchIcon } from '../icons';
+import { Dropdown, Checkbox } from './index';
+import Badge from './Badge';
 
 const tableClass = 'w-full border-collapse text-sm';
 const thBaseClass =
@@ -14,7 +15,7 @@ const actionMenuClass =
   'fixed z-11 min-w-[140px] rounded-lg border border-slate-200 bg-white p-1 shadow-lg dark:border-gray-600 dark:bg-gray-800';
 // they are mostly same classes, only color classes differ
 const baseActionMenuItemClass =
-  'flex w-full items-center gap-2 px-1 py-2.5 rounded-md text-left text-sm font-medium';
+  'flex w-full items-center gap-2 px-1 py-2.5 rounded-md text-left text-sm font-medium cursor-pointer';
 const actionMenuItemClass = `${baseActionMenuItemClass} text-slate-700 hover:bg-slate-100 dark:text-gray-200 dark:hover:bg-gray-700`;
 const actionMenuDeleteClass = `${baseActionMenuItemClass} text-error hover:bg-error-lighter dark:hover:bg-gray-700`;
 
@@ -65,6 +66,38 @@ function Head({ children, columns, selectAll, sortState, onSort }) {
 function Body({ children }) {
   return <tbody>{children}</tbody>;
 }
+
+/**
+ * Single row shown when the table has no data. Centered icon (ic-content.svg) + "No data" text.
+ * Uses border radius and gap like the reference UI.
+ * @param {number} colSpan - Number of columns to span (must match table header column count, including selection column if any)
+ * @param {string} [message='No data'] - Message to show below the icon
+ * @param {string} [className] - Extra classes for the td
+ */
+function EmptyState({ colSpan, message = 'No data', className = '' }) {
+  return (
+    <tr>
+      <td
+        colSpan={colSpan}
+        className={`${tdBaseClass} border-0 py-8 align-middle ${className}`.trim()}
+      >
+        <div className="mx-auto flex max-w-full flex-col items-center justify-center gap-5 py-10 rounded-xl border border-slate-200/80 bg-white  dark:border-gray-600/80 dark:bg-gray-800/80">
+          <img
+            src="/images/ic-content.svg"
+            alt=""
+            width={120}
+            height={120}
+            className=" w-full max-w-[160px] shrink-0"
+            aria-hidden
+          />
+          <p className="text-lg font-medium text-slate-500 dark:text-gray-400">{message}</p>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+Table.EmptyState = EmptyState;
 
 function Row({ children, className = '', hover = true }) {
   return (
@@ -206,6 +239,123 @@ function SelectionBar({
 Table.SelectionBar = SelectionBar;
 
 /**
+ * Status tabs row: tab buttons with badge counts. Use above table toolbar (e.g. with search).
+ * @param {Array<{ value: string, label: string, variant?: string, activeVariant?: string, activeSolid?: boolean }>} tabs - Tab config (value, label, variant, activeVariant, activeSolid)
+ * @param {string} value - Current selected tab value
+ * @param {function(string): void} onChange - Called when a tab is clicked
+ * @param {Record<string, number>} [counts={}] - Map of tab value to count for badge
+ * @param {string} [className] - Extra classes for the wrapper div
+ */
+function StatusTabs({ tabs = [], value, onChange, counts = {}, className = '' }) {
+  return (
+    <div
+      className={`flex flex-wrap gap-0 px-4 pt-4 pb-0 border-b border-slate-200 dark:border-gray-600 ${className}`.trim()}
+    >
+      {tabs.map((tab) => {
+        const count = counts[tab.value] ?? 0;
+        const isActive = value === tab.value;
+        return (
+          <button
+            key={tab.value}
+            type="button"
+            onClick={() => onChange(tab.value)}
+            className={`cursor-pointer flex items-center gap-2 rounded-t-lg border-b-2 -mb-px px-5 py-3 text-sm font-medium transition-colors ${
+              isActive
+                ? 'bg-transparent text-slate-900 dark:text-white border-slate-900 dark:border-white'
+                : 'border-transparent bg-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+            }`}
+          >
+            {tab.label}
+            <Badge
+              size="sm"
+              variant={isActive ? tab.activeVariant : tab.variant}
+              solid={isActive && !!tab.activeSolid}
+            >
+              {count}
+            </Badge>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+Table.StatusTabs = StatusTabs;
+
+const searchInputClass =
+  'h-[42px] w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-800 placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-secondary dark:focus:ring-secondary/20';
+
+/**
+ * Toolbar row for table filters: flex wrapper for search + optional dropdowns/buttons.
+ * @param {React.ReactNode} [children] - Toolbar content (e.g. Table.SearchInput, Dropdown, buttons)
+ * @param {string} [className] - Extra classes for the wrapper
+ */
+function Toolbar({ children, className = '' }) {
+  return (
+    <div className={`flex flex-wrap items-center gap-3 px-4 py-3 ${className}`.trim()}>
+      {children}
+    </div>
+  );
+}
+
+Table.Toolbar = Toolbar;
+
+/**
+ * Search input with icon for table toolbar.
+ * @param {string} [value] - Controlled value
+ * @param {function(React.ChangeEvent): void} [onChange] - Change handler
+ * @param {string} [placeholder='Search...'] - Placeholder text
+ * @param {string} [ariaLabel] - Accessible label (e.g. "Search products")
+ * @param {string} [className] - Extra classes for the wrapper div (e.g. flex-1 min-w-[200px])
+ */
+function SearchInput({
+  value = '',
+  onChange,
+  placeholder = 'Search...',
+  ariaLabel = 'Search',
+  className = '',
+}) {
+  return (
+    <div className={`relative flex flex-1 min-w-[200px] items-center ${className}`.trim()}>
+      <span
+        className="pointer-events-none absolute left-0 top-0 flex h-[42px] w-10 items-center justify-center text-slate-400 dark:text-gray-500"
+        aria-hidden
+      >
+        <SearchIcon className="text-xl leading-none" />
+      </span>
+      <input
+        type="search"
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        className={searchInputClass}
+        aria-label={ariaLabel}
+      />
+    </div>
+  );
+}
+
+Table.SearchInput = SearchInput;
+
+const toolbarDropdownClass =
+  'w-40 [&_button]:h-[42px] [&_button]:py-2.5 [&_button]:rounded-lg [&_button]:border [&_button]:border-slate-200 [&_button]:text-sm [&_button]:bg-white [&_button]:dark:border-gray-600 [&_button]:dark:bg-gray-700';
+
+/**
+ * Dropdown for table toolbar. Use inside Table.Toolbar so multiple filter dropdowns share the same size and style.
+ * Same props as Dropdown (value, onChange, options, placeholder, showPlaceholderOption, etc.); className is merged with toolbar styles.
+ */
+function ToolbarDropdown({ className = '', ...props }) {
+  return (
+    <Dropdown
+      {...props}
+      className={`${toolbarDropdownClass} ${className}`.trim()}
+    />
+  );
+}
+
+Table.ToolbarDropdown = ToolbarDropdown;
+
+/**
  * Active filters bar: shows applied filters as removable chips, result count, and Clear all.
  * @param {Array<{ id: string, label: string, value: string, onRemove: function(): void }>} filters - Active filter chips to show
  * @param {number} resultCount - Number of results after filtering (e.g. "0 results found")
@@ -250,7 +400,7 @@ function ActiveFilters({ filters = [], resultCount, onClearAll, className = '' }
       <button
         type="button"
         onClick={onClearAll}
-        className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-error bg-transparent text-error hover:bg-error/10"
+        className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-error bg-transparent hover:bg-error/10"
         aria-label="Clear all filters"
       >
         <TrashIcon className="text-lg" />

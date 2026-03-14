@@ -5,6 +5,7 @@ import { ChevronDownIcon } from '../icons';
 /**
  * Professional custom dropdown with styled trigger and options panel.
  * @param {string} [label] - Optional label above the dropdown
+ * @param {boolean} [required] - If true, shows an asterisk (*) after the label to indicate required field
  * @param {string} [placeholder] - Placeholder when value is empty (e.g. "All categories")
  * @param {string} value - Current value (controlled)
  * @param {function(string): void} onChange - Called with the selected value
@@ -18,6 +19,7 @@ import { ChevronDownIcon } from '../icons';
  */
 export default function Dropdown({
   label,
+  required = false,
   placeholder,
   value,
   onChange,
@@ -113,6 +115,7 @@ export default function Dropdown({
           className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5"
         >
           {label}
+          {required && <span className="text-error" aria-hidden="true"> *</span>}
         </label>
       )}
       <div className="relative">
@@ -153,8 +156,17 @@ export default function Dropdown({
           <div
             ref={panelRef}
             role="listbox"
-            className="fixed py-1.5 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-xl max-h-60 overflow-y-auto z-10"
-            style={{ top: panelRect.top, left: panelRect.left, width: panelRect.width, minWidth: 'auto' }}
+            className="fixed py-1.5 rounded-[10px] border-2 border-gray-200 dark:border-gray-600 shadow-xl max-h-[240px] overflow-y-auto overflow-x-hidden z-10 outline-none backdrop-blur-[20px] bg-white/90 dark:bg-gray-800/90 transition-shadow duration-300"
+            style={{
+              top: panelRect.top,
+              left: panelRect.left,
+              width: panelRect.width,
+              minWidth: 'auto',
+              backgroundImage: 'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSJ1cmwoI3BhaW50MF9yYWRpYWxfNDQ2NF81NTMzOCkiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CjxkZWZzPgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50MF9yYWRpYWxfNDQ2NF81NTMzOCIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgxMjAgMS44MTgxMmUtMDUpIHJvdGF0ZSgtNDUpIHNjYWxlKDEyMy4yNSkiPgo8c3RvcCBzdG9wLWNvbG9yPSIjMDBCOEQ5Ii8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzAwQjhEOSIgc3RvcC1vcGFjaXR5PSIwIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==), url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSJ1cmwoI3BhaW50MF9yYWRpYWxfNDQ2NF81NTMzNykiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CjxkZWZzPgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50MF9yYWRpYWxfNDQ2NF81NTMzNyIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgwIDEyMCkgcm90YXRlKDEzNSkgc2NhbGUoMTIzLjI1KSI+CjxzdG9wIHN0b3AtY29sb3I9IiNGRjU2MzAiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRkY1NjMwIiBzdG9wLW9wYWNpdHk9IjAiLz4KPC9yYWRpYWxHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4K)',
+              // backgroundSize: '50% 50%',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right top, left bottom',
+            }}
             aria-activedescendant={value ? `${id}-opt-${value}` : undefined}
           >
             {showPlaceholderOption && (

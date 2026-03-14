@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Input, Dropdown, Checkbox } from '../../common';
+import { Modal, Input, Dropdown, Checkbox } from '../../common';
 
 const textareaClass =
   'w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-800 placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-secondary dark:focus:ring-secondary/20 min-h-[80px] resize-y';
@@ -51,26 +51,18 @@ export default function LicensesModal({ mode = 'create', form, setForm, onSave, 
   };
 
   return (
-    <div
-      className="fixed inset-0 z-9 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="license-modal-title"
+    <Modal
+      title={mode === 'create' ? 'Add Tally Plan' : 'Edit Tally Plan'}
+      titleId="license-modal-title"
+      onClose={onClose}
+      primaryLabel={mode === 'create' ? 'Create plan' : 'Update plan'}
+      onPrimary={handleSave}
     >
-      <div
-        className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-800 dark:shadow-none dark:ring-1 dark:ring-gray-700"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <header className="shrink-0 border-b border-slate-200 bg-slate-50/80 px-6 py-4 dark:border-gray-700 dark:bg-gray-800/95">
-          <h2 id="license-modal-title" className="text-lg font-semibold text-slate-800 dark:text-white">
-            {mode === 'create' ? 'Add Tally Plan' : 'Edit Tally Plan'}
-          </h2>
-        </header>
-        <div className="flex-1 overflow-y-auto px-6 py-5">
-          <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-5">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input
                 label="Plan name"
+                required
                 type="text"
                 value={form.planName}
                 onChange={(e) => {
@@ -84,6 +76,7 @@ export default function LicensesModal({ mode = 'create', form, setForm, onSave, 
               <div className="mb-0">
                 <Dropdown
                   label="Type"
+                  required
                   placeholder="Select type"
                   value={form.type}
                   onChange={(val) => {
@@ -104,6 +97,7 @@ export default function LicensesModal({ mode = 'create', form, setForm, onSave, 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input
                 label="Price (₹)"
+                required
                 type="number"
                 value={form.price}
                 onChange={(e) => {
@@ -146,17 +140,7 @@ export default function LicensesModal({ mode = 'create', form, setForm, onSave, 
                 rows={3}
               />
             </div>
-          </div>
-        </div>
-        <footer className="shrink-0 flex flex-wrap justify-end gap-3 border-t border-slate-200 bg-slate-50/80 px-6 py-4 dark:border-gray-700 dark:bg-gray-800/95">
-          <Button type="button" variant="outline" fullWidth={false} onClick={onClose}>
-            Cancel
-          </Button>
-          <Button type="button" variant="primary" fullWidth={false} onClick={handleSave}>
-            {mode === 'create' ? 'Create plan' : 'Update plan'}
-          </Button>
-        </footer>
       </div>
-    </div>
+    </Modal>
   );
 }

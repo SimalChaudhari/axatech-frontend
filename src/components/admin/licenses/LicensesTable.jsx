@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Table, Dropdown, ConfirmModal, Badge } from '../../common';
-import { SearchIcon, DotsVerticalIcon } from '../../icons';
+import { Table, ConfirmModal, Badge } from '../../common';
+import { DotsVerticalIcon } from '../../icons';
 
 const STATUS_TABS = [
   { value: 'all', label: 'All', variant: 'neutral', activeVariant: 'neutral' },
@@ -193,58 +193,25 @@ export default function LicensesTable({ plans, onOpenEdit, onRemove }) {
       {/* Toolbar: status tabs + filters row */}
       <div className="border-b border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-800">
         {/* Status tabs: same padding for all; active = dark label + colored underline; inactive = grey label, no underline */}
-        <div className="flex flex-wrap gap-0 px-4 pt-4 pb-0 border-b border-slate-200 dark:border-gray-600">
-          {STATUS_TABS.map((tab) => {
-            const count = counts[tab.value];
-            const isActive = statusFilter === tab.value;
-            return (
-              <button
-                key={tab.value}
-                type="button"
-                onClick={() => setStatusFilter(tab.value)}
-                className={`flex items-center gap-2 rounded-t-lg border-b-2 -mb-px px-5 py-3 text-sm font-medium transition-colors ${
-                  isActive
-                    ? `bg-transparent text-slate-900 dark:text-white`
-                    : 'border-transparent bg-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-                }`}
-              >
-                {tab.label}
-                <Badge
-                  size="sm"
-                  variant={isActive ? tab.activeVariant : tab.variant}
-                  solid={isActive && !!tab.activeSolid}
-                >
-                  {count}
-                </Badge>
-              </button>
-            );
-          })}
-        </div>
-        {/* Filters row: type dropdown + search + more */}
-        <div className="flex flex-wrap items-center gap-3 px-4 py-3">
-          <Dropdown
+        <Table.StatusTabs
+          tabs={STATUS_TABS}
+          value={statusFilter}
+          onChange={setStatusFilter}
+          counts={counts}
+        />
+        <Table.Toolbar>
+          <Table.ToolbarDropdown
             value={typeFilter}
             onChange={setTypeFilter}
             options={TYPE_OPTIONS}
             showPlaceholderOption={false}
-            className="w-40 [&_button]:h-[42px] [&_button]:py-2.5 [&_button]:rounded-lg [&_button]:border [&_button]:text-sm"
           />
-          <div className="relative flex-1 min-w-[200px]">
-            <span
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-gray-500"
-              aria-hidden
-            >
-              <SearchIcon className="text-xl" />
-            </span>
-            <input
-              type="search"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-[42px] w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-800 placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-secondary dark:focus:ring-secondary/20"
-              aria-label="Search plans"
-            />
-          </div>
+          <Table.SearchInput
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            ariaLabel="Search plans"
+            placeholder="Search plans"
+          />
           <button
             type="button"
             aria-label="More options"
@@ -252,7 +219,7 @@ export default function LicensesTable({ plans, onOpenEdit, onRemove }) {
           >
             <DotsVerticalIcon className="text-xl" />
           </button>
-        </div>
+        </Table.Toolbar>
       </div>
 
       <Table.ActiveFilters
@@ -289,7 +256,10 @@ export default function LicensesTable({ plans, onOpenEdit, onRemove }) {
           />
         )}
         <Table.Body>
-          {paginatedPlans.map((p) => (
+          {paginatedPlans.length === 0 ? (
+            <Table.EmptyState colSpan={6} />
+          ) : (
+          paginatedPlans.map((p) => (
             <Table.Row key={p._id}>
               <Table.SelectionCell
                 checked={selectedIds.has(p._id)}
@@ -320,7 +290,8 @@ export default function LicensesTable({ plans, onOpenEdit, onRemove }) {
                 </div>
               </Table.Td>
             </Table.Row>
-          ))}
+          ))
+          )}
         </Table.Body>
       </Table>
 
@@ -332,12 +303,6 @@ export default function LicensesTable({ plans, onOpenEdit, onRemove }) {
         onRowsPerPageChange={handleRowsPerPageChange}
         // rowsPerPageOptions={[ 5, 10, 20, 50]}
       />
-
-      {filteredPlans.length === 0 && plans.length > 0 && (
-        <div className="px-4 py-8 text-center text-sm text-slate-500 dark:text-gray-400">
-          No plans match your filters. Try changing status, type, or search.
-        </div>
-      )}
 
       <Table.ActionMenu
         open={!!openActionId}

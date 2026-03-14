@@ -163,3 +163,13 @@ export function LoginIcon({ className = '' }) {
 export function CartOutlineIcon({ className = '' }) {
   return <Icon iconClass="icon-[mdi--cart-outline]" className={className} />;
 }
+
+// Menu (hamburger)
+export function MenuIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--menu]" className={className} />;
+}
+
+// Profile / user (la user-secret)
+export function UserSecretIcon({ className = '' }) {
+  return <Icon iconClass="icon-[la--user-secret]" className={className} />;
+}

@@ -4,11 +4,12 @@ import { DotsVerticalIcon } from '../../icons';
 
 const STATUS_TABS = [
   { value: 'all', label: 'All', variant: 'neutral', activeVariant: 'neutral' },
+  { value: 'featured', label: 'Featured', variant: 'info', activeVariant: 'info', activeSolid: true },
   { value: 'active', label: 'Active', variant: 'success', activeVariant: 'success', activeSolid: true },
   { value: 'inactive', label: 'Inactive', variant: 'warning', activeVariant: 'warning', activeSolid: true },
 ];
 
-export default function CategoriesTable({ categories, onOpenEdit, onRemove }) {
+export default function ProductsTable({ products = [], onOpenEdit, onRemove }) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [openActionId, setOpenActionId] = useState(null);
@@ -18,33 +19,36 @@ export default function CategoriesTable({ categories, onOpenEdit, onRemove }) {
   const [sortKey, setSortKey] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
   const [selectedIds, setSelectedIds] = useState(new Set());
-  const [deleteConfirm, setDeleteConfirm] = useState(null); // null | { type: 'single', id, name } | { type: 'bulk', ids: string[] }
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
   const kebabRefs = useRef({});
 
   const counts = useMemo(
     () => ({
-      all: categories.length,
-      active: categories.filter((c) => c.isActive !== false).length,
-      inactive: categories.filter((c) => c.isActive === false).length,
+      all: products.length,
+      featured: products.filter((p) => p.featured).length,
+      active: products.filter((p) => p.isActive !== false).length,
+      inactive: products.filter((p) => p.isActive === false).length,
     }),
-    [categories]
+    [products]
   );
 
-  const filteredCategories = useMemo(() => {
-    return categories.filter((c) => {
-      if (statusFilter === 'active' && c.isActive === false) return false;
-      if (statusFilter === 'inactive' && c.isActive !== false) return false;
+  const filteredProducts = useMemo(() => {
+    return products.filter((p) => {
+      if (statusFilter === 'featured' && !p.featured) return false;
+      if (statusFilter === 'active' && p.isActive === false) return false;
+      if (statusFilter === 'inactive' && p.isActive !== false) return false;
       if (searchQuery.trim()) {
         const q = searchQuery.trim().toLowerCase();
-        const name = (c.name || '').toLowerCase();
-        const slug = (c.slug || '').toLowerCase();
-        if (!name.includes(q) && !slug.includes(q)) return false;
+        const name = (p.name || '').toLowerCase();
+        const slug = (p.slug || '').toLowerCase();
+        const short = (p.shortDescription || '').toLowerCase();
+        if (!name.includes(q) && !slug.includes(q) && !short.includes(q)) return false;
       }
       return true;
     });
-  }, [categories, statusFilter, searchQuery]);
+  }, [products, statusFilter, searchQuery]);
 
-  const totalFiltered = filteredCategories.length;
+  const totalFiltered = filteredProducts.length;
   const totalPages = Math.max(1, Math.ceil(totalFiltered / rowsPerPage));
   const pageSafe = Math.min(page, totalPages) || 1;
 
@@ -75,29 +79,40 @@ export default function CategoriesTable({ categories, onOpenEdit, onRemove }) {
     setSearchQuery('');
   };
 
-  const sortedCategories = useMemo(() => {
-    const list = [...filteredCategories];
+  const sortedProducts = useMemo(() => {
+    const list = [...filteredProducts];
     const key = sortKey;
     const dir = sortDirection;
     list.sort((a, b) => {
-      let va = a[key];
-      let vb = b[key];
-      if (key === 'isActive') {
-        va = va !== false ? 1 : 0;
-        vb = vb !== false ? 1 : 0;
+      if (key === 'name') {
+        const va = String(a.name ?? '').toLowerCase();
+        const vb = String(b.name ?? '').toLowerCase();
+        return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+      }
+      if (key === 'category') {
+        const va = (a.category?.name ?? '').toLowerCase();
+        const vb = (b.category?.name ?? '').toLowerCase();
+        return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+      }
+      if (key === 'featured') {
+        const va = a.featured ? 1 : 0;
+        const vb = b.featured ? 1 : 0;
         return dir === 'asc' ? va - vb : vb - va;
       }
-      va = String(va ?? '').toLowerCase();
-      vb = String(vb ?? '').toLowerCase();
-      return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+      if (key === 'isActive') {
+        const va = a.isActive !== false ? 1 : 0;
+        const vb = b.isActive !== false ? 1 : 0;
+        return dir === 'asc' ? va - vb : vb - va;
+      }
+      return 0;
     });
     return list;
-  }, [filteredCategories, sortKey, sortDirection]);
+  }, [filteredProducts, sortKey, sortDirection]);
 
-  const paginatedCategories = useMemo(() => {
+  const paginatedProducts = useMemo(() => {
     const start = (pageSafe - 1) * rowsPerPage;
-    return sortedCategories.slice(start, start + rowsPerPage);
-  }, [sortedCategories, pageSafe, rowsPerPage]);
+    return sortedProducts.slice(start, start + rowsPerPage);
+  }, [sortedProducts, pageSafe, rowsPerPage]);
 
   const handleSort = (key) => {
     if (sortKey === key) {
@@ -113,12 +128,12 @@ export default function CategoriesTable({ categories, onOpenEdit, onRemove }) {
     setPage((p) => (p > totalPages && totalPages > 0 ? totalPages : p));
   }, [totalPages]);
 
-  const allSelected = paginatedCategories.length > 0 && paginatedCategories.every((c) => selectedIds.has(c._id));
+  const allSelected = paginatedProducts.length > 0 && paginatedProducts.every((p) => selectedIds.has(p._id));
   const someSelected = selectedIds.size > 0;
 
   const handleSelectAll = () => {
     if (allSelected) setSelectedIds(new Set());
-    else setSelectedIds(new Set(paginatedCategories.map((c) => c._id)));
+    else setSelectedIds(new Set(paginatedProducts.map((p) => p._id)));
   };
 
   const handleSelectRow = (id) => {
@@ -140,9 +155,9 @@ export default function CategoriesTable({ categories, onOpenEdit, onRemove }) {
 
   const closeMenu = () => setOpenActionId(null);
 
-  const openSingleDeleteConfirm = (cat) => {
+  const openSingleDeleteConfirm = (product) => {
     closeMenu();
-    setDeleteConfirm({ type: 'single', id: cat._id, name: cat.name });
+    setDeleteConfirm({ type: 'single', id: product._id, name: product.name });
   };
 
   const handleBulkDelete = () => {
@@ -166,7 +181,7 @@ export default function CategoriesTable({ categories, onOpenEdit, onRemove }) {
     setPage(1);
   };
 
-  const catForMenu = openActionId ? categories.find((c) => c._id === openActionId) : null;
+  const productForMenu = openActionId ? products.find((p) => p._id === openActionId) : null;
 
   return (
     <>
@@ -181,8 +196,8 @@ export default function CategoriesTable({ categories, onOpenEdit, onRemove }) {
           <Table.SearchInput
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            ariaLabel="Search categories"
-            placeholder="Search categories"
+            ariaLabel="Search products"
+            placeholder="Search products"
           />
         </Table.Toolbar>
       </div>
@@ -206,7 +221,8 @@ export default function CategoriesTable({ categories, onOpenEdit, onRemove }) {
           <Table.Head
             columns={[
               { key: 'name', label: 'Name', sortable: true },
-              { key: 'slug', label: 'Slug', sortable: true },
+              { key: 'category', label: 'Category', sortable: true },
+              { key: 'featured', label: 'Featured', sortable: true },
               { key: 'isActive', label: 'Active', sortable: true },
               { key: 'actions', label: 'Actions', align: 'right' },
             ]}
@@ -220,35 +236,36 @@ export default function CategoriesTable({ categories, onOpenEdit, onRemove }) {
           />
         )}
         <Table.Body>
-          {paginatedCategories.length === 0 ? (
-            <Table.EmptyState colSpan={5} />
+          {paginatedProducts.length === 0 ? (
+            <Table.EmptyState colSpan={6} />
           ) : (
-          paginatedCategories.map((c) => (
-            <Table.Row key={c._id}>
+          paginatedProducts.map((p) => (
+            <Table.Row key={p._id}>
               <Table.SelectionCell
-                checked={selectedIds.has(c._id)}
-                onChange={() => handleSelectRow(c._id)}
-                ariaLabel={`Select ${c.name}`}
+                checked={selectedIds.has(p._id)}
+                onChange={() => handleSelectRow(p._id)}
+                ariaLabel={`Select ${p.name}`}
               />
-              <Table.Td>{c.name}</Table.Td>
+              <Table.Td>{p.name}</Table.Td>
+              <Table.Td>{p.category?.name || '—'}</Table.Td>
               <Table.Td>
-                <code className="rounded bg-slate-100 px-2 py-0.5 text-sm text-slate-600 dark:bg-gray-600 dark:text-gray-300">
-                  {c.slug}
-                </code>
+                <Badge variant={p.featured ? 'info' : 'neutral'} size="md">
+                  {p.featured ? 'Yes' : 'No'}
+                </Badge>
               </Table.Td>
               <Table.Td>
-                <Badge variant={c.isActive !== false ? 'success' : 'warning'} size="md">
-                  {c.isActive !== false ? 'Active' : 'Inactive'}
+                <Badge variant={p.isActive !== false ? 'success' : 'warning'} size="md">
+                  {p.isActive !== false ? 'Active' : 'Inactive'}
                 </Badge>
               </Table.Td>
               <Table.Td align="right" className="whitespace-nowrap">
                 <div className="relative flex justify-end">
                   <button
-                    ref={(el) => (kebabRefs.current[c._id] = el)}
+                    ref={(el) => (kebabRefs.current[p._id] = el)}
                     type="button"
-                    onClick={(e) => openActionMenu(e, c._id)}
+                    onClick={(e) => openActionMenu(e, p._id)}
                     aria-label="Open actions"
-                    aria-expanded={openActionId === c._id}
+                    aria-expanded={openActionId === p._id}
                     aria-haspopup="menu"
                     className="inline-flex items-center justify-center rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-gray-200"
                   >
@@ -273,8 +290,8 @@ export default function CategoriesTable({ categories, onOpenEdit, onRemove }) {
       <Table.ActionMenu
         open={!!openActionId}
         position={menuPosition}
-        onEdit={catForMenu ? () => onOpenEdit(catForMenu) : undefined}
-        onDelete={catForMenu ? () => openSingleDeleteConfirm(catForMenu) : undefined}
+        onEdit={productForMenu ? () => onOpenEdit(productForMenu) : undefined}
+        onDelete={productForMenu ? () => openSingleDeleteConfirm(productForMenu) : undefined}
         onClose={closeMenu}
       />
 
@@ -282,12 +299,12 @@ export default function CategoriesTable({ categories, onOpenEdit, onRemove }) {
         open={!!deleteConfirm}
         onClose={() => setDeleteConfirm(null)}
         onConfirm={handleConfirmDelete}
-        title="Delete category"
+        title="Delete product"
         message={
           deleteConfirm?.type === 'single'
             ? `Are you sure you want to delete "${deleteConfirm.name}"? This cannot be undone.`
             : deleteConfirm?.type === 'bulk'
-              ? `Are you sure you want to delete ${deleteConfirm.ids.length} selected category(ies)? This cannot be undone.`
+              ? `Are you sure you want to delete ${deleteConfirm.ids.length} selected product(s)? This cannot be undone.`
               : ''
         }
         confirmLabel="Delete"

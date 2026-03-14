@@ -2,10 +2,19 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import {
+  MenuIcon,
+  WeatherSunnyIcon,
+  WeatherNightIcon,
+  UserSecretIcon,
+  ChevronDownIcon,
+  CogOutlineIcon,
+  LogoutIcon,
+} from '../icons';
 
 const PROFILE_DROPDOWN_LINKS = [
-  { to: '/dashboard', label: 'Settings', icon: 'icon-[mdi--cog-outline]' },
-  { to: '/dashboard', label: 'Profile', icon: 'icon-[la--user-secret]' },
+  { to: '/dashboard', label: 'Settings', Icon: CogOutlineIcon },
+  { to: '/dashboard', label: 'Profile', Icon: UserSecretIcon },
 ];
 
 export default function AdminHeader({ sidebarOpen, onMenuToggle }) {
@@ -39,7 +48,7 @@ export default function AdminHeader({ sidebarOpen, onMenuToggle }) {
           aria-label={sidebarOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={sidebarOpen}
         >
-          <span className="icon-[mdi--menu] text-2xl" aria-hidden />
+          <MenuIcon className="text-2xl" />
         </button>
         {/* <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Admin</span> */}
       </div>
@@ -52,9 +61,9 @@ export default function AdminHeader({ sidebarOpen, onMenuToggle }) {
           aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         >
           {theme === 'dark' ? (
-            <span className="icon-[mdi--weather-sunny] text-[20px]" aria-hidden />
+            <WeatherSunnyIcon className="text-[22px] cursor-pointer" />
           ) : (
-            <span className="icon-[mdi--weather-night] text-[20px]" aria-hidden />
+            <WeatherNightIcon className="text-[20px] cursor-pointer" />
           )}
         </button>
         <div className="relative" ref={profileRef}>
@@ -65,27 +74,24 @@ export default function AdminHeader({ sidebarOpen, onMenuToggle }) {
             aria-expanded={profileOpen}
             aria-haspopup="true"
             >
-            <span className="icon-[la--user-secret] text-[25px] shrink-0 text-success-dark dark:text-success-light" aria-hidden />
+            <UserSecretIcon className="text-[25px] shrink-0 dark:text-secondary text-primary cursor-pointer" />
             <span className="hidden sm:inline">Profile</span>
-            <span
-              className={`icon-[mdi--chevron-down] text-lg shrink-0 transition-transform duration-200 ${profileOpen ? 'rotate-180' : ''}`}
-              aria-hidden
-            />
+            <ChevronDownIcon className={`text-lg shrink-0 transition-transform duration-200 ${profileOpen ? 'rotate-180' : ''}`} />
           </button>
           {profileOpen && (
             <div
               className="absolute right-0 top-full z-50 mt-2 min-w-[200px] rounded-xl border border-gray-200 bg-white py-2 shadow-xl shadow-gray-200/50 dark:border-gray-600 dark:bg-gray-800 dark:shadow-black/20"
               role="menu"
             >
-            {PROFILE_DROPDOWN_LINKS.map(({ to, label, icon }) => (
+            {PROFILE_DROPDOWN_LINKS.map(({ to, label, Icon: LinkIcon }) => (
               <Link
                 key={label}
                 to={to}
                 role="menuitem"
-                className="flex items-center gap-3 w-full px-4 py-2.5 text-[0.9375rem] font-medium text-gray-700 no-underline transition-colors hover:bg-success/10 hover:text-success-dark dark:text-gray-200 dark:hover:bg-success/20 dark:hover:text-success-light"
+                className="flex items-center gap-3 w-full px-4 py-2.5 text-[0.9375rem] font-medium text-gray-700 no-underline transition-colors hover:bg-primary/10 hover:text-primary dark:text-gray-200 dark:hover:bg-secondary/20 dark:hover:text-secondary"
                 onClick={() => setProfileOpen(false)}
               >
-                <span className={`${icon} text-[20px] shrink-0 opacity-80`} aria-hidden />
+                <LinkIcon className="text-[20px] shrink-0 opacity-80" />
                 {label}
               </Link>
             ))}
@@ -96,7 +102,7 @@ export default function AdminHeader({ sidebarOpen, onMenuToggle }) {
               className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-[0.9375rem] font-medium text-gray-700 transition-colors hover:bg-error-lighter hover:text-error dark:text-gray-200 dark:hover:bg-error-lighter/30 dark:hover:text-error-light"
               onClick={handleLogout}
             >
-              <span className="icon-[mdi--logout] text-[20px] shrink-0 opacity-80" aria-hidden />
+              <LogoutIcon className="text-[20px] shrink-0 opacity-80" />
               Logout
             </button>
             </div>

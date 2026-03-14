@@ -37,4 +37,6 @@ export {
   LogoutIcon,
   LoginIcon,
   CartOutlineIcon,
+  MenuIcon,
+  UserSecretIcon,
 } from './Icon';

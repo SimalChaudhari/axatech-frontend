@@ -18,6 +18,7 @@ export function getValidationError(schema, value) {
 /**
  * Reusable form input with label, optional error, and optional Zod validation.
  * @param {string} [label] - Label text
+ * @param {boolean} [required] - If true, shows an asterisk (*) after the label to indicate required field
  * @param {string} [type='text'] - Input type (text, email, password, etc.)
  * @param {string} [id] - Input id (for label htmlFor)
  * @param {string} [className] - Extra classes for wrapper
@@ -27,6 +28,7 @@ export function getValidationError(schema, value) {
  */
 export default function Input({
   label,
+  required = false,
   type = 'text',
   id,
   className = '',
@@ -74,13 +76,14 @@ export default function Input({
       {label && (
         <label htmlFor={inputId} className="block font-medium mb-1.5 text-text dark:text-gray-300">
           {label}
+          {required && <span className="text-error" aria-hidden="true"> *</span>}
         </label>
       )}
       <div className="relative">
         <input
           id={inputId}
           type={inputType}
-          className={`w-full py-3 text-base border rounded-[10px] bg-white dark:bg-gray-700 text-text dark:text-gray-200 transition-colors ${isPassword ? 'pl-4 pr-11' : 'px-4'} ${error ? 'border-error focus:border-error focus:ring-2 focus:ring-error/20 focus:outline-none' : 'border-border focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20'}`}
+          className={`w-full py-3 text-base border-2 rounded-[10px] bg-white dark:bg-gray-700 text-text dark:text-gray-200 transition-colors ${isPassword ? 'pl-4 pr-11' : 'px-4'} ${type === 'number' ? '[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-outer-spin-button]:m-0 [-moz-appearance:textfield] appearance-[textfield]' : ''} ${error ? 'border-error focus:border-error focus:ring-2 focus:ring-error/20 focus:outline-none' : 'border-border focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20'}`}
           aria-invalid={!!error}
           aria-describedby={error ? `${inputId}-error` : undefined}
           onChange={handleChange}
