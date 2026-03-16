@@ -14,7 +14,7 @@ const TYPE_OPTIONS = [
   { value: 'multi', label: 'Multi' },
 ];
 
-export default function LicensesTable({ plans, onOpenEdit, onRemove }) {
+export default function LicensesTable({ plans, onOpenEdit, onRemove, loading = false }) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -256,7 +256,9 @@ export default function LicensesTable({ plans, onOpenEdit, onRemove }) {
           />
         )}
         <Table.Body>
-          {paginatedPlans.length === 0 ? (
+          {loading ? (
+            <Table.LoadingState colSpan={6} />
+          ) : paginatedPlans.length === 0 ? (
             <Table.EmptyState colSpan={6} />
           ) : (
           paginatedPlans.map((p) => (

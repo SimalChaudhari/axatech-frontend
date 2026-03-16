@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { z } from 'zod';
 import { useAuth } from '../../context/AuthContext';
 import { Input, Button } from '../../components/common';
+import { toast } from '../../utils/toast';
 
 const loginSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Enter a valid email'),
@@ -50,9 +51,12 @@ export default function Login() {
     setLoading(true);
     try {
       const user = await login(email, password);
+      toast.success('Signed in successfully');
       navigate(user.role === 'admin' ? '/admin' : '/dashboard');
     } catch (err) {
-      setError(err.message || 'Login failed');
+      const msg = err.message || 'Login failed';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

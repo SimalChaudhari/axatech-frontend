@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { TrashIcon, PenIcon, ChevronLeftIcon, ChevronRightIcon, ArrowUpIcon, CloseIcon, SearchIcon } from '../icons';
-import { Dropdown, Checkbox } from './index';
+import { TrashIcon, PenIcon, EyeIcon, ChevronLeftIcon, ChevronRightIcon, ArrowUpIcon, CloseIcon, SearchIcon } from '../icons';
+import { Dropdown, Checkbox, Loader } from './index';
 import Badge from './Badge';
 
 const tableClass = 'w-full border-collapse text-sm';
@@ -98,6 +98,33 @@ function EmptyState({ colSpan, message = 'No data', className = '' }) {
 }
 
 Table.EmptyState = EmptyState;
+
+/**
+ * Single row shown while table data is loading from API.
+ * Shows centered Loader inside the same styled container as EmptyState.
+ * @param {number} colSpan - Number of columns to span
+ * @param {string} [message='Loading...'] - Optional text to show below the loader
+ * @param {string} [className] - Extra classes for the td
+ */
+function LoadingState({ colSpan, message = 'Loading...', className = '' }) {
+  return (
+    <tr>
+      <td
+        colSpan={colSpan}
+        className={`${tdBaseClass} border-0 py-8 align-middle ${className}`.trim()}
+      >
+        <div className="mx-auto flex max-w-full flex-col items-center justify-center gap-5 py-10 rounded-xl border border-slate-200/80 bg-white dark:border-gray-600/80 dark:bg-gray-800/80">
+          <Loader />
+          {message && (
+            <p className="text-lg font-medium text-slate-500 dark:text-gray-400">{message}</p>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+Table.LoadingState = LoadingState;
 
 function Row({ children, className = '', hover = true }) {
   return (
@@ -486,7 +513,7 @@ function TablePagination({
 
 Table.Pagination = TablePagination;
 
-function ActionMenu({ open, position, onEdit, onDelete, onClose }) {
+function ActionMenu({ open, position, onView, onEdit, onDelete, onClose }) {
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -508,30 +535,48 @@ function ActionMenu({ open, position, onEdit, onDelete, onClose }) {
       className={actionMenuClass}
       style={{ top: position.top, left: position.left }}
     >
-      <button
-        type="button"
-        role="menuitem"
-        className={actionMenuItemClass}
-        onClick={() => {
-          onEdit?.();
-          onClose?.();
-        }}
-      >
-        <PenIcon className="text-lg text-slate-500 dark:text-gray-400" />
-        Edit
-      </button>
-      <button
-        type="button"
-        role="menuitem"
-        className={actionMenuDeleteClass}
-        onClick={() => {
-          onDelete?.();
-          onClose?.();
-        }}
-      >
-        <TrashIcon className="text-lg" />
-        Delete
-      </button>
+      {onView && (
+        <button
+          type="button"
+          role="menuitem"
+          className={actionMenuItemClass}
+          onClick={() => {
+            onView?.();
+            onClose?.();
+          }}
+        >
+          <EyeIcon className="text-lg text-slate-500 dark:text-gray-400" />
+          View
+        </button>
+      )}
+      {onEdit && (
+        <button
+          type="button"
+          role="menuitem"
+          className={actionMenuItemClass}
+          onClick={() => {
+            onEdit?.();
+            onClose?.();
+          }}
+        >
+          <PenIcon className="text-lg text-slate-500 dark:text-gray-400" />
+          Edit
+        </button>
+      )}
+      {onDelete && (
+        <button
+          type="button"
+          role="menuitem"
+          className={actionMenuDeleteClass}
+          onClick={() => {
+            onDelete?.();
+            onClose?.();
+          }}
+        >
+          <TrashIcon className="text-lg" />
+          Delete
+        </button>
+      )}
     </div>,
     document.body
   );

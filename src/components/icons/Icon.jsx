@@ -29,6 +29,15 @@ export function SearchIcon({ className = '' }) {
   return <Icon iconClass="icon-[mdi--magnify]" className={className} />;
 }
 
+// Password visibility (show / hide)
+export function EyeIcon({ className = '' }) {
+  return <Icon iconClass="icon-[streamline--eye-optic]" className={className} />;
+}
+
+export function EyeOffIcon({ className = '' }) {
+  return <Icon iconClass="icon-[ph--eye-closed-duotone]" className={className} />;
+}
+
 // Close (modal / drawer)
 export function CloseIcon({ className = '' }) {
   return <Icon iconClass="icon-[mdi--close]" className={className} />;
@@ -172,4 +181,36 @@ export function MenuIcon({ className = '' }) {
 // Profile / user (la user-secret)
 export function UserSecretIcon({ className = '' }) {
   return <Icon iconClass="icon-[la--user-secret]" className={className} />;
+}
+
+// Video play / pause
+export function PlayIcon({ className = '' }) {
+  return <Icon iconClass="icon-[stash--play-btn-light]" className={className} />;
+}
+
+export function PauseIcon({ className = '' }) {
+  return <Icon iconClass="icon-[si--pause-presentation-line]" className={className} />;
+}
+
+// List / bulleted (plans, lists)
+export function FormatListBulletedIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--format-list-bulleted]" className={className} />;
+}
+
+// Home featured addons specific
+export function PackageVariantIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--package-variant]" className={className} />;
+}
+
+export function ArrowRightIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--arrow-right]" className={className} />;
+}
+
+export function AppsIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--apps]" className={className} />;
+}
+
+// Admin: Projects (portfolio)
+export function ProjectsIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--briefcase-outline]" className={className} />;
 }

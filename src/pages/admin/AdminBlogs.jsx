@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../../api';
+import { toast } from '../../utils/toast';
 import { Button } from '../../components/common';
 
 const inputClass = 'w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-secondary dark:focus:ring-secondary/20';
@@ -47,7 +48,7 @@ export default function AdminBlogs() {
       try {
         imageFilename = await api.upload(imageFile);
       } catch (e) {
-        alert('Image upload failed: ' + e.message);
+        toast.error('Image upload failed: ' + e.message);
         return;
       }
     }
@@ -63,12 +64,17 @@ export default function AdminBlogs() {
     };
     if (imageFilename) payload.image = imageFilename;
     try {
-      if (editing === 'new') await api.admin.blogs.create(payload);
-      else await api.admin.blogs.update(editing, payload);
+      if (editing === 'new') {
+        await api.admin.blogs.create(payload);
+        toast.success('Blog post created');
+      } else {
+        await api.admin.blogs.update(editing, payload);
+        toast.success('Blog post updated');
+      }
       setEditing(null);
       load();
     } catch (e) {
-      alert(e.message);
+      toast.error(e.message || 'Failed to save blog post');
     }
   };
 
@@ -76,10 +82,11 @@ export default function AdminBlogs() {
     if (!confirm('Delete this post?')) return;
     try {
       await api.admin.blogs.delete(id);
+      toast.success('Blog post deleted');
       setEditing(null);
       load();
     } catch (e) {
-      alert(e.message);
+      toast.error(e.message || 'Failed to delete blog post');
     }
   };
 

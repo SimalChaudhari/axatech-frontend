@@ -62,18 +62,14 @@ export default function CategoriesModal({ mode = 'create', form, setForm, onSave
               placeholder="Slug (optional – auto-generated from name if blank)"
               className="mb-0"
             />
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-600 dark:text-gray-400">
-                Description
-              </label>
-              <textarea
-                className={textareaClass}
-                placeholder="Optional description"
-                value={form.description}
-                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                rows={2}
-              />
-            </div>
+            <Input
+              label="Description"
+              type="textarea"
+              value={form.description}
+              onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+              placeholder="Optional description"
+              className="mb-0"
+            />
             <div className="flex flex-col justify-end pb-0.5">
               <span className="mb-2 block text-sm font-medium text-slate-600 dark:text-gray-400">Status</span>
               <Checkbox

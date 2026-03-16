@@ -1,18 +1,26 @@
-import { Button } from '../common';
+import { Button, Checkbox } from '../common';
 
-export default function ProductCard({ product, index = 0 }) {
+export default function ProductCard({ product, index = 0, selected = false, onToggle }) {
   const descriptionSnippet = product.shortDescription ||
     (product.description?.slice(0, 100) + (product.description?.length > 100 ? '…' : ''));
 
   return (
     <div
-      className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden flex flex-col shadow-sm dark:shadow-none transition-all duration-300 hover:border-primary/30 dark:hover:border-secondary/40 hover:shadow-xl hover:shadow-primary/5 dark:hover:shadow-none hover:-translate-y-1 animate-fadeInUpSlow"
+      className="group relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden flex flex-col shadow-sm dark:shadow-none transition-all duration-300 hover:border-primary/30 dark:hover:border-secondary/40 hover:shadow-xl hover:shadow-primary/5 dark:hover:shadow-none hover:-translate-y-1 animate-fadeInUpSlow"
       style={{ animationDelay: `${0.3 + index * 0.06}s` }}
     >
-      {product.image && (
+      <div className="absolute top-3 right-3 z-10">
+        <Checkbox
+          size="sm"
+          aria-label="Select product"
+          checked={selected}
+          onChange={(e) => onToggle?.(product._id, e.target.checked)}
+        />
+      </div>
+      {(product.images?.[0]) && (
         <div className="h-48 bg-gray-100 dark:bg-gray-700 overflow-hidden">
           <img
-            src={product.image}
+            src={product.images[0]}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />

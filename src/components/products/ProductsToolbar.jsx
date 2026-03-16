@@ -130,7 +130,10 @@ export default function ProductsToolbar({
   onCategoryChange,
   categories,
   showCategoryDropdown = false,
+  selectedProductIds = [],
 }) {
+  const hasSelection = selectedProductIds.length > 0;
+
   return (
     <div className="flex flex-wrap gap-4 items-center mb-10 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
       <form onSubmit={onSearchSubmit} className="flex gap-3 flex-1 min-w-[200px]">
@@ -142,7 +145,7 @@ export default function ProductsToolbar({
           className="flex-1 mb-0 min-w-0"
         />
         <Button
-          size='lg'
+          size="lg"
           type="submit"
           variant="primary"
           fullWidth={false}
@@ -150,6 +153,19 @@ export default function ProductsToolbar({
         >
           Search
         </Button>
+        {hasSelection && (
+          <Button
+            size="lg"
+            type="button"
+            variant="secondary"
+            fullWidth={false}
+            to="/contact"
+            state={{ enquiryType: 'product', productIds: selectedProductIds }}
+            className="w-[140px] px-6 py-3 rounded-xl hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 whitespace-nowrap"
+          >
+            Enquiry
+          </Button>
+        )}
       </form>
       {showCategoryDropdown && (
         <div className="lg:hidden w-full sm:w-auto max-w-[220px] sm:max-w-[220px]">

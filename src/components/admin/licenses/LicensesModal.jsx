@@ -118,28 +118,22 @@ export default function LicensesModal({ mode = 'create', form, setForm, onSave, 
                 />
               </div>
             </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-600 dark:text-gray-400">Description</label>
-              <textarea
-                className={textareaClass}
-                value={form.description}
-                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                placeholder="Optional description"
-                rows={2}
-              />
-            </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-600 dark:text-gray-400">
-                Features (one per line)
-              </label>
-              <textarea
-                className={textareaClass}
-                value={form.features}
-                onChange={(e) => setForm((f) => ({ ...f, features: e.target.value }))}
-                placeholder="One feature per line"
-                rows={3}
-              />
-            </div>
+            <Input
+              label="Description"
+              type="textarea"
+              value={form.description}
+              onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+              placeholder="Optional description"
+              className="mb-0"
+            />
+            <Input
+              label="Features (one per line)"
+              type="textarea"
+              value={form.features}
+              onChange={(e) => setForm((f) => ({ ...f, features: e.target.value }))}
+              placeholder="One feature per line"
+              className="mb-0"
+            />
       </div>
     </Modal>
   );

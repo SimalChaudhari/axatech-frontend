@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import api from '../../api';
+import { toast } from '../../utils/toast';
 import { ContactHero, ContactSuccess, ContactForm } from '../../components/contact';
 
 export default function Contact() {
@@ -35,8 +36,11 @@ export default function Contact() {
     try {
       await api.enquiry(form);
       setSent(true);
+      toast.success('Enquiry submitted successfully. We will get back to you soon.');
     } catch (err) {
-      setError(err.message || 'Failed to submit');
+      const msg = err.message || 'Failed to submit';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

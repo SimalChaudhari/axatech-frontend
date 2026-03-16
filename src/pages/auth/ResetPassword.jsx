@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { z } from 'zod';
 import api from '../../api';
+import { toast } from '../../utils/toast';
 import { Input, Button } from '../../components/common';
 
 const schema = z.object({
@@ -39,9 +40,12 @@ export default function ResetPassword() {
     try {
       await api.auth.resetPassword(token, password);
       setSuccess(true);
+      toast.success('Password reset successfully. Redirecting to login...');
       setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
-      setError(err.message || 'Failed to reset password');
+      const msg = err.message || 'Failed to reset password';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

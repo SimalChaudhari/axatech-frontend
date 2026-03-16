@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { Input, Dropdown, Checkbox } from '../../common';
+import { Input, Dropdown, Checkbox, Upload } from '../../common';
 
 const textareaClass =
   'w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-800 placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-secondary dark:focus:ring-secondary/20 min-h-[80px] resize-y';
@@ -7,12 +6,15 @@ const textareaClass =
 export default function ProductForm({
   form,
   setForm,
-  imageFile,
-  setImageFile,
+  imageFiles = [],
+  setImageFiles,
+  videoFile,
+  setVideoFile,
   categories = [],
   errors = {},
   onValidateField,
   onClearError,
+  existingImageUrls = [],
 }) {
   const categoryOptions = categories.map((c) => ({ value: c._id, label: c.name }));
 
@@ -29,8 +31,8 @@ export default function ProductForm({
             onClearError?.('name');
           }}
           onBlur={() => onValidateField?.('name')}
-          error={errors.name}
           placeholder="Name"
+          error={errors.name}
           className="mb-0"
         />
         <Input
@@ -43,8 +45,8 @@ export default function ProductForm({
             onClearError?.('slug');
           }}
           onBlur={() => onValidateField?.('slug')}
-          error={errors.slug}
           placeholder="Slug (e.g. my-product)"
+          error={errors.slug}
           className="mb-0"
         />
       </div>
@@ -58,39 +60,29 @@ export default function ProductForm({
         className="mb-0"
       />
 
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-slate-600 dark:text-gray-400">
-          Description
-        </label>
-        <textarea
-          className={textareaClass}
-          placeholder="Description"
-          value={form.description}
-          onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-          rows={3}
-        />
-      </div>
+      <Input
+        label="Description"
+        type="textarea"
+        value={form.description}
+        onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+        placeholder="Description"
+        className="mb-0"
+      />
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <Dropdown
           label="Category"
           placeholder="No category"
           value={form.category}
-          onChange={(v) => setForm((f) => ({ ...f, category: v }))}
+          onChange={(v) => {
+            setForm((f) => ({ ...f, category: v }));
+            onClearError?.('category');
+          }}
           options={categoryOptions}
           showPlaceholderOption={true}
           className="mb-0"
         />
-        <Input
-          label="Demo video URL"
-          type="url"
-          value={form.demoVideoLink}
-          onChange={(e) => setForm((f) => ({ ...f, demoVideoLink: e.target.value }))}
-          placeholder="https://..."
-          className="mb-0"
-        />
-      </div>
-
+        
       <div className="flex flex-wrap items-center gap-6">
         <div className="flex flex-col justify-end pb-0.5">
           <span className="mb-2 block text-sm font-medium text-slate-600 dark:text-gray-400">Featured</span>
@@ -111,16 +103,51 @@ export default function ProductForm({
           />
         </div>
       </div>
+      </div>
+
+      
+      <div>
+          <Upload
+            label="Demo video"
+            accept="video/*"
+            file={videoFile}
+            onFileChange={setVideoFile}
+            existingUrl={!videoFile && form.demoVideoLink?.trim() ? form.demoVideoLink.trim() : undefined}
+          />
+        </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-slate-600 dark:text-gray-400">
-          Image
-        </label>
-        <input
-          type="file"
+        {existingImageUrls.length > 0 && (
+          <div className="mb-3">
+            <p className="mb-2 text-xs font-medium text-slate-500 dark:text-gray-400">Current images</p>
+            <div className="flex flex-wrap gap-3">
+              {existingImageUrls.map((url, index) => (
+                <div key={url + index} className="relative group">
+                  <div className="relative h-24 w-24 rounded-xl overflow-hidden border-2 border-slate-200 dark:border-gray-600 bg-slate-100 dark:bg-gray-700 shrink-0 shadow-sm">
+                    <img src={url} alt="" className="h-full w-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, images: (f.images || []).filter((_, i) => i !== index) }))}
+                      aria-label="Remove image"
+                      className="absolute top-1 right-1 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600 text-xs"
+                    >
+                      <span className="icon-[mdi--close]" aria-hidden />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        <Upload
+          label="Images"
           accept="image/*"
-          className="block w-full text-sm text-slate-600 file:mr-2 file:rounded file:border-0 file:bg-primary file:px-3 file:py-1.5 file:font-medium file:text-white dark:text-gray-400"
-          onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+          multiple
+          files={imageFiles}
+          onFilesChange={(files) => {
+            onClearError?.('images');
+            setImageFiles(files);
+          }}
         />
       </div>
     </div>

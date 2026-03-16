@@ -9,7 +9,7 @@ const STATUS_TABS = [
   { value: 'inactive', label: 'Inactive', variant: 'warning', activeVariant: 'warning', activeSolid: true },
 ];
 
-export default function ProductsTable({ products = [], onOpenEdit, onRemove }) {
+export default function ProductsTable({ products = [], onOpenEdit, onRemove, loading = false }) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [openActionId, setOpenActionId] = useState(null);
@@ -170,7 +170,7 @@ export default function ProductsTable({ products = [], onOpenEdit, onRemove }) {
     if (deleteConfirm.type === 'single') {
       onRemove(deleteConfirm.id);
     } else {
-      deleteConfirm.ids.forEach((id) => onRemove(id));
+      onRemove(deleteConfirm.ids);
       setSelectedIds(new Set());
     }
     setDeleteConfirm(null);
@@ -236,7 +236,9 @@ export default function ProductsTable({ products = [], onOpenEdit, onRemove }) {
           />
         )}
         <Table.Body>
-          {paginatedProducts.length === 0 ? (
+          {loading ? (
+            <Table.LoadingState colSpan={6} />
+          ) : paginatedProducts.length === 0 ? (
             <Table.EmptyState colSpan={6} />
           ) : (
           paginatedProducts.map((p) => (

@@ -8,7 +8,7 @@ const STATUS_TABS = [
   { value: 'inactive', label: 'Inactive', variant: 'warning', activeVariant: 'warning', activeSolid: true },
 ];
 
-export default function CategoriesTable({ categories, onOpenEdit, onRemove }) {
+export default function CategoriesTable({ categories, onOpenEdit, onRemove, loading = false }) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [openActionId, setOpenActionId] = useState(null);
@@ -220,7 +220,9 @@ export default function CategoriesTable({ categories, onOpenEdit, onRemove }) {
           />
         )}
         <Table.Body>
-          {paginatedCategories.length === 0 ? (
+          {loading ? (
+            <Table.LoadingState colSpan={5} />
+          ) : paginatedCategories.length === 0 ? (
             <Table.EmptyState colSpan={5} />
           ) : (
           paginatedCategories.map((c) => (

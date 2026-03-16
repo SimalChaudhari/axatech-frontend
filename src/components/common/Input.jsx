@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { z } from 'zod';
+import { EyeIcon, EyeOffIcon } from '../icons/Icon';
 
 /**
  * Run Zod schema validation and return the first error message or null.
@@ -19,7 +20,7 @@ export function getValidationError(schema, value) {
  * Reusable form input with label, optional error, and optional Zod validation.
  * @param {string} [label] - Label text
  * @param {boolean} [required] - If true, shows an asterisk (*) after the label to indicate required field
- * @param {string} [type='text'] - Input type (text, email, password, etc.)
+ * @param {string} [type='text'] - Input type (text, email, password, textarea, etc.)
  * @param {string} [id] - Input id (for label htmlFor)
  * @param {string} [className] - Extra classes for wrapper
  * @param {string} [error] - Error message from parent (e.g. form-level validation)
@@ -42,6 +43,7 @@ export default function Input({
   const inputId = id || (label ? `input-${label.replace(/\s+/g, '-').toLowerCase()}` : undefined);
   const value = inputProps.value ?? '';
   const isPassword = type === 'password';
+  const isTextarea = type === 'textarea';
   const inputType = isPassword ? (showPassword ? 'text' : 'password') : type;
 
   const validate = useCallback(() => {
@@ -71,6 +73,8 @@ export default function Input({
 
   const error = (errorProp && String(errorProp).trim()) ? errorProp : touchedError;
 
+  const inputClassName = `w-full py-3 text-base border-2 rounded-[10px] bg-white dark:bg-gray-700 text-text dark:text-gray-200 transition-colors ${isPassword ? 'pl-4 pr-11' : 'px-4'} ${type === 'number' ? '[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-outer-spin-button]:m-0 [-moz-appearance:textfield] appearance-[textfield]' : ''} ${isTextarea ? 'min-h-[120px] resize-y' : ''} ${error ? 'border-error focus:border-error focus:ring-2 focus:ring-error/20 focus:outline-none' : 'border-border focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20'}`;
+
   return (
     <div className={className || 'mb-4'}>
       {label && (
@@ -80,16 +84,32 @@ export default function Input({
         </label>
       )}
       <div className="relative">
-        <input
-          id={inputId}
-          type={inputType}
-          className={`w-full py-3 text-base border-2 rounded-[10px] bg-white dark:bg-gray-700 text-text dark:text-gray-200 transition-colors ${isPassword ? 'pl-4 pr-11' : 'px-4'} ${type === 'number' ? '[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-outer-spin-button]:m-0 [-moz-appearance:textfield] appearance-[textfield]' : ''} ${error ? 'border-error focus:border-error focus:ring-2 focus:ring-error/20 focus:outline-none' : 'border-border focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20'}`}
-          aria-invalid={!!error}
-          aria-describedby={error ? `${inputId}-error` : undefined}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          {...inputProps}
-        />
+        {isTextarea ? (
+          <textarea
+            id={inputId}
+            name={inputProps.name}
+            placeholder={inputProps.placeholder}
+            required={required}
+            value={value}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            className={inputClassName}
+            aria-invalid={!!error}
+            aria-describedby={error ? `${inputId}-error` : undefined}
+            {...Object.fromEntries(Object.entries(inputProps).filter(([k]) => !['name', 'placeholder', 'required', 'value', 'onChange', 'onBlur'].includes(k)))}
+          />
+        ) : (
+          <input
+            id={inputId}
+            type={inputType}
+            className={inputClassName}
+            aria-invalid={!!error}
+            aria-describedby={error ? `${inputId}-error` : undefined}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            {...inputProps}
+          />
+        )}
         {isPassword && (
           <button
             type="button"
@@ -98,7 +118,7 @@ export default function Input({
             aria-label={showPassword ? 'Hide password' : 'Show password'}
             tabIndex={-1}
           >
-            <span className={showPassword ? 'icon-[ph--eye-closed-duotone] text-[26px]' : 'icon-[streamline--eye-optic] text-[22px]'} aria-hidden />
+            {showPassword ? <EyeOffIcon className="text-[26px]" /> : <EyeIcon className="text-[22px]" />}
           </button>
         )}
       </div>

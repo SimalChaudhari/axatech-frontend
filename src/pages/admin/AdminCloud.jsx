@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../../api';
+import { toast } from '../../utils/toast';
 import { Button } from '../../components/common';
 
 const inputClass = 'w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-secondary dark:focus:ring-secondary/20';
@@ -47,12 +48,17 @@ export default function AdminCloud() {
       isActive: form.isActive,
     };
     try {
-      if (editing === 'new') await api.admin.cloud.create(payload);
-      else await api.admin.cloud.update(editing, payload);
+      if (editing === 'new') {
+        await api.admin.cloud.create(payload);
+        toast.success('Cloud plan created');
+      } else {
+        await api.admin.cloud.update(editing, payload);
+        toast.success('Cloud plan updated');
+      }
       setEditing(null);
       load();
     } catch (e) {
-      alert(e.message);
+      toast.error(e.message || 'Failed to save cloud plan');
     }
   };
 
@@ -60,10 +66,11 @@ export default function AdminCloud() {
     if (!confirm('Delete this plan?')) return;
     try {
       await api.admin.cloud.delete(id);
+      toast.success('Cloud plan deleted');
       setEditing(null);
       load();
     } catch (e) {
-      alert(e.message);
+      toast.error(e.message || 'Failed to delete cloud plan');
     }
   };
 

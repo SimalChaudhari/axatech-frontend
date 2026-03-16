@@ -48,6 +48,19 @@ export const api = {
     fd.append('file', file);
     return formRequest('/upload', 'POST', fd).then((r) => r.filename || r.url);
   },
+  uploadProjectImage: (file) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    return formRequest('/upload/project-image', 'POST', fd).then((r) => r.filename || r.url);
+  },
+  projects: (params) => {
+    const clean = params && Object.fromEntries(
+      Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== '')
+    ) || {};
+    const q = new URLSearchParams(clean).toString();
+    return request(`/projects${q ? `?${q}` : ''}`);
+  },
+  project: (slug) => request(`/projects/${slug}`),
   blogs: (params) => {
     const clean = params && Object.fromEntries(
       Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== '')
@@ -80,6 +93,7 @@ export const api = {
       create: (body) => request('/products', { method: 'POST', body: JSON.stringify(body) }),
       update: (id, body) => request(`/products/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
       delete: (id) => request(`/products/${id}`, { method: 'DELETE' }),
+      deleteBulk: (ids) => request('/products/bulk-delete', { method: 'POST', body: JSON.stringify({ ids }) }),
     },
     services: {
       list: () => request('/services?all=1'),
@@ -104,6 +118,13 @@ export const api = {
       create: (body) => request('/blogs', { method: 'POST', body: JSON.stringify(body) }),
       update: (id, body) => request(`/blogs/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
       delete: (id) => request(`/blogs/${id}`, { method: 'DELETE' }),
+    },
+    projects: {
+      list: (params) => request(`/projects?all=1${params ? `&${new URLSearchParams(params)}` : ''}`),
+      create: (body) => request('/projects', { method: 'POST', body: JSON.stringify(body) }),
+      update: (id, body) => request(`/projects/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+      delete: (id) => request(`/projects/${id}`, { method: 'DELETE' }),
+      deleteBulk: (ids) => request('/projects/bulk-delete', { method: 'POST', body: JSON.stringify({ ids }) }),
     },
   },
 };

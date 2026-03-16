@@ -39,4 +39,13 @@ export {
   CartOutlineIcon,
   MenuIcon,
   UserSecretIcon,
+  PlayIcon,
+  PauseIcon,
+  FormatListBulletedIcon,
+  PackageVariantIcon,
+  ArrowRightIcon,
+  AppsIcon,
+  ProjectsIcon,
+  EyeIcon,
+  EyeOffIcon,
 } from './Icon';

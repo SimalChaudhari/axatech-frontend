@@ -1,6 +1,11 @@
 import ProductCard from './ProductCard';
 
-export default function ProductsGrid({ products, loading }) {
+export default function ProductsGrid({
+  products,
+  loading,
+  selectedProductIds = [],
+  onToggleProduct,
+}) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 animate-fadeInUp">
@@ -21,7 +26,13 @@ export default function ProductsGrid({ products, loading }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
       {products.map((p, index) => (
-        <ProductCard key={p._id} product={p} index={index} />
+        <ProductCard
+          key={p._id}
+          product={p}
+          index={index}
+          selected={selectedProductIds.includes(p._id)}
+          onToggle={onToggleProduct}
+        />
       ))}
     </div>
   );

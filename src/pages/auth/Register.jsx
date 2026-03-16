@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { z } from 'zod';
 import { useAuth } from '../../context/AuthContext';
 import { Input, Button } from '../../components/common';
+import { toast } from '../../utils/toast';
 
 const registerSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -44,9 +45,12 @@ export default function Register() {
     setLoading(true);
     try {
       await register(form);
+      toast.success('Account created successfully');
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message || 'Registration failed');
+      const msg = err.message || 'Registration failed';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

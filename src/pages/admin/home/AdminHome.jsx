@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../../../api';
+import { toast } from '../../../utils/toast';
 import { Button } from '../../../components/common';
 import {
   HomeContentLoading,
@@ -40,8 +41,11 @@ export default function AdminHome() {
     try {
       await api.admin.home.update(content);
       setMessage('Saved successfully.');
+      toast.success('Home content saved');
     } catch (err) {
-      setMessage(err.message || 'Error saving');
+      const msg = err.message || 'Error saving';
+      setMessage(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
     }

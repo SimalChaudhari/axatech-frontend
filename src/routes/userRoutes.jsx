@@ -6,6 +6,8 @@ import Products from '../pages/products/Products';
 import ProductDetail from '../pages/products/ProductDetail';
 import Services from '../pages/services/Services';
 import ServiceDetail from '../pages/services/ServiceDetail';
+import Projects from '../pages/projects/Projects';
+import ProjectDetail from '../pages/projects/ProjectDetail';
 import CloudHosting from '../pages/cloudHosting/CloudHosting';
 import Contact from '../pages/contact/Contact';
 import Blog from '../pages/blog/Blog';
@@ -22,6 +24,8 @@ export function getUserRoutes() {
       <Route path="products/:slug" element={<ProductDetail />} />
       <Route path="services" element={<Services />} />
       <Route path="services/:slug" element={<ServiceDetail />} />
+      <Route path="projects" element={<Projects />} />
+      <Route path="projects/:slug" element={<ProjectDetail />} />
       <Route path="cloud-hosting" element={<CloudHosting />} />
       <Route path="contact" element={<Contact />} />
       <Route path="blog" element={<Blog />} />

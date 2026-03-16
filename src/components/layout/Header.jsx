@@ -27,17 +27,18 @@ const NAV_LINKS = [
   { to: '/services', label: 'Services' },
   { to: '/cloud-hosting', label: 'Cloud Hosting' },
   { to: '/blog', label: 'Blog' },
-  { to: '/contact', label: 'Contact' },
+  // { to: '/contact', label: 'Contact' },
+  { to: '/projects', label: 'Projects' },
 ];
 
 const getNavLinkClassName = ({ isActive }) =>
-  `block text-[0.9375rem] font-medium px-3 py-2.5 rounded-lg transition-all duration-200 max-[900px]:py-3 max-[900px]:px-4 max-[900px]:text-base max-[900px]:rounded-xl ${isActive
+  `block text-[0.9375rem] font-medium px-3 py-2.5 rounded-lg transition-all duration-200 whitespace-nowrap max-[900px]:py-3 max-[900px]:px-4 max-[900px]:text-base max-[900px]:rounded-xl ${isActive
     ? 'text-primary-hover font-semibold bg-primary/10 dark:text-secondary dark:bg-secondary/20 dark:font-semibold max-[900px]:bg-primary/20 max-[900px]:dark:bg-secondary/25 max-[900px]:border-l-4 max-[900px]:border-primary max-[900px]:dark:border-secondary max-[900px]:pl-[calc(1rem-4px)]'
     : 'text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-primary/5 dark:hover:text-secondary dark:hover:bg-secondary/15 max-[900px]:hover:bg-primary/10 max-[900px]:dark:hover:bg-secondary/15'
   }`;
 
-const actionLinkClass =
-  'inline-flex items-center justify-center gap-1.5 text-[0.9375rem] font-semibold text-primary dark:text-gray-200 px-4 py-2.5 rounded-xl border border-primary/30 dark:border-secondary/40 transition-all duration-200 hover:bg-primary/10 hover:border-primary dark:hover:bg-secondary/20 dark:hover:border-secondary max-[900px]:w-full max-[900px]:py-3';
+const actionBtnBase =
+  'inline-flex items-center justify-center gap-2 min-w-[7rem] text-[0.9375rem] font-semibold py-2.5 px-5 rounded-xl transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 max-[900px]:w-full max-[900px]:py-3';
 
 const utilityLinkClass =
   'inline-flex items-center gap-2 text-[0.8125rem] font-medium text-gray-600 dark:text-gray-400 no-underline transition-colors duration-200 hover:text-primary dark:hover:text-secondary [&>span]:opacity-80';
@@ -63,7 +64,7 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
   return (
     <header
       data-theme={theme}
-      className="sticky top-0 z-100 bg-white dark:bg-gray-900 border-b border-gray-200/80 dark:border-gray-700/80 shadow-sm dark:shadow-none"
+      className="sticky top-0 z-8 bg-white dark:bg-gray-900 border-b border-gray-200/80 dark:border-gray-700/80 shadow-sm dark:shadow-none"
     >
       {/* Top bar - hidden on mobile to avoid duplicate with sidebar header */}
       <div className="hidden min-[901px]:block bg-gray-50 dark:bg-gray-900 border-b border-gray-200/80 dark:border-gray-700/80">
@@ -135,11 +136,11 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
           </div>
 
           <nav
-            className={`flex items-center gap-0.5 flex-1 justify-end max-[900px]:absolute max-[900px]:top-full max-[900px]:left-0 max-[900px]:right-0 max-[900px]:flex-col max-[900px]:items-stretch max-[900px]:bg-white max-[900px]:dark:bg-gray-900 max-[900px]:border-b max-[900px]:border-gray-200 max-[900px]:dark:border-gray-700 max-[900px]:shadow-xl max-[900px]:rounded-b-2xl max-[900px]:overflow-y-auto max-[900px]:max-h-[calc(100vh-120px)] max-[900px]:pt-0 ${menuOpen ? 'max-[900px]:flex' : 'max-[900px]:hidden'
+            className={`flex items-center gap-0.5 flex-1 justify-end max-[900px]:absolute max-[900px]:top-full max-[900px]:left-0 max-[900px]:right-0 max-[900px]:flex-col max-[900px]:items-stretch max-[900px]:gap-4 max-[900px]:bg-white max-[900px]:dark:bg-gray-900 max-[900px]:border-b max-[900px]:border-gray-200 max-[900px]:dark:border-gray-700 max-[900px]:shadow-xl max-[900px]:rounded-b-2xl max-[900px]:overflow-y-auto max-[900px]:max-h-[calc(100vh-120px)] max-[900px]:pt-0 ${menuOpen ? 'max-[900px]:flex' : 'max-[900px]:hidden'
               }`}
           >
 
-            <div className="flex items-center space-y-2 gap-0.5 max-[900px]:flex-col max-[900px]:items-stretch max-[900px]:gap-0 max-[900px]:px-4 max-[900px]:pt-5 max-[900px]:pb-5 max-[900px]:border-b max-[900px]:border-gray-100 max-[900px]:dark:border-gray-700">
+            <div className="flex items-center gap-0.5 max-[900px]:flex-col max-[900px]:items-stretch max-[900px]:gap-3 max-[900px]:px-4 max-[900px]:pt-5 max-[900px]:pb-5 max-[900px]:border-b max-[900px]:border-gray-100 max-[900px]:dark:border-gray-700">
               {NAV_LINKS.map(({ to, label, end }) => (
                 <NavLink
                   key={to}
@@ -170,7 +171,7 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
               {user ? (
                 <>
                   {user.role === 'admin' && (
-                    <NavLink to="/admin" onClick={closeMenu} className={actionLinkClass}>
+                    <NavLink to="/admin" onClick={closeMenu} className={`${actionBtnBase} text-primary dark:text-gray-200 border border-primary/30 dark:border-secondary/40 hover:bg-primary/10 hover:border-primary dark:hover:bg-secondary/20 dark:hover:border-secondary`}>
                       <ShieldAccountIcon className="text-[18px] shrink-0" />
                       Admin
                     </NavLink>
@@ -229,7 +230,7 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
                 <>
                   <Link
                     to="/login"
-                    className="inline-flex items-center justify-center gap-2 py-2.5 px-4 text-[0.9375rem] font-semibold rounded-xl bg-transparent text-primary dark:text-gray-200 border-2 border-primary/40 dark:border-gray-500 transition-all duration-200 hover:bg-primary hover:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:hover:border-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 max-[900px]:w-full max-[900px]:py-3"
+                    className={`${actionBtnBase} bg-transparent text-primary dark:text-gray-200 border-2 border-primary/40 dark:border-gray-500 hover:bg-primary hover:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:hover:border-gray-600`}
                     onClick={closeMenu}
                   >
                     <LoginIcon className="text-[18px] shrink-0" />
@@ -237,7 +238,7 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
                   </Link>
                   <Link
                     to="/licenses"
-                    className="inline-flex items-center justify-center gap-2 py-2.5 px-5 text-[0.9375rem] font-semibold rounded-xl bg-secondary text-white border-0 shadow-md shadow-secondary/25 transition-all duration-200 hover:bg-secondary/90 hover:shadow-lg hover:shadow-secondary/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 max-[900px]:w-full max-[900px]:py-3"
+                    className={`${actionBtnBase} bg-secondary text-white border-0 shadow-md shadow-secondary/25 hover:bg-secondary/90 hover:shadow-lg hover:shadow-secondary/30 focus-visible:ring-secondary`}
                     onClick={closeMenu}
                   >
                     <CartOutlineIcon className="text-[18px] shrink-0" />
@@ -245,7 +246,7 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
                   </Link>
                   <Link
                     to="/contact"
-                    className="inline-flex items-center justify-center gap-2 py-2.5 px-5 text-[0.9375rem] font-semibold rounded-xl bg-primary text-white border-0 shadow-md shadow-primary/20 transition-all duration-200 hover:bg-primary-hover hover:shadow-lg hover:shadow-primary/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 max-[900px]:w-full max-[900px]:py-3"
+                    className={`${actionBtnBase} bg-primary text-white border-0 shadow-md shadow-primary/20 hover:bg-primary-hover hover:shadow-lg hover:shadow-primary/25 focus-visible:ring-primary`}
                     onClick={closeMenu}
                   >
                     Talk To Expert

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../../api';
+import { toast } from '../../utils/toast';
 import { Button } from '../../components/common';
 
 const inputClass = 'w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-secondary dark:focus:ring-secondary/20';
@@ -38,12 +39,17 @@ export default function AdminServices() {
     const payload = { ...form };
     if (!payload.slug) payload.slug = payload.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
     try {
-      if (editing === 'new') await api.admin.services.create(payload);
-      else await api.admin.services.update(editing, payload);
+      if (editing === 'new') {
+        await api.admin.services.create(payload);
+        toast.success('Service created');
+      } else {
+        await api.admin.services.update(editing, payload);
+        toast.success('Service updated');
+      }
       setEditing(null);
       load();
     } catch (e) {
-      alert(e.message);
+      toast.error(e.message || 'Failed to save service');
     }
   };
 
@@ -51,10 +57,11 @@ export default function AdminServices() {
     if (!confirm('Delete this service?')) return;
     try {
       await api.admin.services.delete(id);
+      toast.success('Service deleted');
       setEditing(null);
       load();
     } catch (e) {
-      alert(e.message);
+      toast.error(e.message || 'Failed to delete service');
     }
   };
 

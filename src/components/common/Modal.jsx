@@ -1,4 +1,5 @@
-import { useId } from 'react';
+import { useId, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Button from './Button';
 import { CloseIcon } from '../icons';
 
@@ -50,11 +51,23 @@ export default function Modal({
   const handleCancel = onCancel ?? onClose;
   const maxWidthClass = sizeClass[size] ?? sizeClass.lg;
 
+  useEffect(() => {
+    if (!open) return;
+    const prevBody = document.body.style.overflow;
+    const prevHtml = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevBody;
+      document.documentElement.style.overflow = prevHtml;
+    };
+  }, [open]);
+
   if (open === false) return null;
 
-  return (
+  const modalContent = (
     <div
-      className="fixed inset-0 z-9 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-9 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
@@ -112,4 +125,6 @@ export default function Modal({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

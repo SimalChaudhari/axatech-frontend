@@ -16,6 +16,7 @@ export default function Products() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [selectedProductIds, setSelectedProductIds] = useState([]);
 
   useEffect(() => {
     api.categories().then(setCategories).catch(console.error);
@@ -29,6 +30,13 @@ export default function Products() {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [page, selectedCategoryIds, search]);
+
+  // Keep only IDs that exist in the current page of products
+  useEffect(() => {
+    setSelectedProductIds((prev) =>
+      prev.filter((id) => data.products.some((p) => p._id === id))
+    );
+  }, [data.products]);
 
   const doSearch = (e) => {
     e?.preventDefault();
@@ -65,8 +73,18 @@ export default function Products() {
                 onCategoryChange={(ids) => { setSelectedCategoryIds(ids); setPage(1); }}
                 categories={categories}
                 showCategoryDropdown
+                selectedProductIds={selectedProductIds}
               />
-              <ProductsGrid products={data.products} loading={loading} />
+              <ProductsGrid
+                products={data.products}
+                loading={loading}
+                selectedProductIds={selectedProductIds}
+                onToggleProduct={(id, checked) =>
+                  setSelectedProductIds((prev) =>
+                    checked ? [...prev, id] : prev.filter((x) => x !== id)
+                  )
+                }
+              />
               <ProductsPagination
                 page={page}
                 pages={data.pages}

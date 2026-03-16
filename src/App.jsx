@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useTheme } from './context/ThemeContext';
 import { getUserRoutes, getAuthRoutes, getAdminRoutes } from './routes';
+import { Toaster } from './components/common';
 import NotFound from './pages/auth/NotFound';
 
 export default function App() {
@@ -12,6 +13,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen font-sans antialiased bg-white text-text leading-relaxed dark:bg-gray-900 dark:text-gray-200">
+      <Toaster />
       <Routes>
         {getUserRoutes()}
         {getAuthRoutes()}

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { z } from 'zod';
 import api from '../../api';
+import { toast } from '../../utils/toast';
 import { Input, Button } from '../../components/common';
 
 const schema = z.object({
@@ -32,8 +33,11 @@ export default function ForgotPassword() {
     try {
       await api.auth.forgotPassword(email);
       setSent(true);
+      toast.success('Reset link sent to your email');
     } catch (err) {
-      setError(err.message || 'Failed to send reset link');
+      const msg = err.message || 'Failed to send reset link';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

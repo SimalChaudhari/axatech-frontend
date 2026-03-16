@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal } from '../../common';
 import ProductForm from './ProductForm';
 
@@ -8,14 +8,21 @@ export default function ProductsModal({
   title,
   form,
   setForm,
-  imageFile,
-  setImageFile,
+  imageFiles,
+  setImageFiles,
+  videoFile,
+  setVideoFile,
   categories = [],
   onSave,
   onClose,
   onDelete,
+  existingImageUrls = [],
 }) {
-  const [errors, setErrors] = useState({ name: '', slug: '' });
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (open) setErrors({});
+  }, [open]);
 
   const validate = () => {
     const name = (form.name ?? '').trim();
@@ -25,15 +32,15 @@ export default function ProductsModal({
       slug: slug ? '' : 'Slug is required',
     };
     setErrors(next);
-    return !next.name && !next.slug;
+    return !Object.values(next).some(Boolean);
   };
 
-  const validateField = (field, nextValue) => {
+  const validateField = (field) => {
     if (field === 'name') {
-      const name = (nextValue !== undefined ? nextValue : form.name ?? '').trim();
+      const name = (form.name ?? '').trim();
       setErrors((prev) => ({ ...prev, name: name ? '' : 'Name is required' }));
     } else if (field === 'slug') {
-      const slug = (nextValue !== undefined ? nextValue : form.slug ?? '').trim();
+      const slug = (form.slug ?? '').trim();
       setErrors((prev) => ({ ...prev, slug: slug ? '' : 'Slug is required' }));
     }
   };
@@ -57,16 +64,20 @@ export default function ProductsModal({
       onPrimary={handleSave}
       showDelete={mode === 'edit' && !!onDelete}
       onDelete={onDelete}
+      size="2xl"
     >
       <ProductForm
         form={form}
         setForm={setForm}
-        imageFile={imageFile}
-        setImageFile={setImageFile}
+        imageFiles={imageFiles}
+        setImageFiles={setImageFiles}
+        videoFile={videoFile}
+        setVideoFile={setVideoFile}
         categories={categories}
         errors={errors}
         onValidateField={validateField}
         onClearError={clearError}
+        existingImageUrls={existingImageUrls}
       />
     </Modal>
   );
