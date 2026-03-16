@@ -26,9 +26,9 @@ const NAV_LINKS = [
   { to: '/products', label: 'Add-ons' },
   { to: '/services', label: 'Services' },
   { to: '/cloud-hosting', label: 'Cloud Hosting' },
-  { to: '/blog', label: 'Blog' },
   // { to: '/contact', label: 'Contact' },
   { to: '/projects', label: 'Projects' },
+  { to: '/blog', label: 'Blogs' },
 ];
 
 const getNavLinkClassName = ({ isActive }) =>
