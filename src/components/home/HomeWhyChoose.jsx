@@ -1,20 +1,19 @@
+import { SectionHeader } from '../common';
+
 export default function HomeWhyChoose({ whyChooseItems, whyChooseTitle }) {
   if (!whyChooseItems?.length) return null;
 
   return (
     <section className="py-20 md:py-24 bg-white dark:bg-gray-900 border-y border-gray-100 dark:border-gray-800">
       <div className="max-w-6xl mx-auto px-5">
-        <p className="inline-flex items-center justify-center gap-2 text-xs font-semibold tracking-[0.2em] uppercase text-secondary dark:text-accent mb-4" data-aos="fade-up">
-          <span className="w-8 h-px bg-secondary/60 dark:bg-accent/60" aria-hidden />
-          Why Us
-          <span className="w-8 h-px bg-secondary/60 dark:bg-accent/60" aria-hidden />
-        </p>
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight mb-3 text-center" data-aos="fade-up">
-          {whyChooseTitle || 'Why Choose Axatech'}
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400 text-base max-w-2xl mx-auto mb-10 text-center" data-aos="fade-up">
-          Trusted by businesses across India for Tally licenses, add-ons, and cloud solutions.
-        </p>
+        <SectionHeader
+          label="Why Us"
+          title={whyChooseTitle || 'Why Choose Axatech'}
+          subtitle="Trusted by businesses across India for Tally licenses, add-ons, and cloud solutions."
+          centered
+          subtitleClassName="mb-10"
+          dataAos="fade-up"
+        />
 
         <div className="grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {whyChooseItems.map((item, i) => (

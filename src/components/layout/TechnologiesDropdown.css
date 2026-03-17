@@ -1,0 +1,48 @@
+/* Technologies sidebar submenu: vertical line + L-shaped connector (light #EDEFF2 / dark #282F37) */
+:root {
+  --tech-nav-line: #EDEFF2;
+  --tech-nav-line-dark: #282F37;
+}
+
+/* Wrapper for open submenu – vertical line on the left */
+.tech-submenu-wrapper {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.tech-submenu-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 16px;
+  width: 2px;
+  bottom: calc(36px - 2px - -25px / 2);
+  background-color: var(--tech-nav-line);
+}
+
+.dark .tech-submenu-wrapper::before,
+[data-theme="dark"] .tech-submenu-wrapper::before {
+  background-color: var(--tech-nav-line-dark);
+}
+
+/* Each submenu item – L-shaped connector */
+.tech-submenu-item {
+  position: relative;
+}
+
+.tech-submenu-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 15px;
+  height: 15px;
+  background-color: var(--tech-nav-line);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' viewBox='0 0 14 14'%3E%3Cpath d='M1 1v4a8 8 0 0 0 8 8h4' stroke='%23efefef' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") 50% 50% / 100% no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' viewBox='0 0 14 14'%3E%3Cpath d='M1 1v4a8 8 0 0 0 8 8h4' stroke='%23efefef' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") 50% 50% / 100% no-repeat;
+  transform: translate(calc(16px * -1), calc(-18px * -0.4));
+}
+
+.dark .tech-submenu-item::before,
+[data-theme="dark"] .tech-submenu-item::before {
+  background-color: var(--tech-nav-line-dark);
+}

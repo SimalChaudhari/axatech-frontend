@@ -1,4 +1,4 @@
-import { Button } from '../common';
+import { Button, SectionHeader } from '../common';
 import { FormatListBulletedIcon } from '../icons';
 
 export default function HomeLicenseHighlights({ licenses }) {
@@ -7,17 +7,14 @@ export default function HomeLicenseHighlights({ licenses }) {
   return (
     <section className="py-20 md:py-24 bg-gray-50/80 dark:bg-gray-900 border-y border-gray-100 dark:border-gray-800">
       <div className="max-w-6xl mx-auto px-5">
-        <p className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.2em] uppercase text-secondary dark:text-accent mb-4" data-aos="fade-up">
-          <span className="w-8 h-px bg-secondary/60 dark:bg-accent/60" aria-hidden />
-          Pricing
-          <span className="w-8 h-px bg-secondary/60 dark:bg-accent/60" aria-hidden />
-        </p>
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight mb-3" data-aos="fade-up">
-          License Pricing Highlights
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400 text-base max-w-2xl mb-10" data-aos="fade-up">
-          Choose the right Tally license for your business. Transparent pricing, no hidden fees.
-        </p>
+        <SectionHeader
+          label="Pricing"
+          title="License Pricing Highlights"
+          subtitle="Choose the right Tally license for your business. Transparent pricing, no hidden fees."
+          centered={false}
+          subtitleClassName="mb-10"
+          dataAos="fade-up"
+        />
 
         <div className="grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {licenses.slice(0, 3).map((plan, i) => (

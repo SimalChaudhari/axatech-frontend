@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
+import api from '../../api';
 import {
   PhoneIcon,
   EmailOutlineIcon,
@@ -15,20 +16,22 @@ import {
   LogoutIcon,
   LoginIcon,
   CartOutlineIcon,
+  CloseIcon,
 } from '../icons';
+import { Button } from '../common';
+import TechnologiesDropdown from './TechnologiesDropdown';
 import './Header.css';
 
 const CONTAINER = 'w-full max-w-[1200px] mx-auto px-5';
 
 const NAV_LINKS = [
   { to: '/', label: 'Home', end: true },
-  { to: '/licenses', label: 'Tally' },
-  { to: '/products', label: 'Add-ons' },
   { to: '/services', label: 'Services' },
-  { to: '/cloud-hosting', label: 'Cloud Hosting' },
-  // { to: '/contact', label: 'Contact' },
-  { to: '/projects', label: 'Projects' },
+  { to: '/licenses', label: 'Tally' },
+  { to: '/products', label: 'TDL Shop' },
+  { to: '/technologies', label: 'Technologies', hasDropdown: true },
   { to: '/blog', label: 'Blogs' },
+  { to: '/projects', label: 'Projects' },
 ];
 
 const getNavLinkClassName = ({ isActive }) =>
@@ -50,8 +53,16 @@ const PROFILE_DROPDOWN_LINKS = [
 
 export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout }) {
   const { theme, toggleTheme } = useTheme();
+  const { pathname } = useLocation();
   const [profileOpen, setProfileOpen] = useState(false);
+  const [techMenuOpen, setTechMenuOpen] = useState(false);
+  const [technologies, setTechnologies] = useState([]);
   const profileRef = useRef(null);
+  const isTechnologiesActive = pathname === '/technologies' || pathname.startsWith('/technologies/');
+
+  useEffect(() => {
+    api.technologies().then(setTechnologies).catch(() => setTechnologies([]));
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -60,6 +71,20 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') closeMenu?.();
+    };
+    if (menuOpen) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = '';
+    };
+  }, [menuOpen, closeMenu]);
 
   return (
     <header
@@ -135,39 +160,43 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
 
           </div>
 
-          <nav
-            className={`flex items-center gap-0.5 flex-1 justify-end max-[900px]:absolute max-[900px]:top-full max-[900px]:left-0 max-[900px]:right-0 max-[900px]:flex-col max-[900px]:items-stretch max-[900px]:gap-4 max-[900px]:bg-white max-[900px]:dark:bg-gray-900 max-[900px]:border-b max-[900px]:border-gray-200 max-[900px]:dark:border-gray-700 max-[900px]:shadow-xl max-[900px]:rounded-b-2xl max-[900px]:overflow-y-auto max-[900px]:max-h-[calc(100vh-120px)] max-[900px]:pt-0 ${menuOpen ? 'max-[900px]:flex' : 'max-[900px]:hidden'
-              }`}
-          >
-
-            <div className="flex items-center gap-0.5 max-[900px]:flex-col max-[900px]:items-stretch max-[900px]:gap-3 max-[900px]:px-4 max-[900px]:pt-5 max-[900px]:pb-5 max-[900px]:border-b max-[900px]:border-gray-100 max-[900px]:dark:border-gray-700">
-              {NAV_LINKS.map(({ to, label, end }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  end={end}
-                  onClick={closeMenu}
-                  className={getNavLinkClassName}
-                >
-                  {label}
-                </NavLink>
-              ))}
+          {/* Desktop nav - hidden on mobile */}
+          <nav className="hidden min-[901px]:flex items-center gap-0.5 flex-1 justify-end">
+            <div className="flex items-center gap-0.5">
+              {NAV_LINKS.map(({ to, label, end, hasDropdown }) =>
+                hasDropdown ? (
+                  <div
+                    key={to}
+                    className="relative"
+                    onMouseEnter={() => setTechMenuOpen(true)}
+                    onMouseLeave={() => setTechMenuOpen(false)}
+                  >
+                    <NavLink to={to} end={end} onClick={closeMenu} className={getNavLinkClassName}>
+                      {label}
+                    </NavLink>
+                    {techMenuOpen && technologies.length > 0 && (
+                      <TechnologiesDropdown
+                        technologies={technologies}
+                        onClose={() => { setTechMenuOpen(false); closeMenu(); }}
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <NavLink key={to} to={to} end={end} onClick={closeMenu} className={getNavLinkClassName}>
+                    {label}
+                  </NavLink>
+                )
+              )}
             </div>
-
-            <div className="flex items-center gap-2.5 ml-4 pl-4 border-l border-gray-200 dark:border-gray-700 max-[900px]:ml-0 max-[900px]:border-l-0 max-[900px]:gap-3 max-[900px]:flex-col max-[900px]:px-4 max-[900px]:pt-5 max-[900px]:pb-5">
+            <div className="flex items-center gap-2.5 ml-4 pl-4 border-l border-gray-200 dark:border-gray-700">
               <button
                 type="button"
                 onClick={toggleTheme}
-                className="inline-flex max-[900px]:hidden items-center justify-center w-10 h-10 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-primary dark:text-secondary cursor-pointer transition-all duration-200 hover:bg-primary/10 dark:hover:bg-secondary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                className="inline-flex items-center justify-center w-10 h-10 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-primary dark:text-secondary cursor-pointer transition-all duration-200 hover:bg-primary/10 dark:hover:bg-secondary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
               >
-                {theme === 'dark' ? (
-                  <WeatherSunnyIcon className="text-[20px]" />
-                ) : (
-                  <WeatherNightIcon className="text-[20px]" />
-                )}
+                {theme === 'dark' ? <WeatherSunnyIcon className="text-[20px]" /> : <WeatherNightIcon className="text-[20px]" />}
               </button>
-
               {user ? (
                 <>
                   {user.role === 'admin' && (
@@ -179,30 +208,24 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
                   <div className="relative" ref={profileRef}>
                     <button
                       type="button"
-                      className="inline-flex items-center justify-center gap-2 py-2.5 px-4 text-[0.9375rem] font-semibold text-gray-700 dark:text-gray-200 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 cursor-pointer transition-all duration-200 hover:border-primary/40 hover:bg-primary/5 dark:hover:border-secondary/50 dark:hover:bg-secondary/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 max-[900px]:w-full max-[900px]:justify-center"
+                      className="inline-flex items-center justify-center gap-2 py-2.5 px-4 text-[0.9375rem] font-semibold text-gray-700 dark:text-gray-200 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 cursor-pointer transition-all duration-200 hover:border-primary/40 hover:bg-primary/5 dark:hover:border-secondary/50 dark:hover:bg-secondary/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                       onClick={() => setProfileOpen((o) => !o)}
                       aria-expanded={profileOpen}
                       aria-haspopup="true"
                     >
                       <AccountCircleIcon className="text-[22px] shrink-0 text-primary dark:text-secondary" />
-                      <span className="max-[900px]:hidden">Profile</span>
+                      <span>Profile</span>
                       <ChevronDownIcon className={`text-lg shrink-0 transition-transform duration-200 ${profileOpen ? 'rotate-180' : ''}`} />
                     </button>
                     {profileOpen && (
-                      <div
-                        className="absolute right-0 top-full mt-2 min-w-[200px] py-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600 shadow-xl shadow-gray-200/50 dark:shadow-black/20 z-110"
-                        role="menu"
-                      >
-                        {PROFILE_DROPDOWN_LINKS.map(({ to, label, Icon: LinkIcon }) => (
+                      <div className="absolute right-0 top-full mt-2 min-w-[200px] py-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600 shadow-xl shadow-gray-200/50 dark:shadow-black/20 z-110" role="menu">
+                        {PROFILE_DROPDOWN_LINKS.map(({ to: profileTo, label, Icon: LinkIcon }) => (
                           <Link
                             key={label}
-                            to={to}
+                            to={profileTo}
                             role="menuitem"
                             className="flex items-center gap-3 w-full px-4 py-2.5 text-[0.9375rem] font-medium text-gray-700 dark:text-gray-200 no-underline transition-colors duration-200 hover:bg-primary/5 hover:text-primary dark:hover:bg-secondary/20 dark:hover:text-white"
-                            onClick={() => {
-                              closeMenu();
-                              setProfileOpen(false);
-                            }}
+                            onClick={() => { closeMenu(); setProfileOpen(false); }}
                           >
                             <LinkIcon className="text-[20px] shrink-0 opacity-80" />
                             {label}
@@ -213,11 +236,7 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
                           type="button"
                           role="menuitem"
                           className="flex items-center gap-3 w-full px-4 py-2.5 text-[0.9375rem] font-medium text-gray-700 dark:text-gray-200 text-left transition-colors duration-200 hover:bg-error-lighter hover:text-error dark:hover:bg-error-lighter/30 dark:hover:text-error-light"
-                          onClick={() => {
-                            logout();
-                            closeMenu();
-                            setProfileOpen(false);
-                          }}
+                          onClick={() => { logout(); closeMenu(); setProfileOpen(false); }}
                         >
                           <LogoutIcon className="text-[20px] shrink-0 opacity-80" />
                           Logout
@@ -228,33 +247,165 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
                 </>
               ) : (
                 <>
-                  <Link
-                    to="/login"
-                    className={`${actionBtnBase} bg-transparent text-primary dark:text-gray-200 border-2 border-primary/40 dark:border-gray-500 hover:bg-primary hover:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:hover:border-gray-600`}
-                    onClick={closeMenu}
-                  >
+                  <Link to="/login" className={`${actionBtnBase} bg-transparent text-primary dark:text-gray-200 border-2 border-primary/40 dark:border-gray-500 hover:bg-primary hover:text-white dark:hover:bg-gray-600 dark:hover:text-white dark:hover:border-gray-600`} onClick={closeMenu}>
                     <LoginIcon className="text-[18px] shrink-0" />
                     Login
                   </Link>
-                  <Link
-                    to="/licenses"
-                    className={`${actionBtnBase} bg-secondary text-white border-0 shadow-md shadow-secondary/25 hover:bg-secondary/90 hover:shadow-lg hover:shadow-secondary/30 focus-visible:ring-secondary`}
-                    onClick={closeMenu}
-                  >
+                  <Link to="/licenses" className={`${actionBtnBase} bg-secondary text-white border-0 shadow-md shadow-secondary/25 hover:bg-secondary/90 hover:shadow-lg hover:shadow-secondary/30 focus-visible:ring-secondary`} onClick={closeMenu}>
                     <CartOutlineIcon className="text-[18px] shrink-0" />
                     Buy
                   </Link>
-                  <Link
-                    to="/contact"
-                    className={`${actionBtnBase} bg-primary text-white border-0 shadow-md shadow-primary/20 hover:bg-primary-hover hover:shadow-lg hover:shadow-primary/25 focus-visible:ring-primary`}
-                    onClick={closeMenu}
-                  >
+                  <Link to="/contact" className={`${actionBtnBase} bg-primary text-white border-0 shadow-md shadow-primary/20 hover:bg-primary-hover hover:shadow-lg hover:shadow-primary/25 focus-visible:ring-primary`} onClick={closeMenu}>
                     Talk To Expert
                   </Link>
                 </>
               )}
             </div>
           </nav>
+
+          {/* Mobile: overlay + slide-out sidebar (like AdminSidebar) */}
+          <div
+            role="presentation"
+            className="fixed inset-0 z-50 max-[900px]:block hidden"
+            style={{ pointerEvents: menuOpen ? 'auto' : 'none' }}
+          >
+            <div
+              className={`absolute inset-0 bg-black/50 transition-opacity duration-200 ${menuOpen ? 'opacity-100' : 'opacity-0'}`}
+              onClick={closeMenu}
+              aria-hidden
+            />
+            <aside
+              className={`absolute left-0 top-0 h-full w-[280px] max-w-[85vw] flex flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 shadow-xl transition-[transform] duration-200 ease-out ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+            >
+              {/* Sidebar header: logo, theme, close */}
+              <div className="flex shrink-0 items-center justify-between gap-2 py-4 px-4 border-b border-gray-200 dark:border-gray-700">
+                <Link to="/" className="flex items-center gap-2 min-w-0 font-bold text-gray-900 dark:text-white no-underline hover:opacity-80" onClick={closeMenu}>
+                  <img src="/logo.png" alt="Axatech" className="h-9 w-auto object-contain" />
+                </Link>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={toggleTheme}
+                    className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-primary dark:text-secondary cursor-pointer transition-colors hover:bg-primary/10 dark:hover:bg-secondary/20"
+                    aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                  >
+                    {theme === 'dark' ? <WeatherSunnyIcon className="text-[20px]" /> : <WeatherNightIcon className="text-[20px]" />}
+                  </button>
+                  <button type="button" onClick={closeMenu} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700" aria-label="Close menu">
+                    <CloseIcon className="text-xl cursor-pointer" />
+                  </button>
+                </div>
+              </div>
+              {/* Scrollable menu only – action buttons stay at bottom */}
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                <nav className="py-4">
+                  <p className="mb-2 px-4 text-[0.7rem] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">Menu</p>
+                  <div className="space-y-1 px-3">
+                    {NAV_LINKS.map(({ to, label, end, hasDropdown }) =>
+                      hasDropdown ? (
+                        <div key={to} className="flex flex-col">
+                          <button
+                            type="button"
+                            onClick={() => setTechMenuOpen((o) => !o)}
+                            aria-expanded={techMenuOpen}
+                            aria-haspopup="true"
+                            className={`flex items-center justify-between gap-2 w-full rounded-lg py-2.5 px-3 text-left text-[0.925rem] font-medium transition-all duration-200 ${techMenuOpen || isTechnologiesActive
+                                ? 'bg-primary/10 text-primary dark:bg-secondary/20 dark:text-secondary'
+                                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50'
+                              }`}
+                          >
+                            <span>{label}</span>
+                            <ChevronDownIcon className={`shrink-0 text-lg transition-transform duration-200 ${techMenuOpen ? 'rotate-180' : ''}`} />
+                          </button>
+                          {techMenuOpen && technologies.length > 0 && (
+                            <TechnologiesDropdown
+                              technologies={technologies}
+                              onClose={() => { setTechMenuOpen(false); closeMenu(); }}
+                              inline
+                            />
+                          )}
+                        </div>
+                      ) : (
+                        <NavLink
+                          key={to}
+                          to={to}
+                          end={end}
+                          onClick={closeMenu}
+                          className={({ isActive }) =>
+                            `flex items-center rounded-lg py-2.5 px-3 text-[0.925rem] font-medium no-underline transition-all duration-200 ${isActive
+                              ? 'bg-primary/10 text-primary dark:bg-secondary/20 dark:text-secondary'
+                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50'
+                            }`
+                          }
+                        >
+                          {label}
+                        </NavLink>
+                      )
+                    )}
+                  </div>
+                </nav>
+              </div>
+              {/* Action buttons – always at bottom of sidebar */}
+              <div className="shrink-0 border-t border-gray-200 dark:border-gray-700 p-4 space-y-2 bg-white dark:bg-gray-900">
+                {user ? (
+                  <>
+                    {user.role === 'admin' && (
+                      <NavLink to="/admin" onClick={closeMenu} className={`${actionBtnBase} justify-center text-primary dark:text-gray-200 border border-primary/30 dark:border-secondary/40 hover:bg-primary/10 dark:hover:bg-secondary/20`}>
+                        <ShieldAccountIcon className="text-[18px] shrink-0" />
+                        Admin
+                      </NavLink>
+                    )}
+                    <Link to="/dashboard" onClick={closeMenu} className={`${actionBtnBase} justify-center bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600`}>
+                      <AccountCircleIcon className="text-[22px] shrink-0" />
+                      Profile
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => { logout(); closeMenu(); }}
+                      className={`${actionBtnBase} justify-center w-full bg-transparent text-error border-2 border-error/40 hover:bg-error/10`}
+                    >
+                      <LogoutIcon className="text-[18px] shrink-0" />
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div className='flex items-center gap-2 w-full'>
+                      <Button
+                        to="/login"
+                        variant="outline"
+                        size="sm"
+                        icon={<LoginIcon className="text-[18px] shrink-0" />}
+                        onClick={closeMenu}
+                      className='w-full'
+                      >
+                        Login
+                      </Button>
+                      <Button
+                        to="/licenses"
+                        variant="secondary"
+                        size="sm"
+                        icon={<CartOutlineIcon className="text-[18px] shrink-0" />}
+                        onClick={closeMenu}
+                      className='w-full'
+                      >
+                        Buy
+                      </Button>
+                    </div>
+                    <Button
+                      to="/contact"
+                      variant="primary"
+                      size="sm"
+                      onClick={closeMenu}
+                      className='w-full'
+                    >
+                      Talk To Expert
+                    </Button>
+                  </>
+                )}
+              </div>
+            </aside>
+          </div>
         </div>
       </div>
     </header>

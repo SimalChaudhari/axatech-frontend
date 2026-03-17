@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Button } from '../common';
+import { Button, SectionHeader } from '../common';
 import { ChevronLeftIcon, OpenInNewIcon, ProjectsIcon } from '../icons';
 
 export default function ProjectDetailSection({ project, loading, error }) {
@@ -51,15 +51,7 @@ export default function ProjectDetailSection({ project, loading, error }) {
   return (
     <section className="py-20 md:py-24 bg-white dark:bg-gray-900 border-y border-gray-100 dark:border-gray-800">
       <div className="max-w-4xl mx-auto px-5">
-        <p
-          className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.2em] uppercase text-secondary dark:text-accent mb-4"
-          data-aos="fade-up"
-        >
-          <span className="w-8 h-px bg-secondary/60 dark:bg-accent/60" aria-hidden />
-          Project
-          <span className="w-8 h-px bg-secondary/60 dark:bg-accent/60" aria-hidden />
-        </p>
-
+        <SectionHeader label="Project" position="left" dataAos="fade-up" />
         <header className="mb-8">
           {project.category && (
             <span

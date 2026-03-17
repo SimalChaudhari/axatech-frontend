@@ -214,3 +214,44 @@ export function AppsIcon({ className = '' }) {
 export function ProjectsIcon({ className = '' }) {
   return <Icon iconClass="icon-[mdi--briefcase-outline]" className={className} />;
 }
+
+// Technology / React info pages
+export function CodeIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--code-tags]" className={className} />;
+}
+
+export function PaintBrushIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--brush]" className={className} />;
+}
+
+export function MobileIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--cellphone]" className={className} />;
+}
+
+export function CogsIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--cog-outline]" className={className} />;
+}
+
+export function CloudIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--cloud-outline]" className={className} />;
+}
+
+export function DatabaseIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--database-outline]" className={className} />;
+}
+
+export function ExchangeIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--swap-horizontal]" className={className} />;
+}
+
+export function RocketIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--rocket-launch-outline]" className={className} />;
+}
+
+export function ShieldAltIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--shield-check-outline]" className={className} />;
+}
+
+export function ChartLineIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--chart-line]" className={className} />;
+}

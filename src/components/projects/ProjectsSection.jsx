@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '../common';
+import { Button, SectionHeader } from '../common';
 import { ArrowRightIcon, ProjectsIcon } from '../icons';
 
 export default function ProjectsSection({ projects = [], loading }) {
@@ -28,26 +28,14 @@ export default function ProjectsSection({ projects = [], loading }) {
   return (
     <section className="py-20 md:py-24 bg-white dark:bg-gray-900 border-y border-gray-100 dark:border-gray-800">
       <div className="max-w-6xl mx-auto px-5">
-        <p
-          className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.2em] uppercase text-secondary dark:text-accent mb-4"
-          data-aos="fade-up"
-        >
-          <span className="w-8 h-px bg-secondary/60 dark:bg-accent/60" aria-hidden />
-          Projects
-          <span className="w-8 h-px bg-secondary/60 dark:bg-accent/60" aria-hidden />
-        </p>
-        <h2
-          className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight mb-3"
-          data-aos="fade-up"
-        >
-          Our Featured Projects
-        </h2>
-        <p
-          className="text-gray-600 dark:text-gray-400 text-base max-w-2xl mb-6"
-          data-aos="fade-up"
-        >
-          Discover our portfolio of innovative solutions across various industries.
-        </p>
+        <SectionHeader
+          label="Projects"
+          title="Our Featured Projects"
+          subtitle="Discover our portfolio of innovative solutions across various industries."
+          centered={false}
+          subtitleClassName="mb-6"
+          dataAos="fade-up"
+        />
 
         {/* Category pills */}
         {!loading && projects.length > 0 && (
