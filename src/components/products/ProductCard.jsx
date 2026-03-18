@@ -46,7 +46,7 @@ export default function ProductCard({ product, index = 0, selected = false, onTo
           <Button
             size="sm"
             to="/contact"
-            state={{ enquiryType: 'product', product: product._id, productName: product.name }}
+            state={{ enquiryType: 'product', productIds: [product._id], productName: product.name }}
             variant="primary"
             fullWidth={false}
             className="flex-1 min-w-0 text-center rounded-xl hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 whitespace-nowrap"

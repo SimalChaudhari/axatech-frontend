@@ -156,7 +156,7 @@ export default function Dropdown({
           <div
             ref={panelRef}
             role="listbox"
-            className="fixed py-1.5 rounded-[10px] border-2 border-gray-200 dark:border-gray-600 shadow-xl max-h-[240px] overflow-y-auto overflow-x-hidden z-10 outline-none backdrop-blur-[20px] bg-white/90 dark:bg-gray-800/90 transition-shadow duration-300"
+            className="fixed py-1.5 rounded-[10px] border-2 border-gray-200 dark:border-gray-600 shadow-xl max-h-[240px] overflow-y-auto overflow-x-hidden z-2000 outline-none backdrop-blur-[20px] bg-white/90 dark:bg-gray-800/90 transition-shadow duration-300"
             style={{
               top: panelRect.top,
               left: panelRect.left,
