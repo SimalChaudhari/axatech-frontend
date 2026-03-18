@@ -50,6 +50,7 @@ export default function EnquiriesList() {
       await api.admin.enquiries.updateStatus(detailId, { status, adminNotes });
       setDetail((d) => (d ? { ...d, status, adminNotes } : d));
       load();
+      setDetailId(null);
       toast.success('Enquiry updated');
     } catch (e) {
       toast.error(e.message || 'Failed to update enquiry');

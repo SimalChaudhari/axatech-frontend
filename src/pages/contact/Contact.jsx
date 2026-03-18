@@ -8,6 +8,12 @@ import { ContactHero, ContactSuccess, ContactForm } from '../../components/conta
 export default function Contact() {
   const location = useLocation();
   const state = location.state || {};
+  const productIds =
+    Array.isArray(state.productIds)
+      ? state.productIds
+      : state.productIds
+        ? [state.productIds]
+        : undefined;
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,8 +23,14 @@ export default function Contact() {
     email: '',
     phone: '',
     company: '',
-    message: state.planName ? `Enquiry for: ${state.planName}` : '',
-    product: state.product || undefined,
+    message: state.planName
+      ? `Enquiry for: ${state.planName}`
+      : state.productName
+        ? `Enquiry for: ${state.productName}`
+        : state.serviceName
+          ? `Enquiry for: ${state.serviceName}`
+          : '',
+    productIds,
     service: state.service || undefined,
     licensePlan: state.licensePlan || undefined,
     cloudPlan: state.cloudPlan || undefined,

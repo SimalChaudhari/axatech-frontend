@@ -25,7 +25,7 @@ export default function ProductDetailInfo({ product }) {
       )}
       <Button
         to="/contact"
-        state={{ enquiryType: 'product', product: product._id, productName: product.name }}
+        state={{ enquiryType: 'product', productIds: [product._id], productName: product.name }}
         variant="primary"
         fullWidth={false}
         className="rounded-xl hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/20 transition-all duration-300 px-8 py-4"

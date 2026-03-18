@@ -13,8 +13,30 @@ import { PostgreSQLLayout } from '../../components/technologies/infoPages/databa
 import { ExpressJsLayout } from '../../components/technologies/infoPages/backend/ExpressJs';
 import { GraphQLLayout } from '../../components/technologies/infoPages/backend/GraphQL';
 import { NestJsLayout } from '../../components/technologies/infoPages/backend/NestJs';
+import { NodeJsLayout } from '../../components/technologies/infoPages/backend/NodeJs';
 
-const CUSTOM_LAYOUT_SLUGS = ['react', 'vue', 'vue-js', 'html5', 'html', 'angular', 'firebase', 'mongodb', 'mongo', 'mysql', 'postgresql', 'postgres', 'express', 'expressjs', 'graphql', 'nestjs', 'nest'];
+const CUSTOM_LAYOUT_SLUGS = [
+  'react',
+  'vue',
+  'vue-js',
+  'html5',
+  'html',
+  'angular',
+  'firebase',
+  'mongodb',
+  'mongo',
+  'mysql',
+  'postgresql',
+  'postgres',
+  'express',
+  'expressjs',
+  'graphql',
+  'nestjs',
+  'nest',
+  'nodejs',
+  'node-js',
+  'node',
+];
 
 export default function TechnologyDetail() {
   const { slug } = useParams();
@@ -158,6 +180,18 @@ export default function TechnologyDetail() {
           <meta name="description" content="NestJS development services – TypeScript backend, REST & GraphQL APIs, microservices, and enterprise applications." />
         </Helmet>
         <NestJsLayout />
+      </>
+    );
+  }
+
+  if (slug === 'nodejs' || slug === 'node-js' || slug === 'node') {
+    return (
+      <>
+        <Helmet>
+          <title>Node.js | Technologies | Axatech</title>
+          <meta name="description" content="Node.js development services – scalable backend systems, REST & GraphQL APIs, real-time apps, microservices, and cloud deployment." />
+        </Helmet>
+        <NodeJsLayout />
       </>
     );
   }
