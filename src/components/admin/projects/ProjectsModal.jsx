@@ -75,7 +75,7 @@ export default function ProjectsModal({
       onPrimary={handleSave}
       cancelLabel="Cancel"
       onCancel={onClose}
-      size="2xl"
+      size="3xl"
     >
       <ProjectForm
         form={form}

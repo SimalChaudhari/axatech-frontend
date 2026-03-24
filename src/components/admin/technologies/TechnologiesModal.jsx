@@ -79,7 +79,7 @@ export default function TechnologiesModal({ mode = 'create', form, setForm, onSa
       onClose={onClose}
       primaryLabel={mode === 'create' ? 'Create' : 'Update'}
       onPrimary={handleSave}
-      size="2xl"
+      size="3xl"
     >
       <div className="flex flex-col gap-5">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

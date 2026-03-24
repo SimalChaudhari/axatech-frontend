@@ -5,9 +5,17 @@ import { Button, Input } from '../common';
 const contactSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().min(1, 'Email is required').email('Enter a valid email'),
+  // message: z.string().min(1, 'Message is required'),
+  message: z
+  .string()
+  .trim()
+  .min(1, 'Message is required')
+  .refine(
+    (value) => !/^Enquiry for:\s*[^\n]+$/i.test(value),
+    'Please add your enquiry details'
+  ),
   phone: z.string().optional(),
   company: z.string().optional(),
-  message: z.string().min(1, 'Message is required'),
 });
 
 export default function ContactForm({ form, onChange, onSubmit, error, loading }) {
