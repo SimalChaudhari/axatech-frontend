@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { TrashIcon, PenIcon, EyeIcon, ChevronLeftIcon, ChevronRightIcon, ArrowUpIcon, CloseIcon, SearchIcon } from '../icons';
 import { Dropdown, Checkbox, Loader } from './index';
@@ -341,7 +341,45 @@ function SearchInput({
   placeholder = 'Search...',
   ariaLabel = 'Search',
   className = '',
+  debounceMs = 500,
 }) {
+  const hasDebounce = typeof debounceMs === 'number' && debounceMs > 0 && typeof onChange === 'function';
+  const [draftValue, setDraftValue] = useState(value ?? '');
+  const debounceTimerRef = useRef(null);
+
+  useEffect(() => {
+    // Sync displayed text when parent updates (clear / filter reset).
+    setDraftValue(value ?? '');
+  }, [value]);
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
+  }, []);
+
+  const handleChange = (e) => {
+    if (!hasDebounce) {
+      onChange?.(e);
+      return;
+    }
+
+    const next = e?.target?.value ?? '';
+    setDraftValue(next);
+
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+
+    // Empty input should apply immediately for good UX.
+    if (String(next).trim() === '') {
+      onChange?.({ target: { value: '' } });
+      return;
+    }
+
+    debounceTimerRef.current = setTimeout(() => {
+      onChange?.({ target: { value: next } });
+    }, debounceMs);
+  };
+
   return (
     <div className={`relative flex flex-1 min-w-[200px] items-center ${className}`.trim()}>
       <span
@@ -353,8 +391,8 @@ function SearchInput({
       <input
         type="search"
         placeholder={placeholder}
-        value={value}
-        onChange={onChange}
+        value={hasDebounce ? draftValue : value}
+        onChange={handleChange}
         className={searchInputClass}
         aria-label={ariaLabel}
       />
@@ -533,7 +571,17 @@ function ActionMenu({ open, position, onView, onEdit, onDelete, onClose }) {
       ref={menuRef}
       role="menu"
       className={actionMenuClass}
-      style={{ top: position.top, left: position.left }}
+      // style={{ top: position.top, left: position.left }}
+      style={{
+              top: position.top,
+              left: position.left,
+              // width: position.width,
+              // minWidth: 'auto',
+              backgroundImage: 'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSJ1cmwoI3BhaW50MF9yYWRpYWxfNDQ2NF81NTMzOCkiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CjxkZWZzPgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50MF9yYWRpYWxfNDQ2NF81NTMzOCIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgxMjAgMS44MTgxMmUtMDUpIHJvdGF0ZSgtNDUpIHNjYWxlKDEyMy4yNSkiPgo8c3RvcCBzdG9wLWNvbG9yPSIjMDBCOEQ5Ii8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzAwQjhEOSIgc3RvcC1vcGFjaXR5PSIwIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==), url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSJ1cmwoI3BhaW50MF9yYWRpYWxfNDQ2NF81NTMzNykiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CjxkZWZzPgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50MF9yYWRpYWxfNDQ2NF81NTMzNyIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgwIDEyMCkgcm90YXRlKDEzNSkgc2NhbGUoMTIzLjI1KSI+CjxzdG9wIHN0b3AtY29sb3I9IiNGRjU2MzAiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRkY1NjMwIiBzdG9wLW9wYWNpdHk9IjAiLz4KPC9yYWRpYWxHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4K)',
+              // backgroundSize: '50% 50%',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right top, left bottom',
+            }}
     >
       {onView && (
         <button

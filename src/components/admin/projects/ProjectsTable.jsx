@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Table, ConfirmModal, Badge } from '../../common';
 import { DotsVerticalIcon } from '../../icons';
 
@@ -16,56 +16,70 @@ function getImageUrl(project) {
   return base ? `${base}/uploads/${img.replace(/^\/+/, '')}` : `/uploads/${img.replace(/^\/+/, '')}`;
 }
 
-export default function ProjectsTable({ projects = [], onOpenEdit, onRemove, loading = false }) {
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+export default function ProjectsTable({
+  projects = [],
+  onOpenEdit,
+  onRemove,
+  loading = false,
+  statusFilter = 'all', // all | active | inactive
+  onStatusFilterChange,
+  searchQuery = '',
+  onSearchQueryChange,
+  page = 1,
+  rowsPerPage = 5,
+  totalRows = 0,
+  onPageChange,
+  onRowsPerPageChange,
+  counts = { all: 0, active: 0, inactive: 0 },
+}) {
+  const safeSetStatusFilter = (val) => onStatusFilterChange?.(val);
+  const safeSetSearchQuery = (val) => onSearchQueryChange?.(val);
+  const safeOnPageChange = (next) => onPageChange?.(next);
+  const safeOnRowsPerPageChange = (next) => onRowsPerPageChange?.(next);
+
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [openActionId, setOpenActionId] = useState(null);
   const [menuPosition, setMenuPosition] = useState(null);
   const kebabRefs = useRef({});
 
-  const counts = useMemo(
-    () => ({
-      all: projects.length,
-      active: projects.filter((p) => p.isActive !== false).length,
-      inactive: projects.filter((p) => p.isActive === false).length,
-    }),
-    [projects]
-  );
-
-  const filteredProjects = useMemo(() => {
-    return projects.filter((p) => {
-      if (statusFilter === 'active' && p.isActive === false) return false;
-      if (statusFilter === 'inactive' && p.isActive !== false) return false;
-      if (searchQuery.trim()) {
-        const q = searchQuery.trim().toLowerCase();
-        const title = (p.title || '').toLowerCase();
-        const category = (p.category || '').toLowerCase();
-        const web = (p.webLink || '').toLowerCase();
-        if (!title.includes(q) && !category.includes(q) && !web.includes(q)) return false;
-      }
-      return true;
-    });
-  }, [projects, statusFilter, searchQuery]);
-
-  const totalFiltered = filteredProjects.length;
-  const totalPages = Math.max(1, Math.ceil(totalFiltered / rowsPerPage));
-  const pageSafe = Math.min(page, totalPages) || 1;
-
-  const paginatedProjects = useMemo(() => {
-    const start = (pageSafe - 1) * rowsPerPage;
-    return filteredProjects.slice(start, start + rowsPerPage);
-  }, [filteredProjects, pageSafe, rowsPerPage]);
-
-  const allSelected = paginatedProjects.length > 0 && paginatedProjects.every((p) => selectedIds.has(p._id));
+  const totalFiltered = totalRows;
+  const allSelected = projects.length > 0 && projects.every((p) => selectedIds.has(p._id));
   const someSelected = selectedIds.size > 0;
+
+  const activeFilters = useMemo(() => {
+    const list = [];
+
+    if (statusFilter !== 'all') {
+      const label = STATUS_TABS.find((t) => t.value === statusFilter)?.label ?? statusFilter;
+      list.push({
+        id: 'status',
+        label: 'Status',
+        value: label,
+        onRemove: () => safeSetStatusFilter('all'),
+      });
+    }
+
+    if (searchQuery.trim()) {
+      list.push({
+        id: 'keyword',
+        label: 'Keyword',
+        value: searchQuery.trim(),
+        onRemove: () => safeSetSearchQuery(''),
+      });
+    }
+
+    return list;
+  }, [statusFilter, searchQuery]);
+
+  const handleClearAllFilters = () => {
+    safeSetStatusFilter('all');
+    safeSetSearchQuery('');
+  };
 
   const handleSelectAll = () => {
     if (allSelected) setSelectedIds(new Set());
-    else setSelectedIds(new Set(paginatedProjects.map((p) => p._id)));
+    else setSelectedIds(new Set(projects.map((p) => p._id)));
   };
 
   const handleSelectRow = (id) => {
@@ -93,15 +107,6 @@ export default function ProjectsTable({ projects = [], onOpenEdit, onRemove, loa
     setSelectedIds(new Set());
   };
 
-  const handleRowsPerPageChange = (newRowsPerPage) => {
-    setRowsPerPage(newRowsPerPage);
-    setPage(1);
-  };
-
-  useEffect(() => {
-    setPage((p) => (p > totalPages && totalPages > 0 ? totalPages : p));
-  }, [totalPages]);
-
   const openActionMenu = (e, id) => {
     e.stopPropagation();
     const el = kebabRefs.current[id] || e.currentTarget;
@@ -119,19 +124,27 @@ export default function ProjectsTable({ projects = [], onOpenEdit, onRemove, loa
 
   const projectForMenu = openActionId ? projects.find((p) => p._id === openActionId) : null;
 
+  // Clear selection/menu when the underlying server results change (filters/page).
+  useEffect(() => {
+    setSelectedIds(new Set());
+    setOpenActionId(null);
+    setDeleteConfirm(null);
+  }, [projects]);
+
   return (
     <>
       <div className="border-b border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-800">
         <Table.StatusTabs
           tabs={STATUS_TABS}
           value={statusFilter}
-          onChange={setStatusFilter}
+          onChange={safeSetStatusFilter}
           counts={counts}
         />
         <Table.Toolbar>
           <Table.SearchInput
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            // debounceMs={450}
+            onChange={(e) => safeSetSearchQuery(e.target.value)}
             ariaLabel="Search projects"
             placeholder="Search projects"
           />
@@ -144,6 +157,12 @@ export default function ProjectsTable({ projects = [], onOpenEdit, onRemove, loa
         onClearSelection={() => setSelectedIds(new Set())}
         onBulkDelete={handleBulkDelete}
         label="selected"
+      />
+
+      <Table.ActiveFilters
+        filters={activeFilters}
+        resultCount={totalFiltered}
+        onClearAll={handleClearAllFilters}
       />
 
       <Table>
@@ -164,10 +183,10 @@ export default function ProjectsTable({ projects = [], onOpenEdit, onRemove, loa
         <Table.Body>
           {loading ? (
             <Table.LoadingState colSpan={6} />
-          ) : paginatedProjects.length === 0 ? (
+          ) : projects.length === 0 ? (
             <Table.EmptyState colSpan={6} />
           ) : (
-            paginatedProjects.map((p) => (
+            projects.map((p) => (
               <Table.Row key={p._id}>
                 <Table.SelectionCell
                   checked={selectedIds.has(p._id)}
@@ -214,11 +233,11 @@ export default function ProjectsTable({ projects = [], onOpenEdit, onRemove, loa
       </Table>
 
       <Table.Pagination
-        page={pageSafe}
+        page={page}
         rowsPerPage={rowsPerPage}
         totalRows={totalFiltered}
-        onPageChange={setPage}
-        onRowsPerPageChange={handleRowsPerPageChange}
+        onPageChange={safeOnPageChange}
+        onRowsPerPageChange={safeOnRowsPerPageChange}
       />
 
       <Table.ActionMenu

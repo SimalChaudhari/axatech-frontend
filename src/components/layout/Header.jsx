@@ -304,23 +304,10 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
                     {NAV_LINKS.map(({ to, label, end, hasDropdown }) =>
                       hasDropdown ? (
                         <div key={to} className="flex flex-col">
-                          <button
-                            type="button"
-                            onClick={() => setTechMenuOpen((o) => !o)}
-                            aria-expanded={techMenuOpen}
-                            aria-haspopup="true"
-                            className={`flex items-center justify-between gap-2 w-full rounded-lg py-2.5 px-3 text-left text-[0.925rem] font-medium transition-all duration-200 ${techMenuOpen || isTechnologiesActive
-                                ? 'bg-primary/10 text-primary dark:bg-secondary/20 dark:text-secondary'
-                                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50'
-                              }`}
-                          >
-                            <span>{label}</span>
-                            <ChevronDownIcon className={`shrink-0 text-lg transition-transform duration-200 ${techMenuOpen ? 'rotate-180' : ''}`} />
-                          </button>
-                          {techMenuOpen && technologies.length > 0 && (
+                          {technologies.length > 0 && (
                             <TechnologiesDropdown
                               technologies={technologies}
-                              onClose={() => { setTechMenuOpen(false); closeMenu(); }}
+                              onClose={closeMenu}
                               inline
                             />
                           )}
@@ -333,7 +320,7 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
                           onClick={closeMenu}
                           className={({ isActive }) =>
                             `flex items-center rounded-lg py-2.5 px-3 text-[0.925rem] font-medium no-underline transition-all duration-200 ${isActive
-                              ? 'bg-primary/10 text-primary dark:bg-secondary/20 dark:text-secondary'
+                              ? 'bg-secondary/20 text-secondary dark:bg-secondary/20 dark:text-secondary'
                               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50'
                             }`
                           }

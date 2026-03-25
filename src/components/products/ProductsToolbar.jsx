@@ -126,6 +126,7 @@ export default function ProductsToolbar({
   search,
   onSearchChange,
   onSearchSubmit,
+  onClearSearch,
   selectedCategoryIds = [],
   onCategoryChange,
   categories,
@@ -143,6 +144,8 @@ export default function ProductsToolbar({
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           className="flex-1 mb-0 min-w-0"
+          clearable
+          onClear={onClearSearch}
         />
         <Button
           size="lg"

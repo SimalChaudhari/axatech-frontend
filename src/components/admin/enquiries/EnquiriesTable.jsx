@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Table, Badge } from '../../common';
 import { DotsVerticalIcon } from '../../icons';
 
@@ -9,42 +9,29 @@ const STATUS_TABS = [
   { value: 'Closed', label: 'Closed', variant: 'success', activeVariant: 'success', activeSolid: true },
 ];
 
-export default function EnquiriesTable({ enquiries = [], loading = false, onView }) {
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+export default function EnquiriesTable({
+  enquiries = [],
+  loading = false,
+  onView,
+  statusFilter = 'all',
+  onStatusFilterChange,
+  searchQuery = '',
+  onSearchQueryChange,
+  page = 1,
+  rowsPerPage = 10,
+  totalRows = 0,
+  onPageChange,
+  onRowsPerPageChange,
+  counts = { all: 0, New: 0, Contacted: 0, Closed: 0 },
+}) {
+  const safeSetStatusFilter = (val) => onStatusFilterChange?.(val);
+  const safeSetSearchQuery = (val) => onSearchQueryChange?.(val);
+  const safeOnPageChange = (next) => onPageChange?.(next);
+  const safeOnRowsPerPageChange = (next) => onRowsPerPageChange?.(next);
+
   const [openActionId, setOpenActionId] = useState(null);
   const [menuPosition, setMenuPosition] = useState(null);
   const kebabRefs = useRef({});
-
-  const filteredEnquiries = useMemo(() => {
-    return enquiries.filter((e) => {
-      if (statusFilter !== 'all' && e.status !== statusFilter) return false;
-      if (searchQuery.trim()) {
-        const q = searchQuery.trim().toLowerCase();
-        const name = (e.name || '').toLowerCase();
-        const email = (e.email || '').toLowerCase();
-        const type = (e.type || '').toLowerCase();
-        if (!name.includes(q) && !email.includes(q) && !type.includes(q)) return false;
-      }
-      return true;
-    });
-  }, [enquiries, statusFilter, searchQuery]);
-
-  const totalFiltered = filteredEnquiries.length;
-  const totalPages = Math.max(1, Math.ceil(totalFiltered / rowsPerPage));
-  const pageSafe = Math.min(page, totalPages) || 1;
-
-  const paginatedEnquiries = useMemo(() => {
-    const start = (pageSafe - 1) * rowsPerPage;
-    return filteredEnquiries.slice(start, start + rowsPerPage);
-  }, [filteredEnquiries, pageSafe, rowsPerPage]);
-
-  const handleRowsPerPageChange = (newRowsPerPage) => {
-    setRowsPerPage(newRowsPerPage);
-    setPage(1);
-  };
 
   const statusVariant = (s) => {
     if (s === 'New') return 'info';
@@ -61,7 +48,7 @@ export default function EnquiriesTable({ enquiries = [], loading = false, onView
         id: 'status',
         label: 'Status',
         value: label,
-        onRemove: () => setStatusFilter('all'),
+        onRemove: () => safeSetStatusFilter('all'),
       });
     }
     if (searchQuery.trim()) {
@@ -69,15 +56,15 @@ export default function EnquiriesTable({ enquiries = [], loading = false, onView
         id: 'keyword',
         label: 'Keyword',
         value: searchQuery.trim(),
-        onRemove: () => setSearchQuery(''),
+        onRemove: () => safeSetSearchQuery(''),
       });
     }
     return list;
   }, [statusFilter, searchQuery]);
 
   const handleClearAllFilters = () => {
-    setStatusFilter('all');
-    setSearchQuery('');
+    safeSetStatusFilter('all');
+    safeSetSearchQuery('');
   };
 
   const openActionMenu = (e, id) => {
@@ -94,24 +81,30 @@ export default function EnquiriesTable({ enquiries = [], loading = false, onView
     ? enquiries.find((e) => e._id === openActionId)
     : null;
 
+  // Clear menu state when the underlying server results change.
+  useEffect(() => {
+    setOpenActionId(null);
+  }, [enquiries]);
+
   return (
     <div className="mb-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
       <div className="border-b border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-800">
         <Table.StatusTabs
           tabs={STATUS_TABS}
           value={statusFilter}
-          onChange={setStatusFilter}
+          onChange={safeSetStatusFilter}
           counts={{
-            all: enquiries.length,
-            New: enquiries.filter((e) => e.status === 'New').length,
-            Contacted: enquiries.filter((e) => e.status === 'Contacted').length,
-            Closed: enquiries.filter((e) => e.status === 'Closed').length,
+            all: counts.all ?? 0,
+            New: counts.New ?? 0,
+            Contacted: counts.Contacted ?? 0,
+            Closed: counts.Closed ?? 0,
           }}
         />
         <Table.Toolbar>
           <Table.SearchInput
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            debounceMs={500}
+            onChange={(e) => safeSetSearchQuery(e.target.value)}
             ariaLabel="Search enquiries"
             placeholder="Search by name, email, or type"
           />
@@ -120,7 +113,7 @@ export default function EnquiriesTable({ enquiries = [], loading = false, onView
 
       <Table.ActiveFilters
         filters={activeFilters}
-        resultCount={totalFiltered}
+        resultCount={totalRows}
         onClearAll={handleClearAllFilters}
       />
 
@@ -138,10 +131,10 @@ export default function EnquiriesTable({ enquiries = [], loading = false, onView
         <Table.Body>
           {loading ? (
             <Table.LoadingState colSpan={6} />
-          ) : paginatedEnquiries.length === 0 ? (
+          ) : enquiries.length === 0 ? (
             <Table.EmptyState colSpan={6} />
           ) : (
-            paginatedEnquiries.map((e) => (
+            enquiries.map((e) => (
               <Table.Row key={e._id}>
                 <Table.Td>
                   {new Date(e.createdAt).toLocaleString()}
@@ -176,11 +169,11 @@ export default function EnquiriesTable({ enquiries = [], loading = false, onView
       </Table>
 
       <Table.Pagination
-        page={pageSafe}
+        page={page}
         rowsPerPage={rowsPerPage}
-        totalRows={totalFiltered}
-        onPageChange={setPage}
-        onRowsPerPageChange={handleRowsPerPageChange}
+        totalRows={totalRows}
+        onPageChange={safeOnPageChange}
+        onRowsPerPageChange={safeOnRowsPerPageChange}
       />
 
       <Table.ActionMenu

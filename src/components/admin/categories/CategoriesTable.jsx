@@ -8,9 +8,20 @@ const STATUS_TABS = [
   { value: 'inactive', label: 'Inactive', variant: 'warning', activeVariant: 'warning', activeSolid: true },
 ];
 
-export default function CategoriesTable({ categories, onOpenEdit, onRemove, loading = false }) {
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+export default function CategoriesTable({
+  categories,
+  onOpenEdit,
+  onRemove,
+  loading = false,
+  statusFilter = 'all', // all | active | inactive
+  onStatusFilterChange,
+  searchQuery = '',
+  onSearchQueryChange,
+  counts = { all: 0, active: 0, inactive: 0 },
+}) {
+  const safeSetStatusFilter = (val) => onStatusFilterChange?.(val);
+  const safeSetSearchQuery = (val) => onSearchQueryChange?.(val);
+
   const [openActionId, setOpenActionId] = useState(null);
   const [menuPosition, setMenuPosition] = useState(null);
   const [page, setPage] = useState(1);
@@ -21,28 +32,8 @@ export default function CategoriesTable({ categories, onOpenEdit, onRemove, load
   const [deleteConfirm, setDeleteConfirm] = useState(null); // null | { type: 'single', id, name } | { type: 'bulk', ids: string[] }
   const kebabRefs = useRef({});
 
-  const counts = useMemo(
-    () => ({
-      all: categories.length,
-      active: categories.filter((c) => c.isActive !== false).length,
-      inactive: categories.filter((c) => c.isActive === false).length,
-    }),
-    [categories]
-  );
-
-  const filteredCategories = useMemo(() => {
-    return categories.filter((c) => {
-      if (statusFilter === 'active' && c.isActive === false) return false;
-      if (statusFilter === 'inactive' && c.isActive !== false) return false;
-      if (searchQuery.trim()) {
-        const q = searchQuery.trim().toLowerCase();
-        const name = (c.name || '').toLowerCase();
-        const slug = (c.slug || '').toLowerCase();
-        if (!name.includes(q) && !slug.includes(q)) return false;
-      }
-      return true;
-    });
-  }, [categories, statusFilter, searchQuery]);
+  // categories are already filtered by API in `CategoriesList`.
+  const filteredCategories = categories;
 
   const totalFiltered = filteredCategories.length;
   const totalPages = Math.max(1, Math.ceil(totalFiltered / rowsPerPage));
@@ -56,7 +47,7 @@ export default function CategoriesTable({ categories, onOpenEdit, onRemove, load
         id: 'status',
         label: 'Status',
         value: label,
-        onRemove: () => setStatusFilter('all'),
+        onRemove: () => safeSetStatusFilter('all'),
       });
     }
     if (searchQuery.trim()) {
@@ -64,15 +55,15 @@ export default function CategoriesTable({ categories, onOpenEdit, onRemove, load
         id: 'keyword',
         label: 'Keyword',
         value: searchQuery.trim(),
-        onRemove: () => setSearchQuery(''),
+        onRemove: () => safeSetSearchQuery(''),
       });
     }
     return list;
   }, [statusFilter, searchQuery]);
 
   const handleClearAllFilters = () => {
-    setStatusFilter('all');
-    setSearchQuery('');
+    safeSetStatusFilter('all');
+    safeSetSearchQuery('');
   };
 
   const sortedCategories = useMemo(() => {
@@ -174,13 +165,14 @@ export default function CategoriesTable({ categories, onOpenEdit, onRemove, load
         <Table.StatusTabs
           tabs={STATUS_TABS}
           value={statusFilter}
-          onChange={setStatusFilter}
+          onChange={safeSetStatusFilter}
           counts={counts}
         />
         <Table.Toolbar>
           <Table.SearchInput
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            // debounceMs={450}
+            onChange={(e) => safeSetSearchQuery(e.target.value)}
             ariaLabel="Search categories"
             placeholder="Search categories"
           />

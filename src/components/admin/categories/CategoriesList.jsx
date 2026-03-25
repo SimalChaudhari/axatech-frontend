@@ -16,22 +16,53 @@ const initialForm = {
 
 export default function CategoriesList() {
   const [list, setList] = useState([]);
+  const [allCategories, setAllCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null); // null | 'new' | categoryId
   const [form, setForm] = useState(initialForm);
 
-  const load = () => {
+  const [statusFilter, setStatusFilter] = useState('all'); // all | active | inactive
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const loadAll = () => {
     setLoading(true);
     return api.admin.categories
-      .list()
-      .then(setList)
+      .list({ status: 'all' })
+      .then((r) => setAllCategories(Array.isArray(r) ? r : []))
+      .finally(() => setLoading(false));
+  };
+
+  const loadFiltered = () => {
+    setLoading(true);
+    const search = searchQuery.trim() ? searchQuery.trim() : undefined;
+    return api.admin.categories
+      .list({
+        status: statusFilter === 'all' ? 'all' : statusFilter,
+        search,
+      })
+      .then((r) => setList(Array.isArray(r) ? r : []))
       .catch(console.error)
       .finally(() => setLoading(false));
   };
 
+  const refresh = () => loadAll().then(loadFiltered).catch(console.error);
+
   useEffect(() => {
-    load();
+    loadAll()
+      .then(loadFiltered)
+      .catch(console.error);
   }, []);
+
+  useEffect(() => {
+    // Update API data when filters change.
+    loadFiltered();
+  }, [statusFilter, searchQuery]);
+
+  const counts = {
+    all: allCategories.length,
+    active: allCategories.filter((c) => c.isActive !== false).length,
+    inactive: allCategories.filter((c) => c.isActive === false).length,
+  };
 
   const openCreate = () => {
     setEditing('new');
@@ -64,7 +95,7 @@ export default function CategoriesList() {
         toast.success('Category updated');
       }
       setEditing(null);
-      load();
+      refresh();
     } catch (e) {
       toast.error(e.message || 'Failed to save category');
     }
@@ -75,7 +106,7 @@ export default function CategoriesList() {
       await api.admin.categories.delete(id);
       toast.success('Category deleted');
       setEditing(null);
-      load();
+      refresh();
     } catch (e) {
       toast.error(e.message || 'Failed to delete category');
     }
@@ -91,6 +122,11 @@ export default function CategoriesList() {
           onOpenEdit={openEdit}
           onRemove={remove}
           loading={loading}
+          statusFilter={statusFilter}
+          onStatusFilterChange={setStatusFilter}
+          searchQuery={searchQuery}
+          onSearchQueryChange={setSearchQuery}
+          counts={counts}
         />
       </div>
 

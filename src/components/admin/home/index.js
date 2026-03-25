@@ -1,4 +1,3 @@
-export { default as HomeContentLoading } from './HomeContentLoading';
 export { default as HeroSection } from './HeroSection';
 export { default as IntroSection } from './IntroSection';
 export { default as WhyChooseSection } from './WhyChooseSection';

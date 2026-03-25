@@ -15,108 +15,82 @@ const CATEGORY_OPTIONS = [
   { value: 'Database Technologies', label: 'Database' },
 ];
 
-export default function TechnologiesTable({ technologies, onOpenEdit, onRemove, loading = false }) {
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [categoryFilter, setCategoryFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+export default function TechnologiesTable({
+  technologies = [],
+  onOpenEdit,
+  onRemove,
+  loading = false,
+  statusFilter = 'all',
+  onStatusFilterChange,
+  categoryFilter = 'all',
+  onCategoryFilterChange,
+  searchQuery = '',
+  onSearchQueryChange,
+  page = 1,
+  rowsPerPage = 5,
+  totalRows = 0,
+  onPageChange,
+  onRowsPerPageChange,
+  sortKey = 'title',
+  sortDirection = 'asc',
+  onSortChange,
+  counts = { all: 0, active: 0, inactive: 0 },
+}) {
+  const safeSetStatusFilter = (val) => onStatusFilterChange?.(val);
+  const safeSetCategoryFilter = (val) => onCategoryFilterChange?.(val);
+  const safeSetSearchQuery = (val) => onSearchQueryChange?.(val);
+  const safeOnPageChange = (val) => onPageChange?.(val);
+  const safeOnRowsPerPageChange = (val) => onRowsPerPageChange?.(val);
+
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [openActionId, setOpenActionId] = useState(null);
   const [menuPosition, setMenuPosition] = useState(null);
-  const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [sortKey, setSortKey] = useState('title');
-  const [sortDirection, setSortDirection] = useState('asc');
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const kebabRefs = useRef({});
 
-  const counts = useMemo(() => ({
-    all: technologies.length,
-    active: technologies.filter((t) => t.isActive !== false).length,
-    inactive: technologies.filter((t) => t.isActive === false).length,
-  }), [technologies]);
-
-  const filtered = useMemo(() => {
-    return technologies.filter((t) => {
-      if (statusFilter === 'active' && t.isActive === false) return false;
-      if (statusFilter === 'inactive' && t.isActive !== false) return false;
-      if (categoryFilter !== 'all' && (t.category || '') !== categoryFilter) return false;
-      if (searchQuery.trim()) {
-        const q = searchQuery.trim().toLowerCase();
-        if (!(t.title || '').toLowerCase().includes(q) && !(t.description || '').toLowerCase().includes(q)) return false;
-      }
-      return true;
-    });
-  }, [technologies, statusFilter, categoryFilter, searchQuery]);
-
-  const totalFiltered = filtered.length;
+  const totalFiltered = totalRows;
   const totalPages = Math.max(1, Math.ceil(totalFiltered / rowsPerPage));
-  const pageSafe = Math.min(page, totalPages) || 1;
+  const pageSafe = Math.min(Math.max(page, 1), totalPages);
 
   const activeFilters = useMemo(() => {
     const list = [];
     if (statusFilter !== 'all') {
       const label = STATUS_TABS.find((t) => t.value === statusFilter)?.label ?? statusFilter;
-      list.push({ id: 'status', label: 'Status', value: label, onRemove: () => setStatusFilter('all') });
+      list.push({ id: 'status', label: 'Status', value: label, onRemove: () => safeSetStatusFilter('all') });
     }
     if (categoryFilter !== 'all') {
       const label = CATEGORY_OPTIONS.find((t) => t.value === categoryFilter)?.label ?? categoryFilter;
-      list.push({ id: 'category', label: 'Category', value: label, onRemove: () => setCategoryFilter('all') });
+      list.push({ id: 'category', label: 'Category', value: label, onRemove: () => safeSetCategoryFilter('all') });
     }
     if (searchQuery.trim()) {
-      list.push({ id: 'keyword', label: 'Keyword', value: searchQuery.trim(), onRemove: () => setSearchQuery('') });
+      list.push({
+        id: 'keyword',
+        label: 'Keyword',
+        value: searchQuery.trim(),
+        onRemove: () => safeSetSearchQuery(''),
+      });
     }
     return list;
   }, [statusFilter, categoryFilter, searchQuery]);
 
   const handleClearAllFilters = () => {
-    setStatusFilter('all');
-    setCategoryFilter('all');
-    setSearchQuery('');
+    safeSetStatusFilter('all');
+    safeSetCategoryFilter('all');
+    safeSetSearchQuery('');
   };
-
-  const sorted = useMemo(() => {
-    const list = [...filtered];
-    const key = sortKey;
-    const dir = sortDirection;
-    list.sort((a, b) => {
-      let va = a[key];
-      let vb = b[key];
-      if (key === 'isActive') {
-        va = va !== false ? 1 : 0;
-        vb = vb !== false ? 1 : 0;
-        return dir === 'asc' ? va - vb : vb - va;
-      }
-      va = String(va ?? '').toLowerCase();
-      vb = String(vb ?? '').toLowerCase();
-      return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
-    });
-    return list;
-  }, [filtered, sortKey, sortDirection]);
-
-  const paginated = useMemo(() => {
-    const start = (pageSafe - 1) * rowsPerPage;
-    return sorted.slice(start, start + rowsPerPage);
-  }, [sorted, pageSafe, rowsPerPage]);
 
   const handleSort = (key) => {
-    if (sortKey === key) setSortDirection((d) => (d === 'asc' ? 'desc' : 'asc'));
-    else {
-      setSortKey(key);
-      setSortDirection('asc');
-    }
-    setPage(1);
+    if (typeof onSortChange !== 'function') return;
+    const nextDirection = sortKey === key ? (sortDirection === 'asc' ? 'desc' : 'asc') : 'asc';
+    onSortChange(key, nextDirection);
   };
 
-  useEffect(() => {
-    setPage((p) => (p > totalPages && totalPages > 0 ? totalPages : p));
-  }, [totalPages]);
-
-  const allSelected = paginated.length > 0 && paginated.every((t) => selectedIds.has(t._id));
+  const allSelected = technologies.length > 0 && technologies.every((t) => selectedIds.has(t._id));
   const someSelected = selectedIds.size > 0;
 
   const handleSelectAll = () => {
     if (allSelected) setSelectedIds(new Set());
-    else setSelectedIds(new Set(paginated.map((t) => t._id)));
+    else setSelectedIds(new Set(technologies.map((t) => t._id)));
   };
 
   const handleSelectRow = (id) => {
@@ -159,12 +133,14 @@ export default function TechnologiesTable({ technologies, onOpenEdit, onRemove, 
     setDeleteConfirm(null);
   };
 
-  const handleRowsPerPageChange = (newRowsPerPage) => {
-    setRowsPerPage(newRowsPerPage);
-    setPage(1);
-  };
-
   const techForMenu = openActionId ? technologies.find((t) => t._id === openActionId) : null;
+
+  // Clear selection/menu when the underlying server results change (filters/page).
+  useEffect(() => {
+    setSelectedIds(new Set());
+    setOpenActionId(null);
+    setDeleteConfirm(null);
+  }, [technologies]);
 
   return (
     <>
@@ -172,19 +148,20 @@ export default function TechnologiesTable({ technologies, onOpenEdit, onRemove, 
         <Table.StatusTabs
           tabs={STATUS_TABS}
           value={statusFilter}
-          onChange={setStatusFilter}
+          onChange={safeSetStatusFilter}
           counts={counts}
         />
         <Table.Toolbar>
           <Table.ToolbarDropdown
             value={categoryFilter}
-            onChange={setCategoryFilter}
+            onChange={safeSetCategoryFilter}
             options={CATEGORY_OPTIONS}
             showPlaceholderOption={false}
           />
           <Table.SearchInput
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            // debounceMs={450}
+            onChange={(e) => safeSetSearchQuery(e.target.value)}
             ariaLabel="Search technologies"
             placeholder="Search technologies"
           />
@@ -227,10 +204,10 @@ export default function TechnologiesTable({ technologies, onOpenEdit, onRemove, 
         <Table.Body>
           {loading ? (
             <Table.LoadingState colSpan={6} />
-          ) : paginated.length === 0 ? (
+        ) : technologies.length === 0 ? (
             <Table.EmptyState colSpan={6} />
           ) : (
-            paginated.map((t) => (
+          technologies.map((t) => (
               <Table.Row key={t._id}>
                 <Table.SelectionCell
                   checked={selectedIds.has(t._id)}
@@ -280,8 +257,8 @@ export default function TechnologiesTable({ technologies, onOpenEdit, onRemove, 
         page={pageSafe}
         rowsPerPage={rowsPerPage}
         totalRows={totalFiltered}
-        onPageChange={setPage}
-        onRowsPerPageChange={handleRowsPerPageChange}
+        onPageChange={safeOnPageChange}
+        onRowsPerPageChange={safeOnRowsPerPageChange}
       />
 
       <Table.ActionMenu

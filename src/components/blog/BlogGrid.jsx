@@ -1,14 +1,9 @@
 import BlogCard from './BlogCard';
-import { Pagination } from '../common';
+import { Loader, Pagination } from '../common';
 
 export default function BlogGrid({ blogs = [], loading = false, page = 1, totalPages = 1, onPageChange }) {
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 animate-fadeInUp">
-        <div className="w-12 h-12 border-2 border-primary/30 dark:border-secondary/40 border-t-primary dark:border-t-secondary rounded-full animate-spin mb-4" aria-hidden />
-        <p className="text-gray-600 dark:text-gray-400 font-medium">Loading posts...</p>
-      </div>
-    );
+    return <Loader className="min-h-[40vh]" />;
   }
   if (!blogs?.length) {
     return (

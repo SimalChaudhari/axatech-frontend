@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import api from '../../api';
+import { Loader } from '../../components/common';
 import { ServiceDetailContent } from '../../components/services';
 
 export default function ServiceDetail() {
@@ -15,11 +16,7 @@ export default function ServiceDetail() {
   }, [slug]);
 
   if (loading) {
-    return (
-      <div className="container py-16 text-center text-gray-600 dark:text-gray-400">
-        Loading...
-      </div>
-    );
+    return <Loader className="min-h-screen" />;
   }
   if (!service) {
     return (

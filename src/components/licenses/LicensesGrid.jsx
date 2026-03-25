@@ -1,13 +1,9 @@
 import LicenseCard from './LicenseCard';
+import { Loader } from '../common';
 
 export default function LicensesGrid({ plans, loading }) {
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 animate-fadeInUp">
-        <div className="w-10 h-10 border-2 border-primary/30 dark:border-secondary/40 border-t-primary dark:border-t-secondary rounded-full animate-spin mb-4" aria-hidden />
-        <p className="text-gray-600 dark:text-gray-400 font-medium">Loading plans...</p>
-      </div>
-    );
+    return <Loader className="min-h-[40vh]" />;
   }
   if (!plans?.length) {
     return (

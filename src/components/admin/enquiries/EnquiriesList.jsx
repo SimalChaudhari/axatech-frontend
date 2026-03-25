@@ -7,9 +7,19 @@ import EnquiriesTable from './EnquiriesTable';
 import EnquiryDetailModal from './EnquiryDetailModal';
 
 export default function EnquiriesList() {
-  const [searchParams] = useSearchParams();
-  const statusFilter = searchParams.get('status') || '';
-  const [data, setData] = useState({ enquiries: [], total: 0, pages: 1 });
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlStatus = searchParams.get('status') || 'all';
+  const [statusFilter, setStatusFilter] = useState(urlStatus || 'all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const [data, setData] = useState({
+    enquiries: [],
+    total: 0,
+    pages: 1,
+    counts: { all: 0, New: 0, Contacted: 0, Closed: 0 },
+  });
   const [loading, setLoading] = useState(true);
   const [detailId, setDetailId] = useState(null);
   const [detail, setDetail] = useState(null);
@@ -18,16 +28,24 @@ export default function EnquiriesList() {
   const [saving, setSaving] = useState(false);
 
   const load = () => {
-    const params = { limit: 20 };
-    if (statusFilter) params.status = statusFilter;
+    const params = {
+      page,
+      limit: rowsPerPage,
+      search: searchQuery.trim() ? searchQuery.trim() : undefined,
+    };
+    if (statusFilter && statusFilter !== 'all') params.status = statusFilter;
     return api.admin.enquiries.list(params).then(setData).catch(console.error);
   };
 
   useEffect(() => {
+    setStatusFilter(urlStatus || 'all');
+    setPage(1);
+  }, [urlStatus]);
+
+  useEffect(() => {
     setLoading(true);
     load().finally(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter]);
+  }, [statusFilter, searchQuery, page, rowsPerPage]);
 
   useEffect(() => {
     if (!detailId) {
@@ -59,6 +77,23 @@ export default function EnquiriesList() {
     }
   };
 
+  const handleStatusFilterChange = (val) => {
+    const next = val || 'all';
+    setStatusFilter(next);
+    setPage(1);
+
+    if (next === 'all') {
+      setSearchParams({});
+    } else {
+      setSearchParams({ status: next });
+    }
+  };
+
+  const handleSearchQueryChange = (val) => {
+    setSearchQuery(val ?? '');
+    setPage(1);
+  };
+
   return (
     <div className="mx-auto max-w-[1280px]">
       <EnquiriesHeader statusFilter={statusFilter} />
@@ -67,6 +102,19 @@ export default function EnquiriesList() {
         enquiries={data.enquiries}
         loading={loading}
         onView={(id) => setDetailId(id)}
+        statusFilter={statusFilter}
+        onStatusFilterChange={handleStatusFilterChange}
+        searchQuery={searchQuery}
+        onSearchQueryChange={handleSearchQueryChange}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        totalRows={data.total}
+        onPageChange={setPage}
+        onRowsPerPageChange={(n) => {
+          setRowsPerPage(n);
+          setPage(1);
+        }}
+        counts={data.counts}
       />
 
       <EnquiryDetailModal

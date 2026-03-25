@@ -1,74 +1,78 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { Table, ConfirmModal, Badge } from '../../common';
 import { DotsVerticalIcon } from '../../icons';
 
-const STATUS_TABS = [
-  { value: 'all', label: 'All', variant: 'neutral', activeVariant: 'neutral' },
-  { value: 'active', label: 'Active', variant: 'success', activeVariant: 'success', activeSolid: true },
-  { value: 'inactive', label: 'Inactive', variant: 'warning', activeVariant: 'warning', activeSolid: true },
-];
+const TYPE_LABELS = {
+  single: 'Single',
+  multi: 'Multi',
+};
 
-const TYPE_OPTIONS = [
-  { value: 'all', label: 'All types' },
-  { value: 'single', label: 'Single' },
-  { value: 'multi', label: 'Multi' },
-];
+export default function LicensesTable({
+  plans,
+  onOpenEdit,
+  onRemove,
+  loading = false,
+  statusFilter = 'all', // all | active | inactive
+  onStatusFilterChange,
+  typeFilter = 'all', // all | single | multi
+  onTypeFilterChange,
+  searchQuery = '',
+  onSearchQueryChange,
+  sortKey = 'planName',
+  sortDirection = 'asc',
+  onSortChange,
+  page = 1,
+  rowsPerPage = 5,
+  totalRows = 0,
+  onPageChange,
+  onRowsPerPageChange,
+  counts = { all: 0, active: 0, inactive: 0 },
+  typeOptions = [{ value: 'all', label: 'All types' }],
+}) {
+  const safeSetStatusFilter = (val) => onStatusFilterChange?.(val);
+  const safeSetTypeFilter = (val) => onTypeFilterChange?.(val);
+  const safeSetSearchQuery = (val) => onSearchQueryChange?.(val);
+  const safeOnSortChange = (key, dir) => onSortChange?.(key, dir);
+  const safeOnPageChange = (nextPage) => onPageChange?.(nextPage);
+  const safeOnRowsPerPageChange = (nextRowsPerPage) => onRowsPerPageChange?.(nextRowsPerPage);
 
-export default function LicensesTable({ plans, onOpenEdit, onRemove, loading = false }) {
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [typeFilter, setTypeFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [openActionId, setOpenActionId] = useState(null);
   const [menuPosition, setMenuPosition] = useState(null);
-  const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [sortKey, setSortKey] = useState('planName');
-  const [sortDirection, setSortDirection] = useState('asc');
   const [deleteConfirm, setDeleteConfirm] = useState(null); // null | { type: 'single', id, planName } | { type: 'bulk', ids: string[] }
   const kebabRefs = useRef({});
 
-  const counts = useMemo(() => ({
-    all: plans.length,
-    active: plans.filter((p) => p.isActive !== false).length,
-    inactive: plans.filter((p) => p.isActive === false).length,
-  }), [plans]);
+  const statusTabs = useMemo(() => {
+    const tabs = [
+      { value: 'all', label: 'All', variant: 'neutral', activeVariant: 'neutral' },
+      { value: 'active', label: 'Active', variant: 'success', activeVariant: 'success', activeSolid: true },
+      { value: 'inactive', label: 'Inactive', variant: 'warning', activeVariant: 'warning', activeSolid: true },
+    ];
 
-  const filteredPlans = useMemo(() => {
-    return plans.filter((p) => {
-      if (statusFilter === 'active' && p.isActive === false) return false;
-      if (statusFilter === 'inactive' && p.isActive !== false) return false;
-      if (typeFilter !== 'all' && (p.type || 'single') !== typeFilter) return false;
-      if (searchQuery.trim()) {
-        const q = searchQuery.trim().toLowerCase();
-        if (!(p.planName || '').toLowerCase().includes(q)) return false;
-      }
-      return true;
-    });
-  }, [plans, statusFilter, typeFilter, searchQuery]);
 
-  const totalFiltered = filteredPlans.length;
-  const totalPages = Math.max(1, Math.ceil(totalFiltered / rowsPerPage));
-  const pageSafe = Math.min(page, totalPages) || 1;
+    return tabs;
+  }, []);
+
+  const totalFiltered = totalRows;
 
   const activeFilters = useMemo(() => {
     const list = [];
     if (statusFilter !== 'all') {
-      const label = STATUS_TABS.find((t) => t.value === statusFilter)?.label ?? statusFilter;
+      const label = statusTabs.find((t) => t.value === statusFilter)?.label ?? statusFilter;
       list.push({
         id: 'status',
         label: 'Status',
         value: label,
-        onRemove: () => setStatusFilter('all'),
+        onRemove: () => safeSetStatusFilter('all'),
       });
     }
     if (typeFilter !== 'all') {
-      const label = TYPE_OPTIONS.find((t) => t.value === typeFilter)?.label ?? typeFilter;
+      const label = typeOptions.find((t) => t.value === typeFilter)?.label ?? typeFilter;
       list.push({
         id: 'type',
         label: 'Type',
         value: label,
-        onRemove: () => setTypeFilter('all'),
+        onRemove: () => safeSetTypeFilter('all'),
       });
     }
     if (searchQuery.trim()) {
@@ -76,67 +80,29 @@ export default function LicensesTable({ plans, onOpenEdit, onRemove, loading = f
         id: 'keyword',
         label: 'Keyword',
         value: searchQuery.trim(),
-        onRemove: () => setSearchQuery(''),
+        onRemove: () => safeSetSearchQuery(''),
       });
     }
     return list;
-  }, [statusFilter, typeFilter, searchQuery]);
+  }, [statusFilter, typeFilter, searchQuery, statusTabs, typeOptions]);
 
   const handleClearAllFilters = () => {
-    setStatusFilter('all');
-    setTypeFilter('all');
-    setSearchQuery('');
+    safeSetStatusFilter('all');
+    safeSetTypeFilter('all');
+    safeSetSearchQuery('');
   };
-
-  const sortedPlans = useMemo(() => {
-    const list = [...filteredPlans];
-    const key = sortKey;
-    const dir = sortDirection;
-    list.sort((a, b) => {
-      let va = a[key];
-      let vb = b[key];
-      if (key === 'price') {
-        va = Number(va) || 0;
-        vb = Number(vb) || 0;
-        return dir === 'asc' ? va - vb : vb - va;
-      }
-      if (key === 'isActive') {
-        va = va !== false ? 1 : 0;
-        vb = vb !== false ? 1 : 0;
-        return dir === 'asc' ? va - vb : vb - va;
-      }
-      va = String(va ?? '').toLowerCase();
-      vb = String(vb ?? '').toLowerCase();
-      return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
-    });
-    return list;
-  }, [filteredPlans, sortKey, sortDirection]);
-
-  const paginatedPlans = useMemo(() => {
-    const start = (pageSafe - 1) * rowsPerPage;
-    return sortedPlans.slice(start, start + rowsPerPage);
-  }, [sortedPlans, pageSafe, rowsPerPage]);
 
   const handleSort = (key) => {
-    if (sortKey === key) {
-      setSortDirection((d) => (d === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortKey(key);
-      setSortDirection('asc');
-    }
-    setPage(1);
+    const nextDirection = sortKey === key ? (sortDirection === 'asc' ? 'desc' : 'asc') : 'asc';
+    safeOnSortChange(key, nextDirection);
   };
 
-  useEffect(() => {
-    setPage((p) => (p > totalPages && totalPages > 0 ? totalPages : p));
-  }, [totalPages]);
-
-  const allSelected = paginatedPlans.length > 0 && paginatedPlans.every((p) => selectedIds.has(p._id));
+  const allSelected = plans.length > 0 && plans.every((p) => selectedIds.has(p._id));
   const someSelected = selectedIds.size > 0;
 
   const handleSelectAll = () => {
     if (allSelected) setSelectedIds(new Set());
-    else setSelectedIds(new Set(paginatedPlans.map((p) => p._id)));
+    else setSelectedIds(new Set(plans.map((p) => p._id)));
   };
 
   const handleSelectRow = (id) => {
@@ -181,11 +147,6 @@ export default function LicensesTable({ plans, onOpenEdit, onRemove, loading = f
 
   const closeDeleteConfirm = () => setDeleteConfirm(null);
 
-  const handleRowsPerPageChange = (newRowsPerPage) => {
-    setRowsPerPage(newRowsPerPage);
-    setPage(1);
-  };
-
   const planForMenu = openActionId ? plans.find((p) => p._id === openActionId) : null;
 
   return (
@@ -194,21 +155,22 @@ export default function LicensesTable({ plans, onOpenEdit, onRemove, loading = f
       <div className="border-b border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-800">
         {/* Status tabs: same padding for all; active = dark label + colored underline; inactive = grey label, no underline */}
         <Table.StatusTabs
-          tabs={STATUS_TABS}
+          tabs={statusTabs}
           value={statusFilter}
-          onChange={setStatusFilter}
+          onChange={safeSetStatusFilter}
           counts={counts}
         />
         <Table.Toolbar>
           <Table.ToolbarDropdown
             value={typeFilter}
-            onChange={setTypeFilter}
-            options={TYPE_OPTIONS}
+            onChange={safeSetTypeFilter}
+            options={typeOptions}
             showPlaceholderOption={false}
           />
           <Table.SearchInput
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => safeSetSearchQuery(e.target.value)}
+            // debounceMs={450}
             ariaLabel="Search plans"
             placeholder="Search plans"
           />
@@ -258,10 +220,10 @@ export default function LicensesTable({ plans, onOpenEdit, onRemove, loading = f
         <Table.Body>
           {loading ? (
             <Table.LoadingState colSpan={6} />
-          ) : paginatedPlans.length === 0 ? (
+          ) : plans.length === 0 ? (
             <Table.EmptyState colSpan={6} />
           ) : (
-          paginatedPlans.map((p) => (
+          plans.map((p) => (
             <Table.Row key={p._id}>
               <Table.SelectionCell
                 checked={selectedIds.has(p._id)}
@@ -298,12 +260,12 @@ export default function LicensesTable({ plans, onOpenEdit, onRemove, loading = f
       </Table>
 
       <Table.Pagination
-        page={pageSafe}
+        page={page}
         rowsPerPage={rowsPerPage}
         totalRows={totalFiltered}
-        onPageChange={setPage}
-        onRowsPerPageChange={handleRowsPerPageChange}
-        // rowsPerPageOptions={[ 5, 10, 20, 50]}
+        onPageChange={safeOnPageChange}
+        onRowsPerPageChange={safeOnRowsPerPageChange}
+        // rowsPerPageOptions={[ 1, 5, 10, 20, 50]}
       />
 
       <Table.ActionMenu

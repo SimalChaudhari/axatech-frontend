@@ -1,4 +1,3 @@
-export { default as DashboardLoading } from './DashboardLoading';
 export { default as DashboardStats } from './DashboardStats';
 export { default as DashboardQuickActions } from './DashboardQuickActions';
 export { default as DashboardWelcome } from './DashboardWelcome';

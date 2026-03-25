@@ -17,22 +17,90 @@ const initialForm = {
 
 export default function TechnologiesList() {
   const [technologies, setTechnologies] = useState([]);
+  const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(initialForm);
 
+  // API-driven filters + pagination
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [sortKey, setSortKey] = useState('title');
+  const [sortDirection, setSortDirection] = useState('asc');
+  const [counts, setCounts] = useState({ all: 0, active: 0, inactive: 0 });
+
   const load = () => {
     setLoading(true);
     return api.admin.technologies
-      .list()
-      .then(setTechnologies)
+      .list({
+        status: statusFilter,
+        category: categoryFilter !== 'all' ? categoryFilter : undefined,
+        search: searchQuery.trim() ? searchQuery.trim() : undefined,
+        page,
+        limit: rowsPerPage,
+        sortKey,
+        sortDirection,
+      })
+      .then((res) => {
+        if (res && typeof res === 'object' && Array.isArray(res.technologies)) {
+          setTechnologies(res.technologies);
+          setTotalRows(Number(res.total || 0));
+          setCounts(res.counts || { all: 0, active: 0, inactive: 0 });
+          return;
+        }
+
+        // Backward compatibility fallback (if backend returns a plain array)
+        if (Array.isArray(res)) {
+          setTechnologies(res);
+          setTotalRows(res.length);
+          setCounts({
+            all: res.length,
+            active: res.filter((t) => t.isActive !== false).length,
+            inactive: res.filter((t) => t.isActive === false).length,
+          });
+          return;
+        }
+
+        setTechnologies([]);
+        setTotalRows(0);
+        setCounts({ all: 0, active: 0, inactive: 0 });
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   };
 
   useEffect(() => {
     load();
-  }, []);
+  }, [statusFilter, categoryFilter, searchQuery, page, rowsPerPage, sortKey, sortDirection]);
+
+  const handleStatusFilterChange = (val) => {
+    setStatusFilter(val);
+    setPage(1);
+  };
+
+  const handleCategoryFilterChange = (val) => {
+    setCategoryFilter(val);
+    setPage(1);
+  };
+
+  const handleSearchQueryChange = (val) => {
+    setSearchQuery(val);
+    setPage(1);
+  };
+
+  const handleSortChange = (key, direction) => {
+    setSortKey(key);
+    setSortDirection(direction);
+    setPage(1);
+  };
+
+  const handleRowsPerPageChange = (newRowsPerPage) => {
+    setRowsPerPage(newRowsPerPage);
+    setPage(1);
+  };
 
   const openCreate = () => {
     setEditing('new');
@@ -94,6 +162,21 @@ export default function TechnologiesList() {
           onOpenEdit={openEdit}
           onRemove={remove}
           loading={loading}
+          statusFilter={statusFilter}
+          onStatusFilterChange={handleStatusFilterChange}
+          categoryFilter={categoryFilter}
+          onCategoryFilterChange={handleCategoryFilterChange}
+          searchQuery={searchQuery}
+          onSearchQueryChange={handleSearchQueryChange}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          totalRows={totalRows}
+          onPageChange={setPage}
+          onRowsPerPageChange={handleRowsPerPageChange}
+          sortKey={sortKey}
+          sortDirection={sortDirection}
+          onSortChange={handleSortChange}
+          counts={counts}
         />
       </div>
 

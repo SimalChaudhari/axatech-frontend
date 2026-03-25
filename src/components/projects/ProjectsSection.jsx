@@ -1,10 +1,17 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, SectionHeader } from '../common';
+import { Loader, Pagination, SectionHeader } from '../common';
 import { ArrowRightIcon, ProjectsIcon } from '../icons';
+import api from '../../api';
+
+const ITEMS_PER_PAGE = 8;
 
 export default function ProjectsSection({ projects = [], loading }) {
   const [activeCategory, setActiveCategory] = useState('All');
+  const [pagedProjects, setPagedProjects] = useState([]);
+  const [queryLoading, setQueryLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const categories = useMemo(
     () => [
@@ -20,10 +27,71 @@ export default function ProjectsSection({ projects = [], loading }) {
     [projects]
   );
 
-  const filtered =
-    activeCategory === 'All'
-      ? projects
-      : projects.filter((p) => p.category === activeCategory);
+  const handleCategoryClick = (cat) => {
+    setActiveCategory(cat);
+    setPage(1);
+  };
+
+  useEffect(() => {
+    if (loading) return;
+
+    let cancelled = false;
+    const fetchPagedProjects = async () => {
+      setQueryLoading(true);
+      try {
+        const params = {
+          page,
+          limit: ITEMS_PER_PAGE,
+          ...(activeCategory !== 'All' ? { category: activeCategory } : {}),
+        };
+        const res = await api.projects(params);
+
+        const list = Array.isArray(res)
+          ? res
+          : Array.isArray(res?.projects)
+            ? res.projects
+            : Array.isArray(res?.items)
+              ? res.items
+              : [];
+
+        const apiTotalPages = Number(
+          res?.totalPages ?? res?.pagination?.totalPages ?? 0
+        );
+        const hasApiPagination = apiTotalPages > 0;
+        const nextTotalPages = hasApiPagination
+          ? apiTotalPages
+          : Math.max(1, Math.ceil(list.length / ITEMS_PER_PAGE));
+        const nextPageList = hasApiPagination
+          ? list
+          : list.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+
+        if (!cancelled) {
+          setPagedProjects(nextPageList);
+          setTotalPages(nextTotalPages);
+        }
+      } catch (e) {
+        // Fallback to in-memory behavior if API pagination params are unsupported.
+        const localList = (activeCategory === 'All'
+          ? projects
+          : projects.filter((p) => p.category === activeCategory));
+        const start = (page - 1) * ITEMS_PER_PAGE;
+        const sliced = localList.slice(start, start + ITEMS_PER_PAGE);
+        const localTotalPages = Math.max(1, Math.ceil(localList.length / ITEMS_PER_PAGE));
+
+        if (!cancelled) {
+          setPagedProjects(sliced);
+          setTotalPages(localTotalPages);
+        }
+      } finally {
+        if (!cancelled) setQueryLoading(false);
+      }
+    };
+
+    fetchPagedProjects();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeCategory, page, loading, projects]);
 
   return (
     <section className="py-20 md:py-24 bg-white dark:bg-gray-900 border-y border-gray-100 dark:border-gray-800">
@@ -49,7 +117,7 @@ export default function ProjectsSection({ projects = [], loading }) {
                 <button
                   key={cat}
                   type="button"
-                  onClick={() => setActiveCategory(cat)}
+                  onClick={() => handleCategoryClick(cat)}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                     isActive
                       ? 'bg-primary text-white shadow-sm shadow-primary/25 dark:bg-secondary'
@@ -63,18 +131,18 @@ export default function ProjectsSection({ projects = [], loading }) {
           </div>
         )}
 
-        {loading ? (
+        {loading || queryLoading ? (
           <div className="flex justify-center py-16">
-            <span className="inline-block h-10 w-10 animate-spin rounded-full border-2 border-slate-200 border-t-primary dark:border-gray-600 dark:border-t-secondary" />
+            <Loader className="min-h-[120px]" />
           </div>
-        ) : !filtered.length ? (
+        ) : !pagedProjects.length ? (
           <p className="py-16 text-center text-gray-500 dark:text-gray-400">
             No projects to show yet.
           </p>
         ) : (
           <>
             <div className="grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-              {filtered.map((p, i) => (
+              {pagedProjects.map((p, i) => (
                 <Link
                   to={`/projects/${p.slug}`}
                   key={p._id}
@@ -116,6 +184,12 @@ export default function ProjectsSection({ projects = [], loading }) {
                 </Link>
               ))}
             </div>
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              className="mt-10"
+            />
 
             {/* <div className="mt-10 text-center" data-aos="fade-up">
               <Button

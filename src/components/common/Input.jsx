@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { z } from 'zod';
-import { EyeIcon, EyeOffIcon } from '../icons/Icon';
+import { EyeIcon, EyeOffIcon, CloseIcon } from '../icons/Icon';
 
 /**
  * Run Zod schema validation and return the first error message or null.
@@ -35,6 +35,8 @@ export default function Input({
   className = '',
   error: errorProp,
   schema,
+  clearable = false,
+  onClear,
   onChange,
   ...inputProps
 }) {
@@ -70,6 +72,13 @@ export default function Input({
     },
     [onChange, touchedError, schema]
   );
+
+  const handleClear = useCallback(() => {
+    setTouchedError(null);
+    onClear?.();
+    // If parent passes `onChange`, call it with a synthetic event so `e.target.value` becomes ''.
+    if (onChange) onChange({ target: { value: '' } });
+  }, [onChange, onClear]);
 
   const error = (errorProp && String(errorProp).trim()) ? errorProp : touchedError;
 
@@ -109,6 +118,17 @@ export default function Input({
             onBlur={handleBlur}
             {...inputProps}
           />
+        )}
+        {!isPassword && clearable && !isTextarea && value && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-9 h-9 rounded text-text-muted dark:text-gray-400 hover:text-text dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-secondary/20"
+            aria-label="Clear input"
+            tabIndex={-1}
+          >
+            <CloseIcon className="text-[22px]" />
+          </button>
         )}
         {isPassword && (
           <button

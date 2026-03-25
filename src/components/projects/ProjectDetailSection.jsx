@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Button, SectionHeader } from '../common';
+import { Button, Loader, SectionHeader } from '../common';
 import { ChevronLeftIcon, OpenInNewIcon, ProjectsIcon } from '../icons';
 
 export default function ProjectDetailSection({ project, loading, error }) {
@@ -8,7 +8,7 @@ export default function ProjectDetailSection({ project, loading, error }) {
       <section className="py-20 md:py-24 bg-white dark:bg-gray-900 border-y border-gray-100 dark:border-gray-800">
         <div className="max-w-4xl mx-auto px-5">
           <div className="flex justify-center py-20">
-            <span className="inline-block h-10 w-10 animate-spin rounded-full border-2 border-slate-200 border-t-primary dark:border-gray-600 dark:border-t-secondary" />
+            <Loader className="min-h-[120px]" />
           </div>
         </div>
       </section>

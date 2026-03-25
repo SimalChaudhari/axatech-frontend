@@ -133,6 +133,10 @@ export function EmailOutlineIcon({ className = '' }) {
   return <Icon iconClass="icon-[mdi--email-outline]" className={className} />;
 }
 
+export function EmailEditIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--email-edit-outline]" className={className} />;
+}
+
 export function DownloadIcon({ className = '' }) {
   return <Icon iconClass="icon-[mdi--download]" className={className} />;
 }

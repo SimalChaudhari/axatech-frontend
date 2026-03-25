@@ -1,4 +1,5 @@
 import ProductCard from './ProductCard';
+import { Loader } from '../common';
 
 export default function ProductsGrid({
   products,
@@ -7,12 +8,7 @@ export default function ProductsGrid({
   onToggleProduct,
 }) {
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 animate-fadeInUp">
-        <div className="w-10 h-10 border-2 border-primary/30 dark:border-secondary/40 border-t-primary dark:border-t-secondary rounded-full animate-spin mb-4" aria-hidden />
-        <p className="text-gray-600 dark:text-gray-400 font-medium">Loading products...</p>
-      </div>
-    );
+    return <Loader className="min-h-[40vh]" />;
   }
   if (!products?.length) {
     return (

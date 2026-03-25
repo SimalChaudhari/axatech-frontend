@@ -27,16 +27,54 @@ function getImageUrl(imageValue) {
 
 export default function ProjectList() {
   const [list, setList] = useState([]);
+  const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(initialForm);
   const [imageFile, setImageFile] = useState(null);
 
+  const [statusFilter, setStatusFilter] = useState('all'); // all | active | inactive
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [counts, setCounts] = useState({ all: 0, active: 0, inactive: 0 });
+
   const load = () => {
     setLoading(true);
     return api.admin.projects
-      .list()
-      .then(setList)
+      .list({
+        status: statusFilter,
+        search: searchQuery.trim() ? searchQuery.trim() : undefined,
+        page,
+        limit: rowsPerPage,
+      })
+      .then((res) => {
+        // New API shape with pagination metadata
+        if (res && typeof res === 'object' && Array.isArray(res.projects)) {
+          setList(res.projects);
+          setTotalRows(Number(res.total || 0));
+          setCounts(res.counts || { all: 0, active: 0, inactive: 0 });
+          return;
+        }
+
+        // Backward compatibility (old backend returned array)
+        if (Array.isArray(res)) {
+          const total = res.length;
+          const start = (page - 1) * rowsPerPage;
+          const end = start + rowsPerPage;
+          setList(res.slice(start, end));
+          setTotalRows(total);
+          setCounts({
+            all: total,
+            active: res.filter((p) => p.isActive !== false).length,
+            inactive: res.filter((p) => p.isActive === false).length,
+          });
+        } else {
+          setList([]);
+          setTotalRows(0);
+          setCounts({ all: 0, active: 0, inactive: 0 });
+        }
+      })
       .catch(console.error)
       .finally(() => {
         setLoading(false);
@@ -45,7 +83,17 @@ export default function ProjectList() {
 
   useEffect(() => {
     load();
-  }, []);
+  }, [statusFilter, searchQuery, page, rowsPerPage]);
+
+  const handleStatusFilterChange = (val) => {
+    setStatusFilter(val);
+    setPage(1);
+  };
+
+  const handleSearchQueryChange = (val) => {
+    setSearchQuery(val);
+    setPage(1);
+  };
 
   const openCreate = () => {
     setEditing('new');
@@ -133,7 +181,25 @@ export default function ProjectList() {
       <ProjectsHeader onAddProject={openCreate} />
 
       <div className="mb-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-        <ProjectsTable projects={list} onOpenEdit={openEdit} onRemove={remove} loading={loading} />
+        <ProjectsTable
+          projects={list}
+          onOpenEdit={openEdit}
+          onRemove={remove}
+          loading={loading}
+          statusFilter={statusFilter}
+          onStatusFilterChange={handleStatusFilterChange}
+          searchQuery={searchQuery}
+          onSearchQueryChange={handleSearchQueryChange}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          totalRows={totalRows}
+          onPageChange={setPage}
+          onRowsPerPageChange={(n) => {
+            setRowsPerPage(n);
+            setPage(1);
+          }}
+          counts={counts}
+        />
       </div>
 
       {modalOpen && (

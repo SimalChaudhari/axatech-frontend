@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { Table, ConfirmModal, Badge } from '../../common';
 import { DotsVerticalIcon } from '../../icons';
 
@@ -9,48 +9,42 @@ const STATUS_TABS = [
   { value: 'inactive', label: 'Inactive', variant: 'warning', activeVariant: 'warning', activeSolid: true },
 ];
 
-export default function ProductsTable({ products = [], onOpenEdit, onRemove, loading = false }) {
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+export default function ProductsTable({
+  products = [],
+  onOpenEdit,
+  onRemove,
+  loading = false,
+  statusFilter = 'all',
+  onStatusFilterChange,
+  categoryFilter = 'all',
+  onCategoryFilterChange,
+  categoryOptions = [{ value: 'all', label: 'All categories' }],
+  searchQuery = '',
+  onSearchQueryChange,
+  sortKey = 'name',
+  sortDirection = 'asc',
+  onSortChange,
+  page = 1,
+  rowsPerPage = 5,
+  totalRows = 0,
+  onPageChange,
+  onRowsPerPageChange,
+  counts = { all: 0, featured: 0, active: 0, inactive: 0 },
+}) {
+  const safeSetStatusFilter = (val) => onStatusFilterChange?.(val);
+  const safeSetCategoryFilter = (val) => onCategoryFilterChange?.(val);
+  const safeSetSearchQuery = (val) => onSearchQueryChange?.(val);
+  const safeOnSortChange = (key, dir) => onSortChange?.(key, dir);
+  const safeOnPageChange = (nextPage) => onPageChange?.(nextPage);
+  const safeOnRowsPerPageChange = (nextRowsPerPage) => onRowsPerPageChange?.(nextRowsPerPage);
+
   const [openActionId, setOpenActionId] = useState(null);
   const [menuPosition, setMenuPosition] = useState(null);
-  const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [sortKey, setSortKey] = useState('name');
-  const [sortDirection, setSortDirection] = useState('asc');
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const kebabRefs = useRef({});
 
-  const counts = useMemo(
-    () => ({
-      all: products.length,
-      featured: products.filter((p) => p.featured).length,
-      active: products.filter((p) => p.isActive !== false).length,
-      inactive: products.filter((p) => p.isActive === false).length,
-    }),
-    [products]
-  );
-
-  const filteredProducts = useMemo(() => {
-    return products.filter((p) => {
-      if (statusFilter === 'featured' && !p.featured) return false;
-      if (statusFilter === 'active' && p.isActive === false) return false;
-      if (statusFilter === 'inactive' && p.isActive !== false) return false;
-      if (searchQuery.trim()) {
-        const q = searchQuery.trim().toLowerCase();
-        const name = (p.name || '').toLowerCase();
-        const slug = (p.slug || '').toLowerCase();
-        const short = (p.shortDescription || '').toLowerCase();
-        if (!name.includes(q) && !slug.includes(q) && !short.includes(q)) return false;
-      }
-      return true;
-    });
-  }, [products, statusFilter, searchQuery]);
-
-  const totalFiltered = filteredProducts.length;
-  const totalPages = Math.max(1, Math.ceil(totalFiltered / rowsPerPage));
-  const pageSafe = Math.min(page, totalPages) || 1;
+  const totalFiltered = totalRows;
 
   const activeFilters = useMemo(() => {
     const list = [];
@@ -60,7 +54,16 @@ export default function ProductsTable({ products = [], onOpenEdit, onRemove, loa
         id: 'status',
         label: 'Status',
         value: label,
-        onRemove: () => setStatusFilter('all'),
+        onRemove: () => safeSetStatusFilter('all'),
+      });
+    }
+    if (categoryFilter !== 'all') {
+      const label = categoryOptions.find((c) => c.value === categoryFilter)?.label ?? categoryFilter;
+      list.push({
+        id: 'category',
+        label: 'Category',
+        value: label,
+        onRemove: () => safeSetCategoryFilter('all'),
       });
     }
     if (searchQuery.trim()) {
@@ -68,72 +71,29 @@ export default function ProductsTable({ products = [], onOpenEdit, onRemove, loa
         id: 'keyword',
         label: 'Keyword',
         value: searchQuery.trim(),
-        onRemove: () => setSearchQuery(''),
+        onRemove: () => safeSetSearchQuery(''),
       });
     }
     return list;
-  }, [statusFilter, searchQuery]);
+  }, [statusFilter, categoryFilter, categoryOptions, searchQuery]);
 
   const handleClearAllFilters = () => {
-    setStatusFilter('all');
-    setSearchQuery('');
+    safeSetStatusFilter('all');
+    safeSetCategoryFilter('all');
+    safeSetSearchQuery('');
   };
-
-  const sortedProducts = useMemo(() => {
-    const list = [...filteredProducts];
-    const key = sortKey;
-    const dir = sortDirection;
-    list.sort((a, b) => {
-      if (key === 'name') {
-        const va = String(a.name ?? '').toLowerCase();
-        const vb = String(b.name ?? '').toLowerCase();
-        return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
-      }
-      if (key === 'category') {
-        const va = (a.category?.name ?? '').toLowerCase();
-        const vb = (b.category?.name ?? '').toLowerCase();
-        return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
-      }
-      if (key === 'featured') {
-        const va = a.featured ? 1 : 0;
-        const vb = b.featured ? 1 : 0;
-        return dir === 'asc' ? va - vb : vb - va;
-      }
-      if (key === 'isActive') {
-        const va = a.isActive !== false ? 1 : 0;
-        const vb = b.isActive !== false ? 1 : 0;
-        return dir === 'asc' ? va - vb : vb - va;
-      }
-      return 0;
-    });
-    return list;
-  }, [filteredProducts, sortKey, sortDirection]);
-
-  const paginatedProducts = useMemo(() => {
-    const start = (pageSafe - 1) * rowsPerPage;
-    return sortedProducts.slice(start, start + rowsPerPage);
-  }, [sortedProducts, pageSafe, rowsPerPage]);
 
   const handleSort = (key) => {
-    if (sortKey === key) {
-      setSortDirection((d) => (d === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortKey(key);
-      setSortDirection('asc');
-    }
-    setPage(1);
+    const nextDirection = sortKey === key ? (sortDirection === 'asc' ? 'desc' : 'asc') : 'asc';
+    safeOnSortChange(key, nextDirection);
   };
 
-  useEffect(() => {
-    setPage((p) => (p > totalPages && totalPages > 0 ? totalPages : p));
-  }, [totalPages]);
-
-  const allSelected = paginatedProducts.length > 0 && paginatedProducts.every((p) => selectedIds.has(p._id));
+  const allSelected = products.length > 0 && products.every((p) => selectedIds.has(p._id));
   const someSelected = selectedIds.size > 0;
 
   const handleSelectAll = () => {
     if (allSelected) setSelectedIds(new Set());
-    else setSelectedIds(new Set(paginatedProducts.map((p) => p._id)));
+    else setSelectedIds(new Set(products.map((p) => p._id)));
   };
 
   const handleSelectRow = (id) => {
@@ -176,11 +136,6 @@ export default function ProductsTable({ products = [], onOpenEdit, onRemove, loa
     setDeleteConfirm(null);
   };
 
-  const handleRowsPerPageChange = (newRowsPerPage) => {
-    setRowsPerPage(newRowsPerPage);
-    setPage(1);
-  };
-
   const productForMenu = openActionId ? products.find((p) => p._id === openActionId) : null;
 
   return (
@@ -189,13 +144,20 @@ export default function ProductsTable({ products = [], onOpenEdit, onRemove, loa
         <Table.StatusTabs
           tabs={STATUS_TABS}
           value={statusFilter}
-          onChange={setStatusFilter}
+          onChange={safeSetStatusFilter}
           counts={counts}
         />
         <Table.Toolbar>
+          <Table.ToolbarDropdown
+            value={categoryFilter}
+            onChange={safeSetCategoryFilter}
+            options={categoryOptions}
+            showPlaceholderOption={false}
+          />
           <Table.SearchInput
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => safeSetSearchQuery(e.target.value)}
+            // debounceMs={450}
             ariaLabel="Search products"
             placeholder="Search products"
           />
@@ -238,10 +200,10 @@ export default function ProductsTable({ products = [], onOpenEdit, onRemove, loa
         <Table.Body>
           {loading ? (
             <Table.LoadingState colSpan={6} />
-          ) : paginatedProducts.length === 0 ? (
+          ) : products.length === 0 ? (
             <Table.EmptyState colSpan={6} />
           ) : (
-          paginatedProducts.map((p) => (
+          products.map((p) => (
             <Table.Row key={p._id}>
               <Table.SelectionCell
                 checked={selectedIds.has(p._id)}
@@ -282,11 +244,11 @@ export default function ProductsTable({ products = [], onOpenEdit, onRemove, loa
       </Table>
 
       <Table.Pagination
-        page={pageSafe}
+        page={page}
         rowsPerPage={rowsPerPage}
         totalRows={totalFiltered}
-        onPageChange={setPage}
-        onRowsPerPageChange={handleRowsPerPageChange}
+        onPageChange={safeOnPageChange}
+        onRowsPerPageChange={safeOnRowsPerPageChange}
       />
 
       <Table.ActionMenu

@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../../api';
-import { PageMeta } from '../../components/common';
+import { Loader, PageMeta } from '../../components/common';
 import {
-  HomeLoading,
   HomeHero,
   HomeIntro,
   HomeLicenseHighlights,
@@ -38,7 +37,7 @@ export default function Home() {
   }, []);
 
   if (loading || !content) {
-    return <HomeLoading />;
+    return <Loader className="min-h-screen" />;
   }
 
   return (

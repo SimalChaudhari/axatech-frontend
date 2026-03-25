@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import api from '../../../api';
 import {
-  DashboardLoading,
   DashboardStats,
   DashboardQuickActions,
   DashboardWelcome,
   DashboardOverview,
   DashboardTips,
 } from '../../../components/admin/dashboard';
+import { Loader } from '../../../components/common';
 
 export default function AdminDashboard() {
   const [counts, setCounts] = useState({ enquiries: 0, newEnquiries: 0 });
@@ -29,7 +29,7 @@ export default function AdminDashboard() {
   }, []);
 
   if (loading) {
-    return <DashboardLoading />;
+    return <Loader className="min-h-screen" />;
   }
 
   return (
@@ -38,6 +38,7 @@ export default function AdminDashboard() {
         <h1 className="m-0 text-2xl font-bold tracking-tight text-slate-800 dark:text-white">
           Dashboard
         </h1>
+
       </header>
       <DashboardWelcome />
       <DashboardStats counts={counts} />

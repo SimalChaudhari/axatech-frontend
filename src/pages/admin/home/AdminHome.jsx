@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import api from '../../../api';
 import { toast } from '../../../utils/toast';
-import { Button } from '../../../components/common';
+import { Button, Loader } from '../../../components/common';
 import {
-  HomeContentLoading,
   HeroSection,
   IntroSection,
   WhyChooseSection,
@@ -52,7 +51,7 @@ export default function AdminHome() {
   };
 
   if (!content) {
-    return <HomeContentLoading />;
+    return <Loader className="min-h-screen" />;
   }
 
   return (

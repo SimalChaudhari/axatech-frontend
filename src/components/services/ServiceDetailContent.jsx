@@ -1,4 +1,5 @@
 import { Button, SectionHeader } from '../common';
+import { EmailEditIcon } from '../icons';
 
 export default function ServiceDetailContent({ service }) {
   return (
@@ -31,7 +32,7 @@ export default function ServiceDetailContent({ service }) {
             fullWidth={false}
             className="inline-flex items-center justify-center gap-2"
           >
-            <span className="icon-[mdi--email-edit-outline] text-xl shrink-0" aria-hidden />
+            <EmailEditIcon className="text-xl shrink-0" />
             Enquire now
           </Button>
         </div>

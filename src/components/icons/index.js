@@ -27,6 +27,7 @@ export {
   BlogsIcon,
   PhoneIcon,
   EmailOutlineIcon,
+  EmailEditIcon,
   DownloadIcon,
   WeatherSunnyIcon,
   WeatherNightIcon,

@@ -14,6 +14,7 @@ export default function Products() {
   const [categories, setCategories] = useState([]);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
   const [search, setSearch] = useState('');
+  const [appliedSearch, setAppliedSearch] = useState('');
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [selectedProductIds, setSelectedProductIds] = useState([]);
@@ -25,11 +26,11 @@ export default function Products() {
   useEffect(() => {
     setLoading(true);
     const categoryParam = selectedCategoryIds.length > 0 ? selectedCategoryIds.join(',') : undefined;
-    api.products({ page, limit: 12, category: categoryParam, search: search || undefined })
+    api.products({ page, limit: 12, category: categoryParam, search: appliedSearch || undefined })
       .then(setData)
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [page, selectedCategoryIds, search]);
+  }, [page, selectedCategoryIds, appliedSearch]);
 
   // Keep only IDs that exist in the current page of products
   useEffect(() => {
@@ -40,6 +41,13 @@ export default function Products() {
 
   const doSearch = (e) => {
     e?.preventDefault();
+    setPage(1);
+    setAppliedSearch(search.trim());
+  };
+
+  const clearSearch = () => {
+    setSearch('');
+    setAppliedSearch('');
     setPage(1);
   };
 
@@ -69,6 +77,7 @@ export default function Products() {
                 search={search}
                 onSearchChange={setSearch}
                 onSearchSubmit={doSearch}
+                onClearSearch={clearSearch}
                 selectedCategoryIds={selectedCategoryIds}
                 onCategoryChange={(ids) => { setSelectedCategoryIds(ids); setPage(1); }}
                 categories={categories}

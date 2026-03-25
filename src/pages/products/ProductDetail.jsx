@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import api from '../../api';
 import { ProductDetailMedia, ProductDetailInfo } from '../../components/products';
-import { Button } from '../../components/common';
+import { Button, Loader } from '../../components/common';
 import { ChevronLeftIcon } from '../../components/icons';
 
 export default function ProductDetail() {
@@ -16,11 +16,7 @@ export default function ProductDetail() {
   }, [slug]);
 
   if (loading) {
-    return (
-      <div className="max-w-[1200px] mx-auto px-5 py-16 text-center text-gray-600 dark:text-gray-400">
-        Loading...
-      </div>
-    );
+    return <Loader className="min-h-screen" />;
   }
   if (!product) {
     return (

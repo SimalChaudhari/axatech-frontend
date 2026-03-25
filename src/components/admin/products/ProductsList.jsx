@@ -21,18 +21,48 @@ const initialForm = {
 
 export default function ProductsList() {
   const [data, setData] = useState({ products: [], total: 0 });
+  const [counts, setCounts] = useState({ all: 0, featured: 0, active: 0, inactive: 0 });
+  const [categoryOptions, setCategoryOptions] = useState([{ value: 'all', label: 'All categories' }]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(initialForm);
   const [imageFiles, setImageFiles] = useState([]);
   const [videoFile, setVideoFile] = useState(null);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortKey, setSortKey] = useState('name');
+  const [sortDirection, setSortDirection] = useState('asc');
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const load = () => {
     setLoading(true);
+    const category = categoryFilter !== 'all' ? categoryFilter : undefined;
+    const search = searchQuery.trim() ? searchQuery.trim() : undefined;
     return api.admin.products
-      .list({ limit: 100 })
-      .then((r) => setData({ products: r.products || [], total: r.total || 0 }))
+      .list({
+        status: statusFilter,
+        category,
+        search,
+        page,
+        limit: rowsPerPage,
+        sortKey,
+        sortDirection,
+      })
+      .then((r) => {
+        const products = Array.isArray(r?.products) ? r.products : [];
+        setData({ products, total: Number(r?.total || 0) });
+        setCounts(r?.counts || {
+          all: Number(r?.total || 0),
+          featured: products.filter((p) => p.featured).length,
+          active: products.filter((p) => p.isActive !== false).length,
+          inactive: products.filter((p) => p.isActive === false).length,
+        });
+        const apiCategories = Array.isArray(r?.categories) ? r.categories : [];
+        setCategoryOptions([{ value: 'all', label: 'All categories' }, ...apiCategories]);
+      })
       .catch(console.error)
       .finally(() => {
         setLoading(false);
@@ -42,7 +72,34 @@ export default function ProductsList() {
   useEffect(() => {
     load();
     api.admin.categories.list().then(setCategories).catch(console.error);
-  }, []);
+  }, [statusFilter, categoryFilter, searchQuery, sortKey, sortDirection, page, rowsPerPage]);
+
+  useEffect(() => {
+    const maxPage = Math.max(1, Math.ceil((data.total || 0) / rowsPerPage));
+    setPage((p) => (p > maxPage ? maxPage : p));
+  }, [data.total, rowsPerPage]);
+
+  const handleStatusFilterChange = (val) => {
+    setStatusFilter(val);
+    setPage(1);
+  };
+  const handleCategoryFilterChange = (val) => {
+    setCategoryFilter(val);
+    setPage(1);
+  };
+  const handleSearchQueryChange = (val) => {
+    setSearchQuery(val);
+    setPage(1);
+  };
+  const handleSortChange = (key, direction) => {
+    setSortKey(key);
+    setSortDirection(direction);
+    setPage(1);
+  };
+  const handleRowsPerPageChange = (newRows) => {
+    setRowsPerPage(newRows);
+    setPage(1);
+  };
 
   const openCreate = () => {
     setEditing('new');
@@ -152,6 +209,22 @@ export default function ProductsList() {
           onOpenEdit={openEdit}
           onRemove={remove}
           loading={loading}
+          statusFilter={statusFilter}
+          onStatusFilterChange={handleStatusFilterChange}
+          categoryFilter={categoryFilter}
+          onCategoryFilterChange={handleCategoryFilterChange}
+          categoryOptions={categoryOptions}
+          searchQuery={searchQuery}
+          onSearchQueryChange={handleSearchQueryChange}
+          sortKey={sortKey}
+          sortDirection={sortDirection}
+          onSortChange={handleSortChange}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          totalRows={data.total}
+          onPageChange={setPage}
+          onRowsPerPageChange={handleRowsPerPageChange}
+          counts={counts}
         />
       </div>
 
