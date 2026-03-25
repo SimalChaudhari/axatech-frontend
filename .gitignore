@@ -6,6 +6,8 @@ dist/
 build/
 
 # Local env
+.env
+.env.local
 .env.*.local
 
 # Logs
@@ -34,4 +36,3 @@ Thumbs.db
 .cache/
 coverage/
 .nyc_output/
-config.bat

@@ -57,7 +57,6 @@ export default function LicensesModal({ mode = 'create', form, setForm, onSave, 
       onClose={onClose}
       primaryLabel={mode === 'create' ? 'Create plan' : 'Update plan'}
       onPrimary={handleSave}
-      size="3xl"
     >
       <div className="flex flex-col gap-5">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

@@ -7,10 +7,10 @@ import AdminCategories from '../pages/admin/categories/AdminCategories';
 import AdminProducts from '../pages/admin/products/AdminProducts';
 import AdminProjects from '../pages/admin/projects/AdminProjects';
 import AdminTechnologies from '../pages/admin/technologies/AdminTechnologies';
-import AdminServices from '../pages/admin/services/AdminServices';
-import AdminCloud from '../pages/admin/cloud/AdminCloud';
+import AdminServices from '../pages/admin/AdminServices';
+import AdminCloud from '../pages/admin/AdminCloud';
 import AdminEnquiries from '../pages/admin/enquiries/AdminEnquiries';
-import AdminBlogs from '../pages/admin/blogs/AdminBlogs';
+import AdminBlogs from '../pages/admin/AdminBlogs';
 import PrivateRoute from './PrivateRoute';
 
 export function getAdminRoutes() {

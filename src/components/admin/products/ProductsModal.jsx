@@ -64,7 +64,7 @@ export default function ProductsModal({
       onPrimary={handleSave}
       showDelete={mode === 'edit' && !!onDelete}
       onDelete={onDelete}
-      size="3xl"
+      size="2xl"
     >
       <ProductForm
         form={form}

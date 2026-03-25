@@ -31,11 +31,11 @@ function TechLink({ tech, onClose, inline = false }) {
   const to = `/technologies/${tech.slug || tech._id}`;
   const isActive = pathname === to;
   const baseClass = inline
-    ? 'flex items-center gap-2.5 rounded-lg py-2 px-3 text-[0.925rem] font-medium no-underline transition-all duration-200 bg-gray-100 dark:bg-gray-700/50'
+    ? 'flex items-center gap-2.5 rounded-lg py-2 px-3 text-[0.925rem] font-medium no-underline transition-all duration-200'
     : 'flex items-center gap-2.5 py-2 px-2 -mx-2 rounded-md text-[0.875rem] font-medium no-underline transition-colors duration-150';
   const linkClass = inline
-    ? `${baseClass} ${isActive ? 'bg-primary/10 text-primary dark:bg-secondary/20 dark:text-secondary' : 'text-gray-700 dark:text-gray-200 dark:bg-gray-700/50 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600/50 hover:text-primary dark:hover:text-secondary'}`
-    : `${baseClass} ${isActive ? 'bg-primary/5 text-primary dark:bg-secondary/10 dark:text-secondary' : 'text-gray-700 dark:text-gray-200 dark:bg-gray-700/50 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600/50 hover:text-primary dark:hover:text-secondary'}`;
+    ? `${baseClass} ${isActive ? 'bg-primary/10 text-primary dark:bg-secondary/20 dark:text-secondary' : 'text-gray-700 dark:text-gray-200 dark:bg-gray-700/50 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600/50 hover:text-primary dark:hover:text-secondary'}`
+    : `${baseClass} ${isActive ? 'bg-primary/5 text-primary dark:bg-secondary/10 dark:text-secondary' : 'text-gray-700 dark:text-gray-200 dark:bg-gray-700/50 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600/50 hover:text-primary dark:hover:text-secondary'}`;
   return (
     <li className={inline ? 'tech-submenu-item my-2' : ''}>
       <Link

@@ -38,7 +38,6 @@ export default function CategoriesModal({ mode = 'create', form, setForm, onSave
       onClose={onClose}
       primaryLabel={mode === 'create' ? 'Create category' : 'Update category'}
       onPrimary={handleSave}
-      size="2xl"
     >
       <div className="flex flex-col gap-5">
             <Input
