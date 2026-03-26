@@ -35,6 +35,20 @@ function measureLevelTreeGuides(rootEl) {
   });
 }
 
+
+const SIDEBAR_BG_IMAGE =
+  'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSJ1cmwoI3BhaW50MF9yYWRpYWxfNDQ2NF81NTMzOCkiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CjxkZWZzPgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50MF9yYWRpYWxfNDQ2NF81NTMzOCIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgxMjAgMS44MTgxMmUtMDUpIHJvdGF0ZSgtNDUpIHNjYWxlKDEyMy4yNSkiPgo8c3RvcCBzdG9wLWNvbG9yPSIjMDBCOEQ5Ii8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzAwQjhEOSIgc3RvcC1vcGFjaXR5PSIwIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==), url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSJ1cmwoI3BhaW50MF9yYWRpYWxfNDQ2NF81NTMzNykiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CjxkZWZzPgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50MF9yYWRpYWxfNDQ2NF81NTMzNyIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgwIDEyMCkgcm90YXRlKDEzNSkgc2NhbGUoMTIzLjI1KSI+CjxzdG9wIHN0b3AtY29sb3I9IiNGRjU2MzAiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRkY1NjMwIiBzdG9wLW9wYWNpdHk9IjAiLz4KPC9yYWRpYWxHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4K)';
+
+  
+const sidebarBgStyle = {
+  backgroundImage: SIDEBAR_BG_IMAGE,
+  backgroundSize: '50%, 50%',
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: 'right top, left bottom',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  boxShadow: '40px 40px 80px -8px rgba(0,0,0,0.24)',
+};
 const LEVEL_TREE_STYLES = `
   .level-tree-wrapper {
     position: relative;
@@ -97,6 +111,8 @@ const LEVEL_TREE_STYLES = `
 export default function LevelItem({
   id,
   label,
+  labelIcon: LabelIcon,
+  labelText,
   isOpen,
   defaultOpen = false,
   onToggle,
@@ -106,6 +122,7 @@ export default function LevelItem({
   triggerClassName = '',
   contentClassName = '',
   floating = false,
+  collapsed = false,
 }) {
   const { pathname } = useLocation();
 
@@ -155,8 +172,23 @@ export default function LevelItem({
 
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
   const [openNodes, setOpenNodes] = useState(initialNodes);
+  const [hoverOpen, setHoverOpen] = useState(false);
+  const [hoverPath, setHoverPath] = useState('');
+  const [menuPlacement, setMenuPlacement] = useState({});
   const isControlled = typeof isOpen === 'boolean';
   const open = isControlled ? isOpen : internalOpen;
+  const panelOpen = collapsed ? hoverOpen : open;
+  const collapsedContentClass = collapsed
+    ? 'absolute left-full top-0 ml-1 z-[130] overflow-visible'
+    : '';
+  const resolvedLabel = LabelIcon || labelText ? (
+    <span className={`inline-flex items-center ${collapsed ? 'flex-col gap-1' : 'gap-2'}`}>
+      {LabelIcon ? <LabelIcon className="text-[1.1rem] shrink-0" /> : null}
+      <span className={collapsed ? 'text-[10px] leading-none' : ''}>{labelText ?? label}</span>
+    </span>
+  ) : (
+    label
+  );
 
   useEffect(() => {
     setOpenNodes(initialNodes);
@@ -174,12 +206,16 @@ export default function LevelItem({
   };
 
   const treeWrapperRef = useRef(null);
+  const rootTriggerRef = useRef(null);
+  const menuRefs = useRef({});
+  const parentTriggerRefs = useRef({});
 
   const updateTreeGuides = useCallback(() => {
     requestAnimationFrame(() => measureLevelTreeGuides(treeWrapperRef.current));
   }, []);
 
   useLayoutEffect(() => {
+    if (collapsed) return;
     if (!open) return;
     updateTreeGuides();
     const el = treeWrapperRef.current;
@@ -193,13 +229,70 @@ export default function LevelItem({
     };
   }, [open, openNodes, items, updateTreeGuides]);
 
-  const rowClass =
-    'cursor-pointer mt-1 flex w-full items-center justify-between rounded-lg px-3 py-3 text-left text-sm font-medium text-slate-700 transition-colors duration-200 hover:bg-gray-300  dark:text-gray-200 dark:hover:bg-gray-600/50';
+  useLayoutEffect(() => {
+    if (!collapsed || !panelOpen) return;
+
+    const visiblePaths = ['root'];
+    if (hoverPath) {
+      const parts = hoverPath.split('-');
+      for (let i = 2; i <= parts.length; i += 1) {
+        visiblePaths.push(parts.slice(0, i).join('-'));
+      }
+    }
+
+    const nextPlacement = {};
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+
+    for (const path of visiblePaths) {
+      const menuEl = menuRefs.current[path];
+      const triggerEl = path === 'root' ? rootTriggerRef.current : parentTriggerRefs.current[path];
+      if (!menuEl || !triggerEl) continue;
+
+      const menuRect = menuEl.getBoundingClientRect();
+      const triggerRect = triggerEl.getBoundingClientRect();
+
+      const openUp = triggerRect.top + menuRect.height > viewportHeight - 12;
+      const placement = {
+        top: openUp ? 'auto' : '0px',
+        bottom: openUp ? '0px' : 'auto',
+      };
+
+      if (path !== 'root') {
+        const offsetParentRect = menuEl.offsetParent?.getBoundingClientRect();
+        if (offsetParentRect) {
+          const alignedTop = triggerRect.top - offsetParentRect.top;
+          const minTop = 12 - offsetParentRect.top;
+          const maxTop = viewportHeight - 12 - offsetParentRect.top - menuRect.height;
+          const clampedTop = Math.min(Math.max(alignedTop, minTop), maxTop);
+          placement.top = `${clampedTop}px`;
+          placement.bottom = 'auto';
+        }
+
+        const openLeft = triggerRect.right + menuRect.width > viewportWidth - 12;
+        placement.left = openLeft ? 'auto' : '106%';
+        placement.right = openLeft ? '100%' : 'auto';
+      }
+
+      nextPlacement[path] = placement;
+    }
+
+    setMenuPlacement(nextPlacement);
+  }, [collapsed, panelOpen, hoverPath]);
+
+  const rowClass = `cursor-pointer mt-1 flex w-full items-center rounded-lg text-left font-medium text-slate-700 transition-colors duration-200 hover:bg-gray-300 dark:text-gray-200 dark:hover:bg-gray-600/50 ${
+    collapsed ? 'justify-center gap-1 px-1 py-2 text-[10px]' : 'justify-between px-3 py-3 text-sm'
+  }`;
+  const nestedRowClass = collapsed
+    ? 'cursor-pointer flex w-full items-center justify-between rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition-colors duration-200 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-gray-700/50'
+    : rowClass;
 
   /** Match mobile sidebar NavLink in Header.jsx (active when URL matches). */
   const navLeafClassName = ({ isActive }, item) =>
     [
-      'mt-1 flex w-full items-center rounded-lg py-2.5 px-3 text-[0.925rem] font-medium no-underline transition-all duration-200',
+      collapsed
+        ? 'flex w-full items-center rounded-md px-3 py-2 text-sm font-medium no-underline transition-all duration-200'
+        : 'mt-1 flex w-full items-center rounded-lg py-2.5 px-3 text-[0.925rem] font-medium no-underline transition-all duration-200',
       item.image ? 'gap-2.5' : '',
       isActive
         ? 'bg-gray-200 text-secondary dark:bg-secondary/10 dark:text-secondary'
@@ -209,7 +302,11 @@ export default function LevelItem({
       .join(' ');
 
   const leafRowClass = (item) =>
-    `${rowClass} no-underline ${item.image ? 'justify-start gap-2.5' : ''}`.trim();
+    `${
+      collapsed
+        ? 'flex w-full items-center rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition-colors duration-200 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-gray-700/50'
+        : rowClass
+    } no-underline ${item.image ? 'justify-start gap-2.5' : ''}`.trim();
 
   const renderLeafInner = (item) =>
     item.image ? (
@@ -221,26 +318,50 @@ export default function LevelItem({
       item.label
     );
 
-  const renderItems = (list = [], path = 'root') => (
-    <ul className="level-tree-ul">
+  const renderItems = (list = [], path = 'root', depth = 0) => (
+    <ul
+      ref={(el) => {
+        if (el) menuRefs.current[path] = el;
+        else delete menuRefs.current[path];
+      }}
+      style={collapsed && menuPlacement[path] ? menuPlacement[path] : undefined}
+      className={
+        collapsed
+          ? `w-max min-w-[180px] space-y-1 rounded-xl border border-slate-200 bg-slate-100/95 p-2 shadow-lg backdrop-blur-sm dark:border-gray-600 dark:bg-gray-800/95 ${
+              depth > 0 ? 'absolute z-120' : 'relative z-120'
+            }`
+          : 'level-tree-ul'
+      }
+    >
       {list.map((item, index) => {
         const nodePath = `${path}-${index}`;
         const hasChildren = Array.isArray(item.children) && item.children.length > 0;
-        const nodeOpen = !!openNodes[nodePath];
+        const nodeOpen = collapsed ? hoverPath.startsWith(nodePath) : !!openNodes[nodePath];
         const nodeHasActiveDescendant = hasChildren ? hasActiveDescendant(item.children) : false;
 
         return (
-          <li key={nodePath} >
+          <li
+            key={nodePath}
+            onMouseEnter={collapsed && hasChildren ? () => setHoverPath(nodePath) : undefined}
+          >
             {hasChildren ? (
               <>
                 <div className="level-tree-node-head">
                   <button
+                    ref={
+                      collapsed
+                        ? (el) => {
+                            if (el) parentTriggerRefs.current[nodePath] = el;
+                            else delete parentTriggerRefs.current[nodePath];
+                          }
+                        : undefined
+                    }
                     type="button"
-                    onClick={() => toggleNode(nodePath)}
+                    onClick={() => (collapsed ? setHoverPath(nodePath) : toggleNode(nodePath))}
                     aria-expanded={nodeOpen}
                     aria-controls={`${id}-${nodePath}-content`}
                     id={`${id}-${nodePath}-trigger`}
-                    className={`${rowClass} ${
+                    className={`${nestedRowClass} ${
                       // nodeHasActiveDescendant
                       //   ? 'bg-info-lighter text-info-dark dark:bg-info/20 dark:text-info-light'
                       //   : 
@@ -251,7 +372,9 @@ export default function LevelItem({
                   >
                     {item.label}
                     <ChevronDownIcon
-                      className={`shrink-0 text-base transition-transform duration-200 ${nodeOpen ? 'rotate-180' : ''}`}
+                      className={`shrink-0 text-base transition-transform duration-200 ${
+                        collapsed ? '-rotate-90' : nodeOpen ? 'rotate-180' : ''
+                      }`}
                       aria-hidden
                     />
                   </button>
@@ -261,8 +384,9 @@ export default function LevelItem({
                     id={`${id}-${nodePath}-content`}
                     role="region"
                     aria-labelledby={`${id}-${nodePath}-trigger`}
+                    className={collapsed ? 'relative' : ''}
                   >
-                    {renderItems(item.children, nodePath)}
+                    {renderItems(item.children, nodePath, depth + 1)}
                   </div>
                 )}
               </>
@@ -301,24 +425,40 @@ export default function LevelItem({
   );
 
   return (
-    <div className={className}>
+    <div
+      className={className}
+      onMouseEnter={collapsed ? () => setHoverOpen(true) : undefined}
+      onMouseLeave={collapsed ? () => {
+        setHoverOpen(false);
+        setHoverPath('');
+      } : undefined}
+    >
       <button
+        ref={rootTriggerRef}
         type="button"
-        onClick={handleToggle}
-        aria-expanded={open}
+        onClick={collapsed ? undefined : handleToggle}
+        aria-expanded={panelOpen}
         aria-controls={`${id}-content`}
         id={`${id}-trigger`}
-        className={`cursor-pointer flex w-full items-center justify-between gap-2 rounded-lg py-2.5 px-3 text-left text-[0.7rem] font-semibold uppercase tracking-wider text-gray-500 transition-colors duration-200 dark:text-gray-200 hover:bg-gray-200 hover:dark:bg-gray-700/50 ${
+        className={`cursor-pointer flex w-full items-center rounded-lg text-left font-semibold uppercase tracking-wider text-gray-500 transition-colors duration-200 dark:text-gray-200 hover:bg-gray-200 hover:dark:bg-gray-700/50 ${
+          collapsed
+            ? 'relative justify-center gap-1 px-1 py-2 text-[10px] normal-case tracking-normal'
+            : 'justify-between gap-2 px-3 py-2.5 text-[0.7rem]'
+        } ${
           topHasActiveDescendant
             ? 'bg-info-lighter text-info-dark dark:bg-info/20 dark:text-info-light'
-            : open
+            : panelOpen
               ? 'bg-gray-200 dark:bg-gray-700/50'
               : ''
         } ${triggerClassName}`.trim()}
       >
-        {label}
+        {resolvedLabel}
         <ChevronDownIcon
-          className={`shrink-0 text-base transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          className={`shrink-0 transition-transform duration-200 ${
+            collapsed
+              ? `absolute right-1 top-1/2 -translate-y-1/2 text-sm ${panelOpen ? 'rotate-180' : ''}`
+              : `text-base ${panelOpen ? 'rotate-180' : ''}`
+          }`}
           aria-hidden
         />
       </button>
@@ -326,14 +466,21 @@ export default function LevelItem({
         id={`${id}-content`}
         role="region"
         aria-labelledby={`${id}-trigger`}
-        className={`${floating ? 'overflow-visible' : 'overflow-hidden'} transition-[height] duration-200 ease-out [&_ul]:space-y-1 [&_ul]:pl-4 [&_ul]:pt-2 [&_ul]:text-sm [&_ul]:text-slate-700 dark:[&_ul]:text-gray-200 [&_li]:leading-6 ${open ? 'visible' : 'invisible h-0'} ${contentClassName}`.trim()}
+        style={collapsed && menuPlacement.root ? menuPlacement.root : undefined}
+        className={`${
+          floating ? 'overflow-visible' : 'overflow-hidden'
+        } transition-[height] duration-200 ease-out ${
+          collapsed
+            ? ''
+            : '[&_ul]:space-y-1 [&_ul]:pl-4 [&_ul]:pt-2 [&_ul]:text-sm [&_ul]:text-slate-700 dark:[&_ul]:text-gray-200 [&_li]:leading-6'
+        } ${collapsedContentClass} ${panelOpen ? 'visible' : 'invisible h-0'} ${contentClassName}`.trim()}
       >
-        {open && (
+        {panelOpen && (
           <>
-            <style>{LEVEL_TREE_STYLES}</style>
+            {!collapsed && <style>{LEVEL_TREE_STYLES}</style>}
             <div
               ref={treeWrapperRef}
-              className="level-tree-wrapper h-fit min-h-0 w-full max-w-full self-start"
+              className={` ${collapsed ? 'level-tree-wrapper-collapsed' : 'level-tree-wrapper'} h-fit min-h-0 w-full max-w-full self-start ${collapsed ? 'max-w-[180px]' : ''}`}
             >
               {items ? renderItems(items) : children}
             </div>

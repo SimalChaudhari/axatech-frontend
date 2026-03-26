@@ -94,6 +94,7 @@ export default function Login() {
                 schema={loginSchema.shape.email}
                 error={fieldErrors.email}
                 autoComplete="off"
+                required
               />
               <Input
                 label="Password"
@@ -105,6 +106,7 @@ export default function Login() {
                 schema={loginSchema.shape.password}
                 error={fieldErrors.password}
                 autoComplete="off"
+                required
               />
               <div className="flex items-center justify-end">
                 <Link to="/forgot-password" className="text-sm font-medium text-primary dark:text-secondary hover:underline">

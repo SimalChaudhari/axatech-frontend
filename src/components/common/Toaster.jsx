@@ -2,11 +2,11 @@ import { Toaster as SonnerToaster } from 'sonner';
 import { useTheme } from '../../context/ThemeContext';
 
 /**
- * App-wide toast container (Minimals-style snackbar UI).
- * Clean bordered card, subtle shadow. Supports default, success, error, warning, info, and promise (loading → success/error).
+ * App-wide toast container.
+ * Styled to match compact card toasts with icon badge + rounded close control.
  */
 const baseToast =
-  'rounded-[10px] border bg-white shadow-[0_2px_12px_rgba(18,62,115,0.08)] dark:bg-gray-800 dark:shadow-lg';
+  'group rounded-2xl border border-slate-200 !dark:bg-gray-800 bg-white !py-1 !px-2 !shadow-[0_6px_20px_rgba(2,6,23,0.08)] !dark:shadow-[0_6px_20px_rgba(255,255,255)';
 
 export default function Toaster() {
   const { theme } = useTheme();
@@ -20,14 +20,18 @@ export default function Toaster() {
       toastOptions={{
         duration: 4000,
         classNames: {
-          toast: `${baseToast} border-border dark:border-gray-600`,
-          title: 'text-text dark:text-gray-200 font-medium',
-          description: 'text-text-muted dark:text-gray-400 text-sm',
-          success: `${baseToast} border-success/60`,
-          error: `${baseToast} border-error/60`,
-          warning: `${baseToast} border-warning/60`,
-          info: `${baseToast} border-info/60`,
-          loading: `${baseToast} border-border dark:border-gray-500`,
+          toast: `${baseToast}`,
+          content: 'gap-3',
+          title: 'text-[13px] !font-semibold leading-6 text-slate-800 dark:text-gray-100',
+          description: 'text-sm text-slate-500 dark:text-gray-400',
+          icon: 'rounded-xl p-2',
+          closeButton:
+            '!h-5 !w-5 !rounded-full !right-0 !left-auto !border !border-slate-200 !bg-white !text-slate-500 !shadow-none hover:!bg-slate-100 dark:!border-gray-600 dark:!bg-gray-800 dark:!text-gray-300 dark:hover:!bg-gray-700 !top-14px',
+          success: `${baseToast} toast-variant-success`,
+          error: `${baseToast} toast-variant-error`,
+          warning: `${baseToast} toast-variant-warning`,
+          info: `${baseToast} toast-variant-info`,
+          loading: `${baseToast} toast-variant-info`,
         },
       }}
     />

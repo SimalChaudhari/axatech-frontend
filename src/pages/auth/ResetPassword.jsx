@@ -105,6 +105,7 @@ export default function ResetPassword() {
                     schema={schema.shape.password}
                     error={fieldErrors.password}
                     autoComplete="new-password"
+                    required
                   />
                   <Input
                     label="Confirm new password"
@@ -115,6 +116,7 @@ export default function ResetPassword() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     error={fieldErrors.confirmPassword}
                     autoComplete="new-password"
+                    required
                   />
                   <Button type="submit" loading={loading} loadingLabel="Resetting...">
                     Reset password

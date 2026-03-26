@@ -89,6 +89,7 @@ export default function Register() {
                 schema={registerSchema.shape.name}
                 error={fieldErrors.name}
                 autoComplete="off"
+                required
               />
               <Input
                 label="Email"
@@ -101,6 +102,7 @@ export default function Register() {
                 schema={registerSchema.shape.email}
                 error={fieldErrors.email}
                 autoComplete="off"
+                required
               />
               <Input
                 label="Password"
@@ -113,6 +115,7 @@ export default function Register() {
                 schema={registerSchema.shape.password}
                 error={fieldErrors.password}
                 autoComplete="off"
+                required
               />
               <Input
                 label="Phone (optional)"

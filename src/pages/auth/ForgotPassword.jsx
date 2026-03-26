@@ -81,6 +81,7 @@ export default function ForgotPassword() {
                     schema={schema.shape.email}
                     error={fieldErrors.email}
                     autoComplete="off"
+                    required
                   />
                   <Button type="submit" loading={loading} loadingLabel="Sending...">
                     Send reset link

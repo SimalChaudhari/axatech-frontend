@@ -95,13 +95,19 @@ export default function AdminSidebar({ open, onClose, onNavigate }) {
       </div>
 
       {/* Section label + Nav */}
-      <nav className="min-h-0 flex-1 overflow-y-auto py-4">
+      <nav
+        className={`min-h-0 flex-1 py-4 ${
+          effectiveCollapsed ? 'overflow-visible' : 'overflow-y-auto'
+        }`}
+      >
         {!effectiveCollapsed && (
           <p className="mb-2 px-4 text-[0.7rem] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
             Menu
           </p>
         )}
-        <div className={`space-y-1 ${effectiveCollapsed ? 'px-1' : 'px-3'}`}>
+        <div
+          className={`space-y-1 ${effectiveCollapsed ? 'px-1 overflow-visible' : 'px-3'}`}
+        >
           {NAV_LINKS.map(({ to, end, label, Icon }) => (
             <NavLink
               key={to}
@@ -117,21 +123,17 @@ export default function AdminSidebar({ open, onClose, onNavigate }) {
           ))}
 
           {/* Static nested menu example (LevelItem) */}
-          {/* <div className="relative pt-3">
+          {/* <div className="relative">
             <LevelItem
               id="dashboard-toggle"
-              label="Toggle"
-              defaultOpen
+              labelText="Level"
+              labelIcon={HomeContentIcon}
+              defaultOpen={!effectiveCollapsed}
               className="w-full"
               floating={effectiveCollapsed}
-              contentClassName={
-                effectiveCollapsed
-                  ? 'absolute left-full top-0 z-50 w-[240px] bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-600 rounded-xl shadow-lg p-2'
-                  : ''
-              }
-              triggerClassName=""
+              collapsed={effectiveCollapsed}
               items={[
-                { label: 'Level 1', to: '/admin', navEnd: true },
+                { label: 'Dashboard', to: '/admin', navEnd: true },
                 {
                   label: 'Toggle 2',
                   children: [
@@ -208,7 +210,7 @@ export default function AdminSidebar({ open, onClose, onNavigate }) {
 
       {/* Desktop: in flow, full height; width depends on collapsed — no gradient/blur */}
       <aside
-        className={`hidden ${asideBaseClass} md:flex md:h-screen shadow-[4px_0_24px_rgba(0,0,0,0.08)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.2)] transition-[width] duration-200 ease-out ${collapsed ? 'md:w-[88px] md:min-w-[88px]' : 'md:w-[300px] md:min-w-[300px]'}`}
+        className={`hidden ${asideBaseClass} md:relative md:z-40 md:flex md:h-screen shadow-[4px_0_24px_rgba(0,0,0,0.08)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.2)] transition-[width] duration-200 ease-out ${collapsed ? 'md:w-[88px] md:min-w-[88px]' : 'md:w-[300px] md:min-w-[300px]'}`}
       >
         {sidebarContent(collapsed)}
       </aside>
