@@ -18,7 +18,7 @@ export default function Toaster() {
       richColors
       closeButton
       toastOptions={{
-        duration: 4000,
+        duration: 400000,
         classNames: {
           toast: `${baseToast}`,
           content: 'gap-3',
