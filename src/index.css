@@ -24,10 +24,10 @@
 [data-rich-colors=true][data-sonner-toast][data-type=error],
 [data-rich-colors=true][data-sonner-toast][data-type=info],
 [data-sonner-toast][data-styled=true][data-type=loading] {
-  background: white;
-  border-color: transparent;
-  color: black;
-  width: 80%;
+  background: white !important;
+  border-color: transparent !important;
+  color: black !important;
+  width: 80% !important;
 }
 
 html.dark [data-rich-colors=true][data-sonner-toast][data-type=success],
