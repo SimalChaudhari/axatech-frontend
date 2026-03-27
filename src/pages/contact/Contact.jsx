@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import api from '../../api';
 import { toast } from '../../utils/toast';
+import { PageMeta } from '../../components/common';
 import { ContactHero, ContactSuccess, ContactForm } from '../../components/contact';
 
 export default function Contact() {
@@ -69,10 +69,10 @@ export default function Contact() {
 
   return (
     <>
-      <Helmet>
-        <title>Contact - Axatech</title>
-        <meta name="description" content="Contact Axatech for Tally licenses, add-ons, cloud hosting and services." />
-      </Helmet>
+      <PageMeta
+        title="Contact - Axatech"
+        description="Contact Axatech for Tally licenses, add-ons, cloud hosting and services."
+      />
 
       <ContactHero
         title="Contact Us"

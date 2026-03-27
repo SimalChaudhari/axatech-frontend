@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import { z } from 'zod';
 import api from '../../api';
 import { toast } from '../../utils/toast';
-import { Input, Button } from '../../components/common';
+import { Input, Button, PageMeta } from '../../components/common';
 
 const schema = z.object({
   password: z.string().min(1, 'Password is required').min(6, 'Password must be at least 6 characters'),
@@ -54,7 +53,7 @@ export default function ResetPassword() {
   if (!token) {
     return (
       <>
-        <Helmet><title>Invalid link - Axatech</title></Helmet>
+        <PageMeta title="Invalid link - Axatech" />
         <section className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 bg-gray-100 dark:bg-gray-900/80">
           <div className="w-full max-w-[440px] text-center">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
@@ -69,7 +68,7 @@ export default function ResetPassword() {
 
   return (
     <>
-      <Helmet><title>Reset password - Axatech</title></Helmet>
+      <PageMeta title="Reset password - Axatech" />
       <section className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 bg-gray-100 dark:bg-gray-900/80">
         <div className="w-full max-w-[440px]">
           <div className="bg-white dark:bg-gray-800 border border-gray-200/80 dark:border-gray-700 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-none p-8 sm:p-10">

@@ -17,6 +17,6 @@ export default function PrivateRoute({ children, adminOnly }) {
     );
   }
   if (!token) return <Navigate to="/login" replace />;
-  if (adminOnly && user?.role !== 'admin') return <Navigate to="/dashboard" replace />;
+  if (adminOnly && user?.role !== 'admin') return <Navigate to="/profile" replace />;
   return children;
 }

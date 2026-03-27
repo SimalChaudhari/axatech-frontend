@@ -18,7 +18,7 @@ import {
   CartOutlineIcon,
   CloseIcon,
 } from '../icons';
-import { Button } from '../common';
+import { Button, LevelItem } from '../common';
 import TechnologiesDropdown from './TechnologiesDropdown';
 import './Header.css';
 
@@ -27,16 +27,17 @@ const CONTAINER = 'w-full max-w-[1200px] mx-auto px-5';
 const NAV_LINKS = [
   { to: '/', label: 'Home', end: true },
   { to: '/services', label: 'Services' },
-  { to: '/licenses', label: 'Tally' },
-  { to: '/products', label: 'TDL Shop' },
+  { to: '/licenses', label: 'Tally', hasTallyLevel: true },
+  { to: '/products', label: 'TDL Shop', hasTdlLevel: true },
   { to: '/technologies', label: 'Technologies', hasDropdown: true },
+  { to: '/web-app-development', label: 'Web App' },
   { to: '/blog', label: 'Blogs' },
   { to: '/projects', label: 'Projects' },
 ];
 
 const getNavLinkClassName = ({ isActive }) =>
   `block text-[0.9375rem] font-medium px-3 py-2.5 rounded-lg transition-all duration-200 whitespace-nowrap max-[900px]:py-3 max-[900px]:px-4 max-[900px]:text-base max-[900px]:rounded-xl ${isActive
-    ? 'text-primary-hover font-semibold bg-primary/10 dark:text-secondary dark:bg-secondary/20 dark:font-semibold max-[900px]:bg-primary/20 max-[900px]:dark:bg-secondary/25 max-[900px]:border-l-4 max-[900px]:border-primary max-[900px]:dark:border-secondary max-[900px]:pl-[calc(1rem-4px)]'
+    ? 'bg-info-lighter text-info-dark dark:bg-info/20 dark:text-info-light dark:font-semibold max-[900px]:bg-primary/20 max-[900px]:dark:bg-secondary/25 max-[900px]:border-l-4 max-[900px]:border-primary max-[900px]:dark:border-secondary max-[900px]:pl-[calc(1rem-4px)]'
     : 'text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-primary/5 dark:hover:text-secondary dark:hover:bg-secondary/15 max-[900px]:hover:bg-primary/10 max-[900px]:dark:hover:bg-secondary/15'
   }`;
 
@@ -47,8 +48,8 @@ const utilityLinkClass =
   'inline-flex items-center gap-2 text-[0.8125rem] font-medium text-gray-600 dark:text-gray-400 no-underline transition-colors duration-200 hover:text-primary dark:hover:text-secondary [&>span]:opacity-80';
 
 const PROFILE_DROPDOWN_LINKS = [
-  { to: '/dashboard', label: 'Settings', Icon: CogOutlineIcon },
-  { to: '/dashboard', label: 'Profile', Icon: AccountOutlineIcon },
+  { to: '/profile', label: 'Settings', Icon: CogOutlineIcon },
+  { to: '/profile', label: 'Profile', Icon: AccountOutlineIcon },
 ];
 
 export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout }) {
@@ -59,6 +60,46 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
   const [technologies, setTechnologies] = useState([]);
   const profileRef = useRef(null);
   const isTechnologiesActive = pathname === '/technologies' || pathname.startsWith('/technologies/');
+  const isDesktopTallyCollapsed = true;
+  const isDesktopTdlCollapsed = true;
+  const tallyLevelItems = [
+    { label: 'Tally Licenses', to: '/licenses', navEnd: true, onClick: closeMenu },
+    {
+      label: 'TSS',
+      children: [
+        { label: 'Single User TSS', to: '/tss-renewal-single-user', onClick: closeMenu },
+        { label: 'Multi User TSS', to: '/tss-renewal-multi-user', onClick: closeMenu },
+      ],
+    },
+    {
+      label: 'Tally on Cloud',
+      children: [
+        { label: 'Cloud Hosting', to: '/cloud-hosting', onClick: closeMenu },
+        { label: 'Tally on Cloud', to: '/tally-on-cloud', onClick: closeMenu },
+        { label: 'Dedicated VPS Server', to: '/dedicated-vps-server', onClick: closeMenu },
+      ],
+    },
+    {
+      label: 'Tally Integration',
+      children: [
+        { label: 'Excel Import', to: '/integration-excel-import', onClick: closeMenu },
+        { label: 'Third-Party Integration', to: '/integration-third-party', onClick: closeMenu },
+        { label: 'Tally to WhatsApp', to: '/integration-whatsapp', onClick: closeMenu },
+        { label: 'SMS API Integration', to: '/integration-sms-api', onClick: closeMenu },
+      ],
+    },
+    { label: 'Tally AMC', to: '/tally-amc', onClick: closeMenu },
+    { label: 'Tally Business Solutions', to: '/tally-business-solutions', onClick: closeMenu },
+  ];
+  const tdlLevelItems = [
+    { label: 'All TDL Products', to: '/products', navEnd: true, onClick: closeMenu },
+    { label: 'Security Control TDL', to: '/products/tdl-security-control', onClick: closeMenu },
+    { label: 'Productivity TDL', to: '/products/tdl-productivity', onClick: closeMenu },
+    { label: 'MIS Reporting TDL', to: '/products/tdl-mis-reporting', onClick: closeMenu },
+    { label: 'Invoice TDL', to: '/products/tdl-invoice', onClick: closeMenu },
+    { label: 'Business-Specific TDL', to: '/products/tdl-business-specific', onClick: closeMenu },
+    { label: 'Banking TDL', to: '/products/tdl-banking', onClick: closeMenu },
+  ];
 
   useEffect(() => {
     api.technologies().then(setTechnologies).catch(() => setTechnologies([]));
@@ -163,7 +204,7 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
           {/* Desktop nav - hidden on mobile */}
           <nav className="hidden min-[901px]:flex items-center gap-0.5 flex-1 justify-end">
             <div className="flex items-center gap-0.5">
-              {NAV_LINKS.map(({ to, label, end, hasDropdown }) =>
+              {NAV_LINKS.map(({ to, label, end, hasDropdown, hasTdlLevel }) =>
                 hasDropdown ? (
                   <div
                     key={to}
@@ -180,6 +221,32 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
                         onClose={() => { setTechMenuOpen(false); closeMenu(); }}
                       />
                     )}
+                  </div>
+                ) : to === '/licenses' ? (
+                  <div key={to} className="relative min-w-[70px]">
+                    <LevelItem
+                      id="header-tally-level-desktop"
+                      label={label}
+                      collapsed={isDesktopTallyCollapsed}
+                      defaultOpen
+                      items={tallyLevelItems}
+                      className="w-full"
+                      contentClassName="!left-0 !top-full !ml-0 !mt-1"
+                      triggerClassName="!capitalize !justify-between !gap-2 !px-3 !py-2.5 !text-[0.9375rem] !font-medium !normal-case !tracking-normal !text-gray-700 dark:!text-gray-300 hover:!text-primary dark:hover:!text-secondary hover:!bg-primary/5 dark:hover:!bg-secondary/15"
+                    />
+                  </div>
+                ) : hasTdlLevel ? (
+                  <div key={to} className="relative min-w-[100px]">
+                    <LevelItem
+                      id="header-tdl-level-desktop"
+                      label={label}
+                      collapsed={isDesktopTdlCollapsed}
+                      defaultOpen
+                      items={tdlLevelItems}
+                      className="w-full"
+                      contentClassName="!left-0 !top-full !ml-0 !mt-1"
+                      triggerClassName="!justify-between !gap-2 !px-3 !py-2.5 !text-[0.9375rem] !font-medium !normal-case !tracking-normal !text-gray-700 dark:!text-gray-300 hover:!text-primary dark:hover:!text-secondary hover:!bg-primary/5 dark:hover:!bg-secondary/15"
+                    />
                   </div>
                 ) : (
                   <NavLink key={to} to={to} end={end} onClick={closeMenu} className={getNavLinkClassName}>
@@ -301,7 +368,7 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
                 <nav className="py-4">
                   <p className="mb-2 px-4 text-[0.7rem] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">Menu</p>
                   <div className="space-y-1 px-3">
-                    {NAV_LINKS.map(({ to, label, end, hasDropdown }) =>
+                    {NAV_LINKS.map(({ to, label, end, hasDropdown, hasTallyLevel, hasTdlLevel }) =>
                       hasDropdown ? (
                         <div key={to} className="flex flex-col">
                           {technologies.length > 0 && (
@@ -311,6 +378,26 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
                               inline
                             />
                           )}
+                        </div>
+                      ) : hasTallyLevel ? (
+                        <div key={to} className="flex flex-col">
+                          <LevelItem
+                            id="header-tally-level-mobile"
+                            label={label}
+                            defaultOpen={false}
+                            items={tallyLevelItems}
+                            className="w-full"
+                          />
+                        </div>
+                      ) : hasTdlLevel ? (
+                        <div key={to} className="flex flex-col">
+                          <LevelItem
+                            id="header-tdl-level-mobile"
+                            label={label}
+                            defaultOpen={false}
+                            items={tdlLevelItems}
+                            className="w-full"
+                          />
                         </div>
                       ) : (
                         <NavLink
@@ -342,7 +429,7 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
                         Admin
                       </NavLink>
                     )}
-                    <Link to="/dashboard" onClick={closeMenu} className={`${actionBtnBase} justify-center bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600`}>
+                    <Link to="/profile" onClick={closeMenu} className={`${actionBtnBase} justify-center bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600`}>
                       <AccountCircleIcon className="text-[22px] shrink-0" />
                       Profile
                     </Link>

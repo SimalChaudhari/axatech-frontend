@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import api from '../../api';
-import { Loader } from '../../components/common';
+import { Loader, PageMeta } from '../../components/common';
 import { ServiceDetailContent } from '../../components/services';
 
 export default function ServiceDetail() {
@@ -28,10 +27,7 @@ export default function ServiceDetail() {
 
   return (
     <>
-      <Helmet>
-        <title>{service.title} - Axatech</title>
-        <meta name="description" content={service.shortDescription || service.description} />
-      </Helmet>
+      <PageMeta title={`${service.title} - Axatech`} description={service.shortDescription || service.description} />
 
       <ServiceDetailContent service={service} />
     </>

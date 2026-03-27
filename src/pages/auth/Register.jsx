@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import { z } from 'zod';
 import { useAuth } from '../../context/AuthContext';
-import { Input, Button } from '../../components/common';
+import { Input, Button, PageMeta } from '../../components/common';
 import { toast } from '../../utils/toast';
 
 const registerSchema = z.object({
@@ -46,7 +45,7 @@ export default function Register() {
     try {
       await register(form);
       toast.success('Account created successfully');
-      navigate('/dashboard');
+      navigate('/profile');
     } catch (err) {
       const msg = err.message || 'Registration failed';
       setError(msg);
@@ -58,7 +57,7 @@ export default function Register() {
 
   return (
     <>
-      <Helmet><title>Register - Axatech</title></Helmet>
+      <PageMeta title="Register - Axatech" />
       <section className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 bg-gray-100 dark:bg-gray-900/80">
         <div className="w-full max-w-[520px]">
           <div className="bg-white dark:bg-gray-800 border border-gray-200/80 dark:border-gray-700 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-none p-8 sm:p-10">

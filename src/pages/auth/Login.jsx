@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import { z } from 'zod';
 import { useAuth } from '../../context/AuthContext';
-import { Input, Button } from '../../components/common';
+import { Input, Button, PageMeta } from '../../components/common';
+import { AccountIcon } from '../../components/icons';
 import { toast } from '../../utils/toast';
 
 const loginSchema = z.object({
@@ -52,7 +52,7 @@ export default function Login() {
     try {
       const user = await login(email, password);
       toast.success('Signed in successfully');
-      navigate(user.role === 'admin' ? '/admin' : '/dashboard');
+      navigate(user.role === 'admin' ? '/admin' : '/profile');
     } catch (err) {
       const msg = err.message || 'Login failed';
       setError(msg);
@@ -64,7 +64,7 @@ export default function Login() {
 
   return (
     <>
-      <Helmet><title>Login - Axatech</title></Helmet>
+      <PageMeta title="Login - Axatech" />
       <section className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 bg-gray-100 dark:bg-gray-900/80">
         <div className="w-full max-w-[440px]">
           <div className="bg-white dark:bg-gray-800 border border-gray-200/80 dark:border-gray-700 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-none p-8 sm:p-10">
@@ -142,7 +142,7 @@ export default function Login() {
                   className="flex items-center justify-between gap-3 w-full text-left rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50/80 dark:bg-gray-700/40 p-4 transition-colors duration-200 hover:bg-primary/10 hover:border-primary/30 dark:hover:bg-secondary/20 dark:hover:border-secondary/40"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="icon-[mdi--account] text-xl shrink-0 text-primary dark:text-secondary" aria-hidden />
+                    <AccountIcon className="text-xl shrink-0 text-primary dark:text-secondary" />
                     <div>
                       <span className="block text-sm font-semibold text-gray-900 dark:text-white">{cred.label}</span>
                       <span className="block text-xs text-gray-500 dark:text-gray-400 truncate">{cred.email}</span>

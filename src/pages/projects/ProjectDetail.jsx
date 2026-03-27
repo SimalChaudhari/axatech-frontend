@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import api from '../../api';
+import { PageMeta } from '../../components/common';
 import { ProjectDetailSection } from '../../components/projects';
 
 export default function ProjectDetail() {
@@ -27,10 +27,7 @@ export default function ProjectDetail() {
 
   return (
     <>
-      <Helmet>
-        <title>{title} - Projects - Axatech</title>
-        <meta name="description" content={description.slice(0, 155)} />
-      </Helmet>
+      <PageMeta title={`${title} - Projects - Axatech`} description={description.slice(0, 155)} />
 
       <ProjectDetailSection project={project} loading={loading} error={error} />
     </>

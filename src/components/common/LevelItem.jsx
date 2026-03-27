@@ -209,6 +209,7 @@ export default function LevelItem({
   const rootTriggerRef = useRef(null);
   const menuRefs = useRef({});
   const parentTriggerRefs = useRef({});
+  const closeDelayTimeoutRef = useRef(null);
 
   const updateTreeGuides = useCallback(() => {
     requestAnimationFrame(() => measureLevelTreeGuides(treeWrapperRef.current));
@@ -280,6 +281,14 @@ export default function LevelItem({
     setMenuPlacement(nextPlacement);
   }, [collapsed, panelOpen, hoverPath]);
 
+  useEffect(() => {
+    return () => {
+      if (closeDelayTimeoutRef.current) {
+        clearTimeout(closeDelayTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const rowClass = `cursor-pointer mt-1 flex w-full items-center rounded-lg text-left font-medium text-slate-700 transition-colors duration-200 hover:bg-gray-300 dark:text-gray-200 dark:hover:bg-gray-600/50 ${
     collapsed ? 'justify-center gap-1 px-1 py-2 text-[10px]' : 'justify-between px-3 py-3 text-sm'
   }`;
@@ -324,10 +333,14 @@ export default function LevelItem({
         if (el) menuRefs.current[path] = el;
         else delete menuRefs.current[path];
       }}
-      style={collapsed && menuPlacement[path] ? menuPlacement[path] : undefined}
+      style={
+        collapsed
+          ? { ...sidebarBgStyle, ...(menuPlacement[path] || {}) }
+          : undefined
+      }
       className={
         collapsed
-          ? `w-max min-w-[180px] space-y-1 rounded-xl border border-slate-200 bg-slate-100/95 p-2 shadow-lg backdrop-blur-sm dark:border-gray-600 dark:bg-gray-800/95 ${
+          ? `w-max min-w-[180px] space-y-1 rounded-xl border border-slate-200 bg-slate-100 p-2 shadow-lg backdrop-blur-sm dark:border-gray-600 dark:bg-gray-800 ${
               depth > 0 ? 'absolute z-120' : 'relative z-120'
             }`
           : 'level-tree-ul'
@@ -342,7 +355,22 @@ export default function LevelItem({
         return (
           <li
             key={nodePath}
-            onMouseEnter={collapsed && hasChildren ? () => setHoverPath(nodePath) : undefined}
+            onMouseEnter={
+              collapsed
+                ? () => {
+                    if (hasChildren) {
+                      // Show only the currently hovered parent's submenu.
+                      setHoverPath(nodePath);
+                    } else if (path === 'root') {
+                      // Root leaf hovered -> hide any sibling submenu.
+                      setHoverPath('');
+                    } else {
+                      // Nested leaf hovered -> keep its parent submenu visible.
+                      setHoverPath(path);
+                    }
+                  }
+                : undefined
+            }
           >
             {hasChildren ? (
               <>
@@ -365,6 +393,9 @@ export default function LevelItem({
                       // nodeHasActiveDescendant
                       //   ? 'bg-info-lighter text-info-dark dark:bg-info/20 dark:text-info-light'
                       //   : 
+                      nodeHasActiveDescendant
+                        ? 'bg-gray-200 text-secondary! dark:bg-info/20 dark:text-info-light'
+                        : 
                         nodeOpen
                           ? 'bg-gray-200 dark:bg-gray-700/50'
                           : ''
@@ -427,10 +458,20 @@ export default function LevelItem({
   return (
     <div
       className={className}
-      onMouseEnter={collapsed ? () => setHoverOpen(true) : undefined}
+      onMouseEnter={collapsed ? () => {
+        if (closeDelayTimeoutRef.current) {
+          clearTimeout(closeDelayTimeoutRef.current);
+          closeDelayTimeoutRef.current = null;
+        }
+        setHoverOpen(true);
+      } : undefined}
       onMouseLeave={collapsed ? () => {
-        setHoverOpen(false);
-        setHoverPath('');
+        if (closeDelayTimeoutRef.current) clearTimeout(closeDelayTimeoutRef.current);
+        closeDelayTimeoutRef.current = setTimeout(() => {
+          setHoverOpen(false);
+          setHoverPath('');
+          closeDelayTimeoutRef.current = null;
+        }, 100);
       } : undefined}
     >
       <button
@@ -440,7 +481,7 @@ export default function LevelItem({
         aria-expanded={panelOpen}
         aria-controls={`${id}-content`}
         id={`${id}-trigger`}
-        className={`cursor-pointer flex w-full items-center rounded-lg text-left font-semibold uppercase tracking-wider text-gray-500 transition-colors duration-200 dark:text-gray-200 hover:bg-gray-200 hover:dark:bg-gray-700/50 ${
+        className={`cursor-pointer flex w-full items-center rounded-lg text-left font-semibold capitalize text-[0.8375rem] text-gray-500 transition-colors duration-200 dark:text-gray-200 hover:bg-gray-200 hover:dark:bg-gray-700/50 ${
           collapsed
             ? 'relative justify-center gap-1 px-1 py-2 text-[10px] normal-case tracking-normal'
             : 'justify-between gap-2 px-3 py-2.5 text-[0.7rem]'

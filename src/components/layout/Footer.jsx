@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { EmailOutlineIcon, MessageTextOutlineIcon, PhoneIcon } from '../icons';
 
 const CONTAINER = 'w-full max-w-[1200px] mx-auto px-5';
 
@@ -7,6 +8,8 @@ const footerLinkClass =
 
 const SOLUTIONS = [
   { to: '/licenses', label: 'Tally Licenses' },
+  { to: '/licenses/tss-renewal-single-user', label: 'Single User TSS Renewal' },
+  { to: '/licenses/tss-renewal-multi-user', label: 'Multi User TSS Renewal' },
   { to: '/products', label: 'Add-ons' },
   { to: '/cloud-hosting', label: 'Cloud Hosting' },
 ];
@@ -88,14 +91,14 @@ export default function Footer() {
                 href="tel:+918448449099"
                 className="inline-flex items-center justify-center sm:justify-start gap-2 text-[0.9375rem] text-white/90 dark:text-gray-400 hover:text-secondary dark:hover:text-accent transition-colors duration-200"
               >
-                <span className="icon-[mdi--phone] text-[18px] shrink-0 opacity-90" aria-hidden />
+                <PhoneIcon className="text-[18px] shrink-0 opacity-90" />
                 +91 8448449099
               </a>
               <a
                 href="mailto:info@axatech.com"
                 className="inline-flex items-center justify-center sm:justify-start gap-2 text-[0.9375rem] text-white/90 dark:text-gray-400 hover:text-secondary dark:hover:text-accent transition-colors duration-200"
               >
-                <span className="icon-[mdi--email-outline] text-[18px] shrink-0 opacity-90" aria-hidden />
+                <EmailOutlineIcon className="text-[18px] shrink-0 opacity-90" />
                 info@axatech.com
               </a>
             </div>
@@ -103,7 +106,7 @@ export default function Footer() {
               to="/contact"
               className="inline-flex items-center justify-center gap-2 py-3 px-6 font-semibold text-[0.9375rem] rounded-xl border-2 border-white/80 dark:border-gray-500 text-white dark:text-gray-200 bg-transparent transition-all duration-200 hover:bg-white/20 hover:border-white hover:text-white dark:hover:bg-secondary/20 dark:hover:border-secondary max-[640px]:w-full"
             >
-              <span className="icon-[mdi--message-text-outline] text-[18px] shrink-0" aria-hidden />
+              <MessageTextOutlineIcon className="text-[18px] shrink-0" />
               Contact Us
             </Link>
           </div>

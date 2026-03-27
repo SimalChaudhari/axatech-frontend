@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import api from '../../api';
+import { PageMeta } from '../../components/common';
+import { ArrowLeftIcon } from '../../components/icons';
 import { ReactLayout } from '../../components/technologies/infoPages/frontend/react';
 import { VueLayout } from '../../components/technologies/infoPages/frontend/vue';
 import { HtmlLayout } from '../../components/technologies/infoPages/frontend/html';
@@ -55,10 +56,10 @@ export default function TechnologyDetail() {
   if (slug === 'react') {
     return (
       <>
-        <Helmet>
-          <title>React | Technologies | Axatech</title>
-          <meta name="description" content="React JS development services – scalable frontend solutions, React Native, state management, and performance optimization." />
-        </Helmet>
+        <PageMeta
+          title="React | Technologies | Axatech"
+          description="React JS development services – scalable frontend solutions, React Native, state management, and performance optimization."
+        />
         <ReactLayout />
       </>
     );
@@ -67,10 +68,10 @@ export default function TechnologyDetail() {
   if (slug === 'vue' || slug === 'vue-js' || slug === 'vuejs') {
     return (
       <>
-        <Helmet>
-          <title>Vue.js | Technologies | Axatech</title>
-          <meta name="description" content="Vue.js development services – modern frontend solutions, Vuex, Pinia, state management, and performance optimization." />
-        </Helmet>
+        <PageMeta
+          title="Vue.js | Technologies | Axatech"
+          description="Vue.js development services – modern frontend solutions, Vuex, Pinia, state management, and performance optimization."
+        />
         <VueLayout />
       </>
     );
@@ -79,10 +80,10 @@ export default function TechnologyDetail() {
   if (slug === 'html5' || slug === 'html') {
     return (
       <>
-        <Helmet>
-          <title>HTML5 | Technologies | Axatech</title>
-          <meta name="description" content="HTML5 web development services – semantic markup, responsive design, SEO-friendly code, and modern web standards." />
-        </Helmet>
+        <PageMeta
+          title="HTML5 | Technologies | Axatech"
+          description="HTML5 web development services – semantic markup, responsive design, SEO-friendly code, and modern web standards."
+        />
         <HtmlLayout />
       </>
     );
@@ -91,10 +92,10 @@ export default function TechnologyDetail() {
   if (slug === 'angular') {
     return (
       <>
-        <Helmet>
-          <title>Angular | Technologies | Axatech</title>
-          <meta name="description" content="Angular development services – enterprise frontend solutions, TypeScript, PWAs, and performance optimization." />
-        </Helmet>
+        <PageMeta
+          title="Angular | Technologies | Axatech"
+          description="Angular development services – enterprise frontend solutions, TypeScript, PWAs, and performance optimization."
+        />
         <AngularLayout />
       </>
     );
@@ -103,10 +104,10 @@ export default function TechnologyDetail() {
   if (slug === 'firebase') {
     return (
       <>
-        <Helmet>
-          <title>Firebase | Technologies | Axatech</title>
-          <meta name="description" content="Firebase development services – real-time database, authentication, Firestore, Cloud Functions, and serverless backend solutions." />
-        </Helmet>
+        <PageMeta
+          title="Firebase | Technologies | Axatech"
+          description="Firebase development services – real-time database, authentication, Firestore, Cloud Functions, and serverless backend solutions."
+        />
         <FirebaseLayout />
       </>
     );
@@ -115,10 +116,10 @@ export default function TechnologyDetail() {
   if (slug === 'mongodb' || slug === 'mongo') {
     return (
       <>
-        <Helmet>
-          <title>MongoDB | Technologies | Axatech</title>
-          <meta name="description" content="MongoDB development services – document database, query optimization, replication, sharding, and high-performance NoSQL solutions." />
-        </Helmet>
+        <PageMeta
+          title="MongoDB | Technologies | Axatech"
+          description="MongoDB development services – document database, query optimization, replication, sharding, and high-performance NoSQL solutions."
+        />
         <MongoDBLayout />
       </>
     );
@@ -127,10 +128,10 @@ export default function TechnologyDetail() {
   if (slug === 'mysql') {
     return (
       <>
-        <Helmet>
-          <title>MySQL | Technologies | Axatech</title>
-          <meta name="description" content="MySQL development services – relational database design, optimization, replication, migration, and high-availability solutions." />
-        </Helmet>
+        <PageMeta
+          title="MySQL | Technologies | Axatech"
+          description="MySQL development services – relational database design, optimization, replication, migration, and high-availability solutions."
+        />
         <MySQLLayout />
       </>
     );
@@ -139,10 +140,10 @@ export default function TechnologyDetail() {
   if (slug === 'postgresql' || slug === 'postgres') {
     return (
       <>
-        <Helmet>
-          <title>PostgreSQL | Technologies | Axatech</title>
-          <meta name="description" content="PostgreSQL development services – relational database design, optimization, replication, migration, and high-performance solutions." />
-        </Helmet>
+        <PageMeta
+          title="PostgreSQL | Technologies | Axatech"
+          description="PostgreSQL development services – relational database design, optimization, replication, migration, and high-performance solutions."
+        />
         <PostgreSQLLayout />
       </>
     );
@@ -151,10 +152,10 @@ export default function TechnologyDetail() {
   if (slug === 'express' || slug === 'expressjs') {
     return (
       <>
-        <Helmet>
-          <title>Express.js | Technologies | Axatech</title>
-          <meta name="description" content="Express.js development services – Node.js backend, REST & GraphQL APIs, real-time apps, authentication, and microservices." />
-        </Helmet>
+        <PageMeta
+          title="Express.js | Technologies | Axatech"
+          description="Express.js development services – Node.js backend, REST & GraphQL APIs, real-time apps, authentication, and microservices."
+        />
         <ExpressJsLayout />
       </>
     );
@@ -163,10 +164,10 @@ export default function TechnologyDetail() {
   if (slug === 'graphql') {
     return (
       <>
-        <Helmet>
-          <title>GraphQL | Technologies | Axatech</title>
-          <meta name="description" content="GraphQL development services – API development, schema design, subscriptions, and efficient data query solutions." />
-        </Helmet>
+        <PageMeta
+          title="GraphQL | Technologies | Axatech"
+          description="GraphQL development services – API development, schema design, subscriptions, and efficient data query solutions."
+        />
         <GraphQLLayout />
       </>
     );
@@ -175,10 +176,10 @@ export default function TechnologyDetail() {
   if (slug === 'nestjs' || slug === 'nest') {
     return (
       <>
-        <Helmet>
-          <title>NestJS | Technologies | Axatech</title>
-          <meta name="description" content="NestJS development services – TypeScript backend, REST & GraphQL APIs, microservices, and enterprise applications." />
-        </Helmet>
+        <PageMeta
+          title="NestJS | Technologies | Axatech"
+          description="NestJS development services – TypeScript backend, REST & GraphQL APIs, microservices, and enterprise applications."
+        />
         <NestJsLayout />
       </>
     );
@@ -187,10 +188,10 @@ export default function TechnologyDetail() {
   if (slug === 'nodejs' || slug === 'node-js' || slug === 'node') {
     return (
       <>
-        <Helmet>
-          <title>Node.js | Technologies | Axatech</title>
-          <meta name="description" content="Node.js development services – scalable backend systems, REST & GraphQL APIs, real-time apps, microservices, and cloud deployment." />
-        </Helmet>
+        <PageMeta
+          title="Node.js | Technologies | Axatech"
+          description="Node.js development services – scalable backend systems, REST & GraphQL APIs, real-time apps, microservices, and cloud deployment."
+        />
         <NodeJsLayout />
       </>
     );
@@ -218,10 +219,7 @@ export default function TechnologyDetail() {
 
   return (
     <>
-      <Helmet>
-        <title>{title} | Technologies | Axatech</title>
-        <meta name="description" content={description?.slice(0, 160)} />
-      </Helmet>
+      <PageMeta title={`${title} | Technologies | Axatech`} description={description?.slice(0, 160)} />
 
       <section className="py-16 md:py-20 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-4xl mx-auto px-5">
@@ -229,7 +227,7 @@ export default function TechnologyDetail() {
             to="/technologies"
             className="inline-flex items-center gap-1.5 text-sm font-medium text-primary dark:text-secondary hover:underline mb-8"
           >
-            <span className="icon-[mdi--arrow-left] text-lg" aria-hidden />
+            <ArrowLeftIcon className="text-lg" />
             Back to Technologies
           </Link>
           <div className="flex flex-col sm:flex-row gap-8 items-start">

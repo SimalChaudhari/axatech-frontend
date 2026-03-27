@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import api from '../../api';
 import { ProductDetailMedia, ProductDetailInfo } from '../../components/products';
-import { Button, Loader } from '../../components/common';
+import { Button, Loader, PageMeta } from '../../components/common';
 import { ChevronLeftIcon } from '../../components/icons';
 
 export default function ProductDetail() {
@@ -37,10 +36,7 @@ export default function ProductDetail() {
 
   return (
     <>
-      <Helmet>
-        <title>{product.name} - Axatech Add-ons</title>
-        <meta name="description" content={product.shortDescription || product.description} />
-      </Helmet>
+      <PageMeta title={`${product.name} - Axatech Add-ons`} description={product.shortDescription || product.description} />
 
       <section className="py-20 md:py-24 bg-white dark:bg-gray-900 border-y border-gray-100 dark:border-gray-800">
         <div className="max-w-[1200px] mx-auto px-5">

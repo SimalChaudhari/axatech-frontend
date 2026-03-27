@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { ArrowRightIcon, BlogsIcon } from '../icons';
 
 export default function BlogCard({ post, index = 0 }) {
   return (
@@ -13,7 +14,7 @@ export default function BlogCard({ post, index = 0 }) {
         </div>
       ) : (
         <div className="aspect-4/3 bg-gray-100 dark:bg-gray-700 flex items-center justify-center shrink-0">
-          <span className="icon-[streamline-freehand--book-bookmark] text-4xl text-gray-400 dark:text-gray-500" aria-hidden />
+          <BlogsIcon className="text-4xl text-gray-400 dark:text-gray-500" />
         </div>
       )}
       <div className="p-5 sm:p-6 flex flex-col flex-1 min-h-0">
@@ -33,7 +34,7 @@ export default function BlogCard({ post, index = 0 }) {
           )}
           <span className="inline-flex items-center gap-1 font-semibold text-secondary dark:text-accent text-sm">
             Read more
-            <span className="icon-[mdi--arrow-right] text-base transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden />
+            <ArrowRightIcon className="text-base transition-transform duration-200 group-hover:translate-x-0.5" />
           </span>
         </div>
       </div>

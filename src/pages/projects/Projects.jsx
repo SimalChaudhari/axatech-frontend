@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 import api from '../../api';
+import { PageMeta } from '../../components/common';
 import { ProjectsSection } from '../../components/projects';
 
 export default function Projects() {
@@ -17,13 +17,10 @@ export default function Projects() {
 
   return (
     <>
-      <Helmet>
-        <title>Projects - Axatech</title>
-        <meta
-          name="description"
-          content="Explore our portfolio projects and case studies."
-        />
-      </Helmet>
+      <PageMeta
+        title="Projects - Axatech"
+        description="Explore our portfolio projects and case studies."
+      />
 
       <ProjectsSection projects={projects} loading={loading} />
     </>

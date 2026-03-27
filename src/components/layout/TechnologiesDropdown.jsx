@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LevelItem } from '../common';
+import { CodeIcon } from '../icons';
 
 const CATEGORY_ORDER = [
   'Frontend Technologies',
@@ -24,6 +25,20 @@ function groupByCategory(technologies) {
   }
   return CATEGORY_ORDER.map((cat) => ({ category: cat, label: CATEGORY_LABELS[cat] || cat, items: map[cat] || [] }));
 }
+
+const SIDEBAR_BG_IMAGE =
+  'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSJ1cmwoI3BhaW50MF9yYWRpYWxfNDQ2NF81NTMzOCkiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CjxkZWZzPgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50MF9yYWRpYWxfNDQ2NF81NTMzOCIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgxMjAgMS44MTgxMmUtMDUpIHJvdGF0ZSgtNDUpIHNjYWxlKDEyMy4yNSkiPgo8c3RvcCBzdG9wLWNvbG9yPSIjMDBCOEQ5Ii8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzAwQjhEOSIgc3RvcC1vcGFjaXR5PSIwIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==), url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSJ1cmwoI3BhaW50MF9yYWRpYWxfNDQ2NF81NTMzNykiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CjxkZWZzPgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50MF9yYWRpYWxfNDQ2NF81NTMzNyIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgwIDEyMCkgcm90YXRlKDEzNSkgc2NhbGUoMTIzLjI1KSI+CjxzdG9wIHN0b3AtY29sb3I9IiNGRjU2MzAiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRkY1NjMwIiBzdG9wLW9wYWNpdHk9IjAiLz4KPC9yYWRpYWxHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4K)';
+
+  const sidebarBgStyle = {
+    backgroundImage: SIDEBAR_BG_IMAGE,
+    backgroundSize: '50%, 50%',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'right top, left bottom',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    boxShadow: '40px 40px 80px -8px rgba(0,0,0,0.24)',
+  };
+
 
 export default function TechnologiesDropdown({ technologies, onClose, inline = false }) {
   const { pathname } = useLocation();
@@ -71,7 +86,7 @@ export default function TechnologiesDropdown({ technologies, onClose, inline = f
 
   const content = (
     <div className="min-w-[280px] w-[min(92vw,720px)] sm:w-[min(92vw,680px)] bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600 shadow-xl shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
-      <div className="grid grid-cols-3 gap-0">
+      <div className="grid grid-cols-3 gap-0" style={sidebarBgStyle}>
         {sections.map(({ category, label, items }) => (
           <div
             key={category}
@@ -93,7 +108,7 @@ export default function TechnologiesDropdown({ technologies, onClose, inline = f
                           <img src={tech.image} alt="" className="h-7 w-7 shrink-0 object-contain rounded" />
                         ) : (
                           <span className="h-7 w-7 shrink-0 flex items-center justify-center rounded bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500">
-                            <span className="icon-[mdi--code-tags] text-base" aria-hidden />
+                            <CodeIcon className="text-base" />
                           </span>
                         )}
                         <span className="truncate min-w-0">{tech.title}</span>

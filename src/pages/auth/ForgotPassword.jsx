@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import { z } from 'zod';
 import api from '../../api';
 import { toast } from '../../utils/toast';
-import { Input, Button } from '../../components/common';
+import { Input, Button, PageMeta } from '../../components/common';
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Enter a valid email'),
@@ -45,7 +44,7 @@ export default function ForgotPassword() {
 
   return (
     <>
-      <Helmet><title>Forgot password - Axatech</title></Helmet>
+      <PageMeta title="Forgot password - Axatech" />
       <section className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 bg-gray-100 dark:bg-gray-900/80">
         <div className="w-full max-w-[440px]">
           <div className="bg-white dark:bg-gray-800 border border-gray-200/80 dark:border-gray-700 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-none p-8 sm:p-10">

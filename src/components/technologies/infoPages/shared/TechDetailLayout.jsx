@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button, SectionHeader } from "../../../common";
-import { ArrowRightIcon } from "../../../icons";
+import { ArrowLeftIcon, ArrowRightIcon } from "../../../icons";
 import { techIconMap } from "./iconMap";
 import { CodeIcon } from "../../../icons";
 
@@ -18,7 +18,7 @@ export default function TechDetailLayout({ content }) {
           to="/technologies"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-primary dark:text-secondary hover:underline mb-2"
         >
-          <span className="icon-[mdi--arrow-left] text-lg" aria-hidden />
+          <ArrowLeftIcon className="text-lg" />
           Back to Technologies
         </Link>
       </div>

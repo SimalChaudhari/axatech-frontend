@@ -13,8 +13,8 @@ import {
 } from '../icons';
 
 const PROFILE_DROPDOWN_LINKS = [
-  { to: '/dashboard', label: 'Settings', Icon: CogOutlineIcon },
-  { to: '/dashboard', label: 'Profile', Icon: UserSecretIcon },
+  { to: '/profile', label: 'Settings', Icon: CogOutlineIcon },
+  { to: '/profile', label: 'Profile', Icon: UserSecretIcon },
 ];
 
 export default function AdminHeader({ sidebarOpen, onMenuToggle }) {

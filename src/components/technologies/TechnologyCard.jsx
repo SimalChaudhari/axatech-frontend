@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { CodeIcon } from '../icons';
 
 export default function TechnologyCard({ technology, index = 0 }) {
   const { title, description, image, slug, _id } = technology;
@@ -18,7 +19,7 @@ export default function TechnologyCard({ technology, index = 0 }) {
             className="w-full h-full object-contain max-h-28"
           />
         ) : (
-          <span className="icon-[mdi--code-tags] text-5xl text-gray-400 dark:text-gray-500" aria-hidden />
+          <CodeIcon className="text-5xl text-gray-400 dark:text-gray-500" />
         )}
       </div>
       <div className="p-5 flex flex-col flex-1">

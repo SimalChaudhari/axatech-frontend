@@ -259,3 +259,82 @@ export function ShieldAltIcon({ className = '' }) {
 export function ChartLineIcon({ className = '' }) {
   return <Icon iconClass="icon-[mdi--chart-line]" className={className} />;
 }
+
+export function CheckCircleOutlineIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--check-circle-outline]" className={className} />;
+}
+
+export function MessageTextOutlineIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--message-text-outline]" className={className} />;
+}
+
+export function AccountIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--account]" className={className} />;
+}
+
+export function FileIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--file]" className={className} />;
+}
+
+export function CheckMarkIcon({ className = '' }) {
+  return <Icon iconClass="icon-[game-icons--check-mark]" className={className} />;
+}
+
+export function CogLoopIcon({ className = '' }) {
+  return <Icon iconClass="icon-[line-md--cog-loop]" className={className} />;
+}
+
+export function CloudIbmIcon({ className = '' }) {
+  return <Icon iconClass="icon-[carbon--ibm-cloud]" className={className} />;
+}
+
+export function ArrowLeftIcon({ className = '' }) {
+  return <Icon iconClass="icon-[mdi--arrow-left]" className={className} />;
+}
+
+export function CodeSquareIcon({ className = '' }) {
+  return <Icon iconClass="icon-[proicons--code-square]" className={className} />;
+}
+
+export function HtmlIcon({ className = '' }) {
+  return <Icon iconClass="icon-[skill-icons--html]" className={className} />;
+}
+
+export function JavascriptIcon({ className = '' }) {
+  return <Icon iconClass="icon-[skill-icons--javascript]" className={className} />;
+}
+
+export function WhatsappIcon({ className = '' }) {
+  return <Icon iconClass="icon-[uim--whatsapp]" className={className} />;
+}
+
+export function DataConfigurationIcon({ className = '' }) {
+  return <Icon iconClass="icon-[flat-color-icons--data-configuration]" className={className} />;
+}
+
+export function AndroidStudioIcon({ className = '' }) {
+  return (
+    <>
+      <Icon iconClass="icon-[skill-icons--androidstudio-light]" className={`inline dark:hidden ${className}`.trim()} />
+      <Icon iconClass="icon-[skill-icons--androidstudio-dark]" className={`hidden dark:inline ${className}`.trim()} />
+    </>
+  );
+}
+
+export function BashIcon({ className = '' }) {
+  return (
+    <>
+      <Icon iconClass="icon-[skill-icons--bash-light]" className={`inline dark:hidden ${className}`.trim()} />
+      <Icon iconClass="icon-[skill-icons--bash-dark]" className={`hidden dark:inline ${className}`.trim()} />
+    </>
+  );
+}
+
+export function GithubActionsIcon({ className = '' }) {
+  return (
+    <>
+      <Icon iconClass="icon-[skill-icons--githubactions-light]" className={`inline dark:hidden ${className}`.trim()} />
+      <Icon iconClass="icon-[skill-icons--githubactions-dark]" className={`hidden dark:inline ${className}`.trim()} />
+    </>
+  );
+}

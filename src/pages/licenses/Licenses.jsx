@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 import api from '../../api';
+import { PageMeta } from '../../components/common';
 import { LicensesHero, LicensesGrid } from '../../components/licenses';
 
 export default function Licenses() {
@@ -17,10 +17,10 @@ export default function Licenses() {
 
   return (
     <>
-      <Helmet>
-        <title>Tally License Pricing - Axatech</title>
-        <meta name="description" content="Tally Single User and Multi User license pricing. Buy now via enquiry." />
-      </Helmet>
+      <PageMeta
+        title="Tally License Pricing - Axatech"
+        description="Tally Single User and Multi User license pricing. Buy now via enquiry."
+      />
 
       <LicensesHero type={type} onTypeChange={setType} />
 

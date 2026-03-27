@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 import api from '../../api';
+import { PageMeta } from '../../components/common';
 import { TechnologiesHero, TechnologiesByCategory } from '../../components/technologies';
 
 export default function Technologies() {
@@ -13,10 +13,10 @@ export default function Technologies() {
 
   return (
     <>
-      <Helmet>
-        <title>Technologies We Work With | Axatech</title>
-        <meta name="description" content="Frontend, Backend and Database technologies we work with." />
-      </Helmet>
+      <PageMeta
+        title="Technologies We Work With | Axatech"
+        description="Frontend, Backend and Database technologies we work with."
+      />
 
       <TechnologiesHero title="Technologies We Work With" />
 

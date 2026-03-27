@@ -1,4 +1,5 @@
 import { Button } from '../common';
+import { CheckMarkIcon } from '../icons';
 
 export default function LicenseCard({ plan, index = 0 }) {
   return (
@@ -26,7 +27,7 @@ export default function LicenseCard({ plan, index = 0 }) {
         <ul className="list-none my-5 space-y-2">
           {plan.features.map((f, i) => (
             <li key={i} className="flex items-start gap-2 text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-              <span className="icon-[game-icons--check-mark] text-secondary dark:text-accent shrink-0 mt-0.5 size-4" aria-hidden />
+              <CheckMarkIcon className="text-secondary dark:text-accent shrink-0 mt-0.5 size-4" />
               {f}
             </li>
           ))}

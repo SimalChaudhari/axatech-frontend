@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import api from '../../api';
-import { Loader } from '../../components/common';
+import { Loader, PageMeta } from '../../components/common';
 import { BlogPostContent } from '../../components/blog';
 
 export default function BlogPost() {
@@ -27,10 +26,10 @@ export default function BlogPost() {
 
   return (
     <>
-      <Helmet>
-        <title>{post.metaTitle || post.title} - Axatech</title>
-        <meta name="description" content={post.metaDescription || post.excerpt || post.content?.slice(0, 160)} />
-      </Helmet>
+      <PageMeta
+        title={`${post.metaTitle || post.title} - Axatech`}
+        description={post.metaDescription || post.excerpt || post.content?.slice(0, 160)}
+      />
 
       <BlogPostContent post={post} />
     </>

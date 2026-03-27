@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 import api from '../../api';
+import { PageMeta } from '../../components/common';
 import { BlogHero, BlogGrid } from '../../components/blog';
 
 export default function Blog() {
@@ -14,10 +14,10 @@ export default function Blog() {
 
   return (
     <>
-      <Helmet>
-        <title>Blog - Axatech</title>
-        <meta name="description" content="Axatech blog - Tally, cloud and business solutions updates." />
-      </Helmet>
+      <PageMeta
+        title="Blog - Axatech"
+        description="Axatech blog - Tally, cloud and business solutions updates."
+      />
 
       <BlogHero title="Blog" subtitle="Updates and insights from Axatech." />
 

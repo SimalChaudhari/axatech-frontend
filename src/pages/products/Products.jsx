@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 import api from '../../api';
+import { PageMeta } from '../../components/common';
 import {
   ProductsHero,
   ProductsSidebar,
@@ -53,10 +53,10 @@ export default function Products() {
 
   return (
     <>
-      <Helmet>
-        <title>Tally Add-ons - Axatech</title>
-        <meta name="description" content="Browse Tally add-ons and automation products. Filter by category, search, and request enquiry." />
-      </Helmet>
+      <PageMeta
+        title="Tally Add-ons - Axatech"
+        description="Browse Tally add-ons and automation products. Filter by category, search, and request enquiry."
+      />
 
       <ProductsHero />
 

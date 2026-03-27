@@ -1,4 +1,5 @@
 import { Button } from '../common';
+import { CloudIbmIcon } from '../icons';
 
 export default function CloudPlanCard({ plan, index = 0 }) {
   return (
@@ -10,7 +11,7 @@ export default function CloudPlanCard({ plan, index = 0 }) {
         className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 dark:bg-secondary/20 text-primary dark:text-secondary mb-4 transition-all duration-200 group-hover:bg-primary/15 dark:group-hover:bg-secondary/30 group-hover:scale-105 shrink-0"
         aria-hidden
       >
-        <span className="icon-[carbon--ibm-cloud] text-2xl" />
+        <CloudIbmIcon className="text-2xl" />
       </span>
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-primary dark:group-hover:text-secondary transition-colors duration-200">
         {plan.planName}

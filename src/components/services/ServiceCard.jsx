@@ -1,4 +1,5 @@
 import { Button } from '../common';
+import { ArrowRightIcon, CogLoopIcon } from '../icons';
 
 export default function ServiceCard({ service, index = 0 }) {
   return (
@@ -10,7 +11,7 @@ export default function ServiceCard({ service, index = 0 }) {
         className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 dark:bg-secondary/20 text-primary dark:text-secondary text-lg font-bold mb-4 transition-all duration-200 group-hover:bg-primary/15 dark:group-hover:bg-secondary/30 group-hover:scale-105 shrink-0"
         aria-hidden
       >
-        <span className="icon-[line-md--cog-loop] text-3xl" />
+        <CogLoopIcon className="text-3xl" />
       </span>
       <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-primary dark:group-hover:text-secondary transition-colors duration-200">
         {service.title}
@@ -21,7 +22,7 @@ export default function ServiceCard({ service, index = 0 }) {
       <div className="flex flex-wrap gap-3">
         <Button to={`/services/${service.slug}`} variant="outline" fullWidth={false} className="inline-flex items-center gap-1.5">
           Learn more
-          <span className="icon-[mdi--arrow-right] text-lg transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden />
+          <ArrowRightIcon className="text-lg transition-transform duration-200 group-hover:translate-x-0.5" />
         </Button>
         <Button
           to="/contact"

@@ -1,4 +1,5 @@
 import { Input, Dropdown, Checkbox, Upload } from '../../common';
+import { CloseIcon } from '../../icons';
 
 const textareaClass =
   'w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-800 placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-secondary dark:focus:ring-secondary/20 min-h-[80px] resize-y';
@@ -131,7 +132,7 @@ export default function ProductForm({
                       aria-label="Remove image"
                       className="absolute top-1 right-1 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600 text-xs"
                     >
-                      <span className="icon-[mdi--close]" aria-hidden />
+                      <CloseIcon className="text-sm" />
                     </button>
                   </div>
                 </div>

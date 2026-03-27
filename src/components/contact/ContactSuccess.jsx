@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '../common';
+import { CheckCircleOutlineIcon } from '../icons';
 
 export default function ContactSuccess({ title = 'Thank you', message }) {
   return (
@@ -12,7 +13,7 @@ export default function ContactSuccess({ title = 'Thank you', message }) {
       <div className="relative max-w-[980px] mx-auto px-5">
         <div className="mx-auto max-w-[740px] rounded-3xl border border-gray-200/80 dark:border-gray-700 bg-white/92 dark:bg-gray-800/92 shadow-2xl shadow-gray-200/70 dark:shadow-none p-10 sm:p-12 md:p-14 text-center backdrop-blur-sm">
           <div className="mx-auto mb-6 flex h-18 w-18 items-center justify-center rounded-3xl bg-primary/10 dark:bg-secondary/20 animate-[home-fadeInUp_0.5s_ease-out_0.12s_both]">
-            <span className="icon-[mdi--check-circle-outline] text-4xl text-primary dark:text-secondary" aria-hidden />
+            <CheckCircleOutlineIcon className="text-4xl text-primary dark:text-secondary" />
           </div>
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-4 animate-[home-fadeInUp_0.5s_ease-out_0.18s_both]">

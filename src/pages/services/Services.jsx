@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 import api from '../../api';
-import { Loader } from '../../components/common';
+import { Loader, PageMeta } from '../../components/common';
 import { ServicesHero, ServicesGrid } from '../../components/services';
 
 const ITEMS_PER_PAGE = 12;
@@ -40,10 +39,10 @@ export default function Services() {
 
   return (
     <>
-      <Helmet>
-        <title>Services - Tally Customization, Cloud, Integration | Axatech</title>
-        <meta name="description" content="Tally Customization, Cloud Hosting, WhatsApp, Zoho & Zakya Integration, API & Automation services." />
-      </Helmet>
+      <PageMeta
+        title="Services - Tally Customization, Cloud, Integration | Axatech"
+        description="Tally Customization, Cloud Hosting, WhatsApp, Zoho & Zakya Integration, API & Automation services."
+      />
 
       <ServicesHero
         title="Our Services"

@@ -1,13 +1,10 @@
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import { PageMeta } from '../../components/common';
 
 export default function NotFound() {
   return (
     <>
-      <Helmet>
-        <title>Page not found - Axatech</title>
-        <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet" />
-      </Helmet>
+      <PageMeta title="Page not found - Axatech" />
 
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-nunito">
 
