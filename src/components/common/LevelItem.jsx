@@ -153,6 +153,18 @@ export default function LevelItem({
     [items, pathname]
   );
 
+  /** One top-level link with no subtree: no chevron/panel — navigate directly. */
+  const singleRootLeaf = useMemo(() => {
+    const list = items;
+    if (!Array.isArray(list) || list.length !== 1) return null;
+    const only = list[0];
+    if (only == null || only.content != null) return null;
+    if (Array.isArray(only.children) && only.children.length > 0) return null;
+    if (only.to != null && only.to !== '') return only;
+    if (only.href != null && only.href !== '') return only;
+    return null;
+  }, [items]);
+
   const getInitialOpenNodes = (list = [], path = 'root', shouldOpen = false) => {
     const map = {};
     list.forEach((item, index) => {
@@ -302,7 +314,7 @@ export default function LevelItem({
       collapsed
         ? 'flex w-full items-center rounded-md px-3 py-2 text-sm font-medium no-underline transition-all duration-200'
         : 'mt-1 flex w-full items-center rounded-lg py-2.5 px-3 text-[0.925rem] font-medium no-underline transition-all duration-200',
-      item.image ? 'gap-2.5' : '',
+      item.image || item.Icon ? 'gap-2.5' : '',
       isActive
         ? 'bg-gray-200 text-secondary dark:bg-secondary/10 dark:text-secondary'
         : 'text-gray-700  dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600/50 hover:text-primary dark:hover:text-secondary',
@@ -315,17 +327,28 @@ export default function LevelItem({
       collapsed
         ? 'flex w-full items-center rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition-colors duration-200 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-gray-700/50'
         : rowClass
-    } no-underline ${item.image ? 'justify-start gap-2.5' : ''}`.trim();
+    } no-underline ${item.image || item.Icon ? 'justify-start gap-2.5' : ''}`.trim();
 
-  const renderLeafInner = (item) =>
-    item.image ? (
-      <>
-        <img src={item.image} alt="" className="h-7 w-7 shrink-0 object-contain rounded" />
-        <span className="min-w-0 flex-1 truncate">{item.label}</span>
-      </>
-    ) : (
-      item.label
-    );
+  const renderLeafInner = (item) => {
+    if (item.Icon) {
+      const LeafIcon = item.Icon;
+      return (
+        <>
+          <LeafIcon className="nav-icon text-[1.35rem] shrink-0" />
+          <span className="min-w-0 flex-1 truncate">{item.label}</span>
+        </>
+      );
+    }
+    if (item.image) {
+      return (
+        <>
+          <img src={item.image} alt="" className="h-7 w-7 shrink-0 object-contain rounded" />
+          <span className="min-w-0 flex-1 truncate">{item.label}</span>
+        </>
+      );
+    }
+    return item.label;
+  };
 
   const renderItems = (list = [], path = 'root', depth = 0) => (
     <ul
@@ -349,6 +372,14 @@ export default function LevelItem({
       {list.map((item, index) => {
         const nodePath = `${path}-${index}`;
         const hasChildren = Array.isArray(item.children) && item.children.length > 0;
+        const soleChild =
+          hasChildren && item.children.length === 1 ? item.children[0] : null;
+        const soleChildIsNavLeaf =
+          soleChild &&
+          soleChild.content == null &&
+          !(Array.isArray(soleChild.children) && soleChild.children.length > 0) &&
+          ((soleChild.to != null && soleChild.to !== '') ||
+            (soleChild.href != null && soleChild.href !== ''));
         const nodeOpen = collapsed ? hoverPath.startsWith(nodePath) : !!openNodes[nodePath];
         const nodeHasActiveDescendant = hasChildren ? hasActiveDescendant(item.children) : false;
 
@@ -358,7 +389,7 @@ export default function LevelItem({
             onMouseEnter={
               collapsed
                 ? () => {
-                    if (hasChildren) {
+                    if (hasChildren && !soleChildIsNavLeaf) {
                       // Show only the currently hovered parent's submenu.
                       setHoverPath(nodePath);
                     } else if (path === 'root') {
@@ -372,7 +403,30 @@ export default function LevelItem({
                 : undefined
             }
           >
-            {hasChildren ? (
+            {soleChildIsNavLeaf ? (
+              <div className="level-tree-node-head w-full min-w-0">
+                {soleChild.to != null && soleChild.to !== '' ? (
+                  <NavLink
+                    to={soleChild.to}
+                    end={soleChild.navEnd === true}
+                    onClick={soleChild.onClick}
+                    className={(state) => navLeafClassName(state, soleChild)}
+                  >
+                    {renderLeafInner(soleChild)}
+                  </NavLink>
+                ) : (
+                  <a
+                    href={soleChild.href}
+                    className={`block ${leafRowClass(soleChild)}`}
+                    onClick={soleChild.onClick}
+                    target={soleChild.external ? '_blank' : undefined}
+                    rel={soleChild.external ? 'noopener noreferrer' : undefined}
+                  >
+                    {renderLeafInner(soleChild)}
+                  </a>
+                )}
+              </div>
+            ) : hasChildren ? (
               <>
                 <div className="level-tree-node-head">
                   <button
@@ -454,6 +508,46 @@ export default function LevelItem({
       })}
     </ul>
   );
+
+  const rootLinkBaseClass =
+    'cursor-pointer flex w-full items-center justify-start rounded-lg text-left font-semibold capitalize text-[0.8375rem] text-gray-500 no-underline transition-colors duration-200 dark:text-gray-200 hover:bg-gray-200 hover:dark:bg-gray-700/50';
+
+  if (singleRootLeaf) {
+    const leafActive =
+      singleRootLeaf.to != null &&
+      isPathActive(singleRootLeaf.to, singleRootLeaf.navEnd === true);
+    const activeCls = 'bg-info-lighter text-info-dark dark:bg-info/20 dark:text-info-light';
+    const layoutClass = collapsed
+      ? 'relative justify-start gap-1 px-1 py-2 text-[10px] normal-case tracking-normal'
+      : 'justify-start gap-2 px-3 py-2.5 text-[0.7rem]';
+
+    return (
+      <div className={className}>
+        {singleRootLeaf.to != null && singleRootLeaf.to !== '' ? (
+          <NavLink
+            to={singleRootLeaf.to}
+            end={singleRootLeaf.navEnd === true}
+            onClick={singleRootLeaf.onClick}
+            className={({ isActive }) =>
+              `${rootLinkBaseClass} ${layoutClass} ${isActive || leafActive ? activeCls : ''} ${triggerClassName}`.trim()
+            }
+          >
+            {resolvedLabel}
+          </NavLink>
+        ) : (
+          <a
+            href={singleRootLeaf.href}
+            className={`${rootLinkBaseClass} ${layoutClass} ${triggerClassName}`.trim()}
+            onClick={singleRootLeaf.onClick}
+            target={singleRootLeaf.external ? '_blank' : undefined}
+            rel={singleRootLeaf.external ? 'noopener noreferrer' : undefined}
+          >
+            {resolvedLabel}
+          </a>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div

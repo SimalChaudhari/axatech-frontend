@@ -5,6 +5,7 @@ export { default as Badge } from './Badge';
 export { default as ConfirmModal } from './ConfirmModal';
 export { default as Modal } from './Modal';
 export { default as Dropdown } from './Dropdown';
+export { default as ThemeToggleButton } from './ThemeToggleButton';
 export { default as Pagination } from './Pagination';
 export { default as Table } from './Table';
 export { default as Checkbox } from './Checkbox';
