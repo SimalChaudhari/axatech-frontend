@@ -1,51 +1,48 @@
-import { useEffect, useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  CloseIcon,
-  DashboardIcon,
-  HomeContentIcon,
-  LicensesIcon,
-  CategoriesIcon,
-  ProductsIcon,
-  ProjectsIcon,
-  AppsIcon,
-  ServicesIcon,
-  CloudPlansIcon,
-  EnquiriesIcon,
-  BlogsIcon,
-} from '../icons';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ChevronLeftIcon, ChevronRightIcon, CloseIcon } from '../icons';
 import { LevelItem } from '../common';
+import { ADMIN_NAV, withCloseMenu } from '../routes';
 
 const SIDEBAR_BG_IMAGE =
   'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSJ1cmwoI3BhaW50MF9yYWRpYWxfNDQ2NF81NTMzOCkiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CjxkZWZzPgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50MF9yYWRpYWxfNDQ2NF81NTMzOCIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgxMjAgMS44MTgxMmUtMDUpIHJvdGF0ZSgtNDUpIHNjYWxlKDEyMy4yNSkiPgo8c3RvcCBzdG9wLWNvbG9yPSIjMDBCOEQ5Ii8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzAwQjhEOSIgc3RvcC1vcGFjaXR5PSIwIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==), url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSJ1cmwoI3BhaW50MF9yYWRpYWxfNDQ2NF81NTMzNykiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CjxkZWZzPgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50MF9yYWRpYWxfNDQ2NF81NTMzNyIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgwIDEyMCkgcm90YXRlKDEzNSkgc2NhbGUoMTIzLjI1KSI+CjxzdG9wIHN0b3AtY29sb3I9IiNGRjU2MzAiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRkY1NjMwIiBzdG9wLW9wYWNpdHk9IjAiLz4KPC9yYWRpYWxHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4K)';
 
-const NAV_LINKS = [
-  { to: '/admin', end: true, label: 'Dashboard', Icon: DashboardIcon },
-  { to: '/admin/home', label: 'Home Content', Icon: HomeContentIcon },
-  // { to: '/admin/licenses', label: 'Licenses', Icon: LicensesIcon },
-  { to: '/admin/licenses', label: 'Tally', Icon: LicensesIcon },
-  { to: '/admin/categories', label: 'Categories', Icon: CategoriesIcon },
-  { to: '/admin/products', label: 'Products', Icon: ProductsIcon },
-  { to: '/admin/projects', label: 'Projects', Icon: ProjectsIcon },
-  { to: '/admin/technologies', label: 'Technologies', Icon: AppsIcon },
-  { to: '/admin/services', label: 'Services', Icon: ServicesIcon },
-  { to: '/admin/cloud', label: 'Cloud Plans', Icon: CloudPlansIcon },
-  { to: '/admin/enquiries', label: 'Enquiries', Icon: EnquiriesIcon },
-  { to: '/admin/blogs', label: 'Blogs', Icon: BlogsIcon },
-];
-
-function getNavLinkClass(isActive, collapsed) {
-  const base = `flex items-center rounded-lg py-2.5 font-medium no-underline transition-all duration-200 ${collapsed ? 'flex-col gap-1 px-1 text-[10px]' : 'flex-row gap-2 px-3 text-[0.925rem]'}`;
-  const active = isActive
-    ? 'bg-info-lighter text-info-dark dark:bg-info/20 dark:text-info-light [&_.nav-icon]:!text-info-dark dark:[&_.nav-icon]:!text-info-light'
-    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 [&_.nav-icon]:text-gray-500 dark:[&_.nav-icon]:text-gray-400';
-  return `${base} ${active}`;
-}
-
 export default function AdminSidebar({ open, onClose, onNavigate }) {
   const [collapsed, setCollapsed] = useState(false);
+
+  const handleNavClick = useCallback(() => {
+    onNavigate?.();
+  }, [onNavigate]);
+
+  const levelItemsWithClose = useMemo(() => {
+    const map = {};
+    for (const item of ADMIN_NAV.items) {
+      if (item.type === 'level') {
+        map[item.key] = withCloseMenu(item.levelItems, handleNavClick);
+      }
+    }
+    return map;
+  }, [handleNavClick]);
+
+  const linkItemsWithClose = useMemo(() => {
+    const map = {};
+    for (const item of ADMIN_NAV.items) {
+      if (item.type === 'link') {
+        map[item.key] = withCloseMenu(
+          [
+            {
+              label: item.label,
+              to: item.to,
+              navEnd: item.end === true,
+              Icon: item.Icon,
+            },
+          ],
+          handleNavClick
+        );
+      }
+    }
+    return map;
+  }, [handleNavClick]);
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -60,10 +57,6 @@ export default function AdminSidebar({ open, onClose, onNavigate }) {
       document.body.style.overflow = '';
     };
   }, [open, onClose]);
-
-  const handleNavClick = () => {
-    onNavigate?.();
-  };
 
   const sidebarContent = (effectiveCollapsed) => (
     <>
@@ -108,66 +101,38 @@ export default function AdminSidebar({ open, onClose, onNavigate }) {
         <div
           className={`space-y-1 ${effectiveCollapsed ? 'px-1 overflow-visible' : 'px-3'}`}
         >
-          {NAV_LINKS.map(({ to, end, label, Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              title={effectiveCollapsed ? label : undefined}
-              className={({ isActive }) => getNavLinkClass(isActive, effectiveCollapsed)}
-              onClick={handleNavClick}
-            >
-              <Icon className="nav-icon text-[1.35rem] shrink-0" />
-              <span className={effectiveCollapsed ? 'whitespace-nowrap' : ''}>{label}</span>
-            </NavLink>
-          ))}
+          {ADMIN_NAV.items.map((item) => {
+            const isLevel = item.type === 'level';
+            const isLink = item.type === 'link';
+            const linkCollapsed = isLink && effectiveCollapsed;
+            const navItems = isLevel
+              ? levelItemsWithClose[item.key]
+              : linkItemsWithClose[item.key];
+            const triggerAlign = effectiveCollapsed ? '!justify-center' : '!justify-start';
+            const triggerBase = isLevel
+              ? item.triggerClassName
+              : ADMIN_NAV.sidebar.levelTriggerClass;
 
-          {/* Static nested menu example (LevelItem) */}
-          {/* <div className="relative">
-            <LevelItem
-              id="dashboard-toggle"
-              labelText="Level"
-              labelIcon={HomeContentIcon}
-              defaultOpen={!effectiveCollapsed}
-              className="w-full"
-              floating={effectiveCollapsed}
-              collapsed={effectiveCollapsed}
-              items={[
-                { label: 'Dashboard', to: '/admin', navEnd: true },
-                {
-                  label: 'Toggle 2',
-                  children: [
-                    { label: 'Home', to: '/admin/home' },
-                    { label: 'Categories', to: '/admin/categories' },
-                    {
-                      label: 'Toggle 3',
-                      children: [
-                        { label: 'Products', to: '/admin/products' },
-                        { label: 'Projects', to: '/admin/projects' },
-                        {
-                          label: 'Toggle 4',
-                          children: [
-                            { label: 'Technologies', to: '/admin/technologies' },
-                            { label: 'Services', to: '/admin/services' },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
-                { label: 'Cloud Plans', to: '/admin/cloud' },
-                { label: 'Enquiries', to: '/admin/enquiries' },
-                { label: 'Blogs', to: '/admin/blogs' },
-                {
-                  label: 'Toggle 5',
-                  children: [
-                    { label: 'Products', to: '/admin/products' },
-                    { label: 'Projects', to: '/admin/projects' },
-                  ],
-                },
-              ]}
-            />
-          </div> */}
+            return (
+              <div
+                key={item.key}
+                className={`relative ${isLevel ? item.desktopMinWidth : 'min-w-0'}`}
+              >
+                <LevelItem
+                  id={`admin-nav-${item.key}`}
+                  labelText={item.label}
+                  labelIcon={isLevel ? item.labelIcon : item.Icon}
+                  collapsed={linkCollapsed ? true : effectiveCollapsed}
+                  defaultOpen={linkCollapsed ? true : !effectiveCollapsed}
+                  floating={linkCollapsed ? true : effectiveCollapsed}
+                  items={navItems}
+                  className="w-full"
+                  contentClassName={ADMIN_NAV.sidebar.levelContentClass}
+                  triggerClassName={`${triggerBase} ${triggerAlign}`.trim()}
+                />
+              </div>
+            );
+          })}
         </div>
       </nav>
 

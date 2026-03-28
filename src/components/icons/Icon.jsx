@@ -157,10 +157,6 @@ export function AccountCircleIcon({ className = '' }) {
   return <Icon iconClass="icon-[mdi--account-circle]" className={className} />;
 }
 
-export function CogOutlineIcon({ className = '' }) {
-  return <Icon iconClass="icon-[mdi--cog-outline]" className={className} />;
-}
-
 export function AccountOutlineIcon({ className = '' }) {
   return <Icon iconClass="icon-[mdi--account-outline]" className={className} />;
 }

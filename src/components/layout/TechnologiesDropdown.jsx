@@ -45,7 +45,7 @@ export default function TechnologiesDropdown({ technologies, onClose, inline = f
   const sections = groupByCategory(technologies);
   const wrapperClassName = 'min-w-[200px] w-full';
   const triggerClassName = '!capitalize !text-[0.925rem]';
-  const levelItemId = 'tech-sidebar-toggle-tree';
+  const levelItemId = inline ? 'tech-sidebar-toggle-inline' : 'tech-sidebar-toggle-flyout';
 
   /** LevelItem tree: first row + one branch per CATEGORY_ORDER section with real tech titles. */
   const levelToggleItems = useMemo(
@@ -56,15 +56,17 @@ export default function TechnologiesDropdown({ technologies, onClose, inline = f
         navEnd: true,
         onClick: onClose,
       },
-      ...sections.map(({ label, items: techs }) => ({
-        label,
-        children: techs.map((tech) => ({
-          label: tech.title,
-          to: `/technologies/${tech.slug || tech._id}`,
-          onClick: onClose,
-          image: tech.image || undefined,
-        })),
-      })),
+      ...sections
+        .map(({ label, items: techs }) => ({
+          label,
+          children: techs.map((tech) => ({
+            label: tech.title,
+            to: `/technologies/${tech.slug || tech._id}`,
+            onClick: onClose,
+            image: tech.image || undefined,
+          })),
+        }))
+        .filter((node) => node.children.length > 0),
     ],
     [sections, onClose]
   );
@@ -100,7 +102,7 @@ export default function TechnologiesDropdown({ technologies, onClose, inline = f
                 {items.map((tech) => {
                   const to = `/technologies/${tech.slug || tech._id}`;
                   const isActive = pathname === to;
-                  const linkClass = `flex items-center gap-2.5 py-2 px-2 -mx-2 rounded-md text-[0.875rem] font-medium no-underline transition-colors duration-150 ${isActive ? 'bg-primary/5 text-primary dark:bg-secondary/10 dark:text-secondary' : 'text-gray-700 dark:text-gray-200 dark:bg-gray-700/50 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600/50 hover:text-primary dark:hover:text-secondary'}`;
+                  const linkClass = `flex items-center gap-2.5 py-2 px-2 -mx-2 rounded-md text-[0.875rem] font-medium no-underline transition-colors duration-150 ${isActive ? 'bg-primary/5 text-info dark:bg-secondary/10 dark:text-info' : 'text-gray-700 dark:text-gray-200 dark:bg-gray-700/50 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600/50 hover:text-primary dark:hover:text-secondary'}`;
                   return (
                     <li key={tech._id}>
                       <Link to={to} onClick={onClose} role="menuitem" className={linkClass}>
@@ -126,7 +128,7 @@ export default function TechnologiesDropdown({ technologies, onClose, inline = f
 
   return (
     <div
-      className="absolute left-1/2 top-full mt-1 z-50 -translate-x-1/2"
+      className="absolute left-1/2 top-full z-50 -translate-x-1/2 pt-2"
       role="menu"
       aria-label="Technologies menu"
     >

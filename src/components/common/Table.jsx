@@ -514,12 +514,11 @@ function TablePagination({
       <div className="flex items-center gap-2">
         <span className="font-medium">Rows per page:</span>
         <Dropdown
-          // placeholder="Rows per page"
           showPlaceholderOption={false}
           value={String(rowsPerPage)}
           onChange={(v) => onRowsPerPageChange(Number(v))}
           options={rowsPerPageOptionsList}
-          className="w-16 [&_button]:h-9 [&_button]:py-1.5 [&_button]:rounded-lg [&_button]:text-sm [&_button]:pl-3 [&_button]:pr-8 [&_button]:border [&_button]:border-slate-200 [&_button]:dark:border-gray-600 [&_button]:bg-white [&_button]:dark:bg-gray-700 [&_button]:text-slate-800 [&_button]:dark:text-gray-100"
+          className="w-16 min-w-17 [&_button]:h-9 [&_button]:py-1.5 [&_button]:rounded-lg [&_button]:text-sm [&_button]:pl-3 [&_button]:pr-8 [&_button]:border [&_button]:border-slate-200 [&_button]:dark:border-gray-600 [&_button]:bg-white [&_button]:dark:bg-gray-700 [&_button]:text-slate-800 [&_button]:dark:text-gray-100"
         />
       </div>
       <span className="font-medium" aria-live="polite">
