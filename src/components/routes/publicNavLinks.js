@@ -111,13 +111,15 @@ const paths = {
     },
     children: {
       licenses: { path: '/licenses', label: 'Tally Licenses', navEnd: true },
-      tss: {
-        label: 'TSS',
-        children: {
-          singleUser: { path: '/tss-renewal-single-user', label: 'Single User TSS' },
-          multiUser: { path: '/tss-renewal-multi-user', label: 'Multi User TSS' },
-        },
-      },
+      tss: { path: '/tss-renew', label: 'TSS Renewal', navEnd: true },
+      // tss: {
+      //   label: 'TSS',
+      //   children: {
+      //     pricing: { path: '/tss-renew', label: 'TSS Renewal Pricing' },
+      //     singleUser: { path: '/tss-renewal-single-user', label: 'Single User TSS' },
+      //     multiUser: { path: '/tss-renewal-multi-user', label: 'Multi User TSS' },
+      //   },
+      // },
       cloud: {
         label: 'Tally on Cloud',
         children: {

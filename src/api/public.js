@@ -3,6 +3,8 @@ import authApi from './auth';
 import { home } from './home/public';
 import { categories } from './categories/public';
 import { licenses } from './licenses/public';
+import { tss } from './tss/public';
+import { tssContent } from './tssContent/public';
 import { products, product } from './products/public';
 import { services, service } from './service/public';
 import { cloud } from './cloud/public';
@@ -22,6 +24,8 @@ export function createPublicApi() {
     cloud,
     enquiry,
     licenses,
+    tss,
+    tssContent,
     products,
     services,
     technologies,

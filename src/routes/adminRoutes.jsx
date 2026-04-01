@@ -3,6 +3,8 @@ import { AdminLayout } from '../components/layout';
 import AdminDashboard from '../pages/admin/dashboard/AdminDashboard';
 import AdminHome from '../pages/admin/home/AdminHome';
 import AdminLicenses from '../pages/admin/licenses/AdminLicenses';
+import AdminTssSingleContent from '../pages/admin/tss/AdminTssSingleContent';
+import AdminTss from '../pages/admin/tss/AdminTss';
 import AdminCategories from '../pages/admin/categories/AdminCategories';
 import AdminProducts from '../pages/admin/products/AdminProducts';
 import AdminProjects from '../pages/admin/projects/AdminProjects';
@@ -19,6 +21,8 @@ export function getAdminRoutes() {
       <Route index element={<AdminDashboard />} />
       <Route path="home" element={<AdminHome />} />
       <Route path="licenses" element={<AdminLicenses />} />
+      <Route path="tss-single" element={<AdminTssSingleContent />} />
+      <Route path="renew-tss" element={<AdminTss />} />
       <Route path="categories" element={<AdminCategories />} />
       <Route path="products" element={<AdminProducts />} />
       <Route path="projects" element={<AdminProjects />} />

@@ -2,6 +2,7 @@ import { Navigate, Route } from 'react-router-dom';
 import { Layout } from '../components/layout';
 import Home from '../pages/home/Home';
 import Licenses from '../pages/licenses/Licenses';
+import TssRenewLicenses from '../pages/tss/TssRenewLicenses';
 import TssSingleRenewal from '../pages/tss/TssSingleRenewal';
 import TssMultiRenewal from '../pages/tss/TssMultiRenewal';
 import Products from '../pages/products/Products';
@@ -39,6 +40,7 @@ export function getUserRoutes() {
     <Route path="/" element={<Layout />}>
       <Route index element={<Home />} />
       <Route path="licenses" element={<Licenses />} />
+      <Route path="tss-renew" element={<TssRenewLicenses />} />
       <Route path="tss-renewal-single-user" element={<TssSingleRenewal />} />
       <Route path="tss-renewal-multi-user" element={<TssMultiRenewal />} />
       <Route path="products" element={<Products />} />

@@ -113,6 +113,11 @@ export default function AdminSidebar({ open, onClose, onNavigate }) {
               ? item.triggerClassName
               : ADMIN_NAV.sidebar.levelTriggerClass;
 
+            const contentClassName =
+              effectiveCollapsed && ADMIN_NAV.sidebar.levelContentCollapsedClass
+                ? ADMIN_NAV.sidebar.levelContentCollapsedClass
+                : ADMIN_NAV.sidebar.levelContentClass;
+
             return (
               <div
                 key={item.key}
@@ -127,7 +132,7 @@ export default function AdminSidebar({ open, onClose, onNavigate }) {
                   floating={linkCollapsed ? true : effectiveCollapsed}
                   items={navItems}
                   className="w-full"
-                  contentClassName={ADMIN_NAV.sidebar.levelContentClass}
+                  contentClassName={contentClassName}
                   triggerClassName={`${triggerBase} ${triggerAlign}`.trim()}
                 />
               </div>

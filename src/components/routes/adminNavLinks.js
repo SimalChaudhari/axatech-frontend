@@ -72,7 +72,10 @@ function buildAdminNavItems(paths, order, sidebar) {
 }
 
 const sidebar = {
+  // For expanded sidebar: dropdown opens just below the trigger
   levelContentClass: '!left-0 !top-full !ml-0 !mt-1',
+  // For collapsed sidebar: flyout should align vertically with the trigger button
+  levelContentCollapsedClass: '!left-full !top-1/2 !-translate-y-1/2 !ml-0',
   /** Horizontal align is set in AdminSidebar from `effectiveCollapsed` (`!justify-center` vs `!justify-start`). */
   levelTriggerClass:
     '!gap-2 !rounded-lg !py-2.5 !px-1 !text-[0.925rem] !font-medium !normal-case !tracking-normal !text-gray-700 dark:!text-gray-300 hover:!bg-gray-100 dark:hover:!bg-gray-700/50 !w-full',
@@ -82,6 +85,7 @@ const order = [
   'dashboard',
   'home',
   'licenses',
+  'tss',
   'categories',
   'products',
   'projects',
@@ -96,6 +100,16 @@ const paths = {
   dashboard: { path: '/admin', label: 'Dashboard', end: true, Icon: DashboardIcon },
   home: { path: '/admin/home', label: 'Home Content', Icon: HomeContentIcon },
   licenses: { path: '/admin/licenses', label: 'Tally', Icon: LicensesIcon },
+  // TSS level with two child links
+  tss: {
+    path: '/admin/renew-tss',
+    label: 'TSS',
+    Icon: LicensesIcon,
+    children: {
+      renewTss: { path: '/admin/renew-tss', label: 'Renew TSS' },
+      tssSingle: { path: '/admin/tss-single', label: 'TSS Single Content' },
+    },
+  },
   categories: { path: '/admin/categories', label: 'Categories', Icon: CategoriesIcon },
   products: { path: '/admin/products', label: 'Products', Icon: ProductsIcon },
   projects: { path: '/admin/projects', label: 'Projects', Icon: ProjectsIcon },

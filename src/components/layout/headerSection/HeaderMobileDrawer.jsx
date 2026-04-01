@@ -32,7 +32,7 @@ export default function HeaderMobileDrawer({
             <img src="/logo.png" alt="Axatech" className="h-9 w-auto object-contain" />
           </Link>
           <div className="flex items-center gap-1">
-            <ThemeToggleButton className="!rounded-lg transition-colors hover:bg-primary/10 dark:hover:bg-secondary/20" />
+            <ThemeToggleButton className="!rounded-lg! transition-colors hover:bg-primary/10 dark:hover:bg-secondary/20" />
             <button type="button" onClick={closeMenu} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700" aria-label="Close menu">
               <CloseIcon className="text-xl cursor-pointer" />
             </button>

@@ -1,13 +1,19 @@
 import { Button, SectionHeader } from '../common';
 
-export default function LicensesHero({ type, onTypeChange }) {
+export default function LicensesHero({
+  type,
+  onTypeChange,
+  label = 'Pricing',
+  title = 'Tally License Pricing',
+  subtitle = 'Choose Single User or Multi User plans. Buy Now redirects to enquiry form.',
+}) {
   return (
     <section className="py-20 md:py-24 bg-gray-50/80 dark:bg-gray-900 border-y border-gray-100 dark:border-gray-800">
       <div className="max-w-4xl mx-auto px-5 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
         <SectionHeader
-          label="Pricing"
-          title="Tally License Pricing"
-          subtitle="Choose Single User or Multi User plans. Buy Now redirects to enquiry form."
+          label={label}
+          title={title}
+          subtitle={subtitle}
           centered
           as="h1"
           subtitleClassName="mb-8"

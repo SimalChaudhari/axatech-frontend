@@ -1,45 +1,39 @@
-import { Button, PageMeta, SectionHeader } from '../../components/common';
+import { useEffect, useState } from 'react';
+import api from '../../api';
+import { Button, PageMeta, SectionHeader, Loader } from '../../components/common';
 import { CheckCircleOutlineIcon, CogLoopIcon, RocketIcon } from '../../components/icons';
 
-const BENEFITS = [
-  'Latest updates including GST, TDS and compliance changes',
-  'Remote access features',
-  'Priority support from Axatech',
-  'Annual renewal at competitive pricing',
-];
-
-const RENEWAL_HIGHLIGHTS = [
-  {
-    title: 'Always Compliance-Ready',
-    description: 'Stay aligned with the latest statutory requirements and regulatory updates without disruption.',
-    icon: CheckCircleOutlineIcon,
-  },
-  {
-    title: 'Smooth Day-to-Day Operations',
-    description: 'Keep billing, accounting, and reporting workflows stable with timely subscription continuity.',
-    icon: CogLoopIcon,
-  },
-  {
-    title: 'Faster Support Response',
-    description: 'Get dependable priority assistance from the Axatech team whenever you need expert guidance.',
-    icon: RocketIcon,
-  },
-];
-
 export default function TssSingleRenewal() {
+  const [content, setContent] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.tssContent()
+      .then(setContent)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading || !content) {
+    return <Loader className="min-h-screen" />;
+  }
+
+  const benefits = Array.isArray(content.singleBenefits) ? content.singleBenefits : [];
+  const highlights = Array.isArray(content.singleHighlights) ? content.singleHighlights : [];
+
   return (
     <>
       <PageMeta
-        title="Single User TSS Renewal | Axatech"
-        description="Renew your single-user TSS and keep Tally up to date with GST, e-Invoice and compliance updates."
+        title={content.singleMetaTitle}
+        description={content.singleMetaDescription}
       />
 
       <section className="bg-linear-to-b from-slate-50 to-white py-20 md:py-24 dark:from-gray-900 dark:to-gray-900/90">
         <div className="mx-auto max-w-5xl px-5">
           <SectionHeader
-            label="2.1 Single User TSS Renewal"
-            title="Keep Your Tally Always Up to Date"
-            subtitle="Renew your single-user Tally license software subscription and continue uninterrupted compliance and support."
+            label={content.singleLabel}
+            title={content.singleTitle}
+            subtitle={content.singleSubtitle}
             centered={false}
             as="h1"
             subtitleClassName="mb-8"
@@ -48,13 +42,19 @@ export default function TssSingleRenewal() {
 
           <div data-aos="fade-up" className="mb-6 rounded-2xl border border-primary/20 bg-primary/5 p-5 dark:border-secondary/30 dark:bg-secondary/10">
             <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
-              Perfect for single-user businesses that require uninterrupted compliance, trusted support, and consistent Tally performance.
+              {content.singleIntroText}
             </p>
           </div>
 
           <div data-aos="fade-up" className="grid gap-4 md:grid-cols-3">
-            {RENEWAL_HIGHLIGHTS.map((highlight) => {
-              const HighlightIcon = highlight.icon;
+            {highlights.map((highlight) => {
+              const HighlightIcon =
+                highlight.icon === 'CogLoopIcon'
+                  ? CogLoopIcon
+                  : highlight.icon === 'RocketIcon'
+                    ? RocketIcon
+                    : CheckCircleOutlineIcon;
+
               return (
                 <article
                   key={highlight.title}
@@ -71,9 +71,11 @@ export default function TssSingleRenewal() {
           </div>
 
           <div data-aos="fade-up" className="mt-5 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 sm:p-8">
-            <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">Benefits Included</h3>
+            <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
+              {content.singleBenefitsTitle}
+            </h3>
             <ul className="list-disc pl-5 space-y-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
-              {BENEFITS.map((benefit) => (
+              {benefits.map((benefit) => (
                 <li key={benefit}>{benefit}</li>
               ))}
             </ul>
@@ -81,12 +83,12 @@ export default function TssSingleRenewal() {
 
           <div className="mt-8">
             <Button
-              to="/contact"
+              to="/tss-renew"
               fullWidth={false}
               state={{ enquiryType: 'tss-renewal', tssType: 'single-user' }}
               className="px-6"
             >
-              Renew Single User TSS
+              Renew TSS
             </Button>
           </div>
         </div>

@@ -1,6 +1,8 @@
 import { request } from './core';
 import adminHomeApi from './home/admin';
 import adminLicensesApi from './licenses/admin';
+import adminTssApi from './tss/admin';
+import adminTssContentApi from './tssContent/admin';
 import adminCategoriesApi from './categories/admin';
 import adminProductsApi from './products/admin';
 import adminServicesApi from './service/admin';
@@ -15,6 +17,8 @@ export function createAdminApi() {
   return {
     home: adminHomeApi,
     licenses: adminLicensesApi,
+    tss: adminTssApi,
+    tssContent: adminTssContentApi,
     categories: adminCategoriesApi,
     products: adminProductsApi,
     services: adminServicesApi,
