@@ -65,7 +65,7 @@ export default function AdminSidebar({ open, onClose, onNavigate }) {
         <button
           type="button"
           onClick={() => setCollapsed((c) => !c)}
-          className="hidden md:flex absolute -right-3 top-4 h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-slate-100 dark:bg-gray-900 text-gray-500 shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-gray-200"
+          className="hidden md:flex absolute -right-3 top-4 z-90 h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-slate-100 dark:bg-gray-900 text-gray-500 shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-gray-200"
           aria-label={effectiveCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {effectiveCollapsed ? <ChevronRightIcon className="text-xl cursor-pointer" /> : <ChevronLeftIcon className="text-xl cursor-pointer" />}
@@ -90,7 +90,7 @@ export default function AdminSidebar({ open, onClose, onNavigate }) {
       {/* Section label + Nav */}
       <nav
         className={`min-h-0 flex-1 py-4 ${
-          effectiveCollapsed ? 'overflow-visible' : 'overflow-y-auto'
+          effectiveCollapsed ? 'overflow-visible' : 'overflow-y-auto no-scrollbar'
         }`}
       >
         {!effectiveCollapsed && (
@@ -108,6 +108,7 @@ export default function AdminSidebar({ open, onClose, onNavigate }) {
             const navItems = isLevel
               ? levelItemsWithClose[item.key]
               : linkItemsWithClose[item.key];
+            const isVerticalMenu = isLevel;
             const triggerAlign = effectiveCollapsed ? '!justify-center' : '!justify-start';
             const triggerBase = isLevel
               ? item.triggerClassName
@@ -122,12 +123,19 @@ export default function AdminSidebar({ open, onClose, onNavigate }) {
                   id={`admin-nav-${item.key}`}
                   labelText={item.label}
                   labelIcon={isLevel ? item.labelIcon : item.Icon}
+                  vertical={isVerticalMenu}
                   collapsed={linkCollapsed ? true : effectiveCollapsed}
                   defaultOpen={linkCollapsed ? true : !effectiveCollapsed}
                   floating={linkCollapsed ? true : effectiveCollapsed}
                   items={navItems}
                   className="w-full"
-                  contentClassName={ADMIN_NAV.sidebar.levelContentClass}
+                  contentClassName={
+                    isVerticalMenu
+                      ? (effectiveCollapsed
+                          ? `${ADMIN_NAV.sidebar.levelContentCollapsedClass} !top-0`
+                          : ADMIN_NAV.sidebar.levelContentClass)
+                      : ''
+                  }
                   triggerClassName={`${triggerBase} ${triggerAlign}`.trim()}
                 />
               </div>
@@ -175,7 +183,7 @@ export default function AdminSidebar({ open, onClose, onNavigate }) {
 
       {/* Desktop: in flow, full height; width depends on collapsed — no gradient/blur */}
       <aside
-        className={`hidden ${asideBaseClass} md:relative md:z-40 md:flex md:h-screen shadow-[4px_0_24px_rgba(0,0,0,0.08)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.2)] transition-[width] duration-200 ease-out ${collapsed ? 'md:w-[88px] md:min-w-[88px]' : 'md:w-[300px] md:min-w-[300px]'}`}
+        className={`hidden ${asideBaseClass} md:relative md:z-10 md:flex md:h-screen md:overflow-y-auto md:overflow-x-visible no-scrollbar shadow-[4px_0_24px_rgba(0,0,0,0.08)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.2)] transition-[width] duration-200 ease-out ${collapsed ? 'md:w-[88px] md:min-w-[88px]' : 'md:w-[300px] md:min-w-[300px]'}`}
       >
         {sidebarContent(collapsed)}
       </aside>

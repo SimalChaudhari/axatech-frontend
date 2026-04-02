@@ -19,6 +19,26 @@
   }
 }
 
+@layer components {
+  .hero-gradient-section {
+    @apply bg-linear-to-br from-primary to-secondary text-white;
+  }
+
+  .hero-glass-panel {
+    @apply rounded-[10px] border border-white/25 bg-white/10 text-white/95 shadow-sm;
+  }
+
+  /* Keep scroll behavior but hide visible scrollbar for cleaner UI. */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and old Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+}
+
 [data-rich-colors=true][data-sonner-toast][data-type=success],
 [data-rich-colors=true][data-sonner-toast][data-type=warning],
 [data-rich-colors=true][data-sonner-toast][data-type=error],

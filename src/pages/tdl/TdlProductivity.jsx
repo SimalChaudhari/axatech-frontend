@@ -1,63 +1,72 @@
-import { Button, PageMeta, SectionHeader } from '../../components/common';
+import { useEffect, useState } from 'react';
+import api from '../../api';
+import { Button, Loader, PageMeta, SectionHeader } from '../../components/common';
 import { RocketIcon, CogLoopIcon, CheckCircleOutlineIcon } from '../../components/icons';
 
-const POINTS = [
-  'Auto-fill and smart defaults for faster entry',
-  'Batch voucher processing',
-  'Custom shortcuts and workflow automation',
-  'Reduce data entry time by up to 60%',
-];
-
-const PRODUCTIVITY_PILLARS = [
-  {
-    title: 'Faster Data Entry',
-    description: 'Smart defaults and assisted workflows reduce repetitive effort for day-to-day accounting.',
-    icon: RocketIcon,
-  },
-  {
-    title: 'Workflow Automation',
-    description: 'Automated steps and custom shortcuts ensure teams complete tasks consistently and quickly.',
-    icon: CogLoopIcon,
-  },
-  {
-    title: 'Operational Accuracy',
-    description: 'Standardized processes lower manual mistakes and improve reliability of business records.',
-    icon: CheckCircleOutlineIcon,
-  },
-];
+const FALLBACK_PILLAR_ICONS = [RocketIcon, CogLoopIcon, CheckCircleOutlineIcon];
 
 export default function TdlProductivity() {
+  const [content, setContent] = useState(null);
+
+  useEffect(() => {
+    api.tdlProductivityContent
+      .get()
+      .then(setContent)
+      .catch(console.error);
+  }, []);
+
+  if (!content) return <Loader className="min-h-screen" />;
+
+  const productivityPillars = Array.isArray(content.productivityPillars) ? content.productivityPillars : [];
+  const points = Array.isArray(content.points) ? content.points : [];
+
   return (
     <>
       <PageMeta
-        title="Productivity TDL | Axatech"
-        description="Speed up daily Tally operations with productivity-focused TDL customizations."
+        title={content.metaTitle || 'Productivity TDL | Axatech'}
+        description={
+          content.metaDescription ||
+          'Speed up daily Tally operations with productivity-focused TDL customizations.'
+        }
+        keywords={content.metaKeywords}
       />
 
-      <section className="bg-linear-to-b from-slate-50 to-white py-20 md:py-24 dark:from-gray-900 dark:to-gray-900/90">
-        <div className="mx-auto max-w-5xl px-5">
+      <section className="bg-linear-to-b from-slate-50 to-white pb-20 md:pb-24 dark:from-gray-900 dark:to-gray-900/90">
+        <div className="hero-gradient-section py-20 md:py-24">
+          <div className="mx-auto max-w-4xl px-5">
           <SectionHeader
-            label="5.2 Productivity TDL"
-            title="Speed Up Your Daily Tally Operations"
-            subtitle="Automation and process acceleration to help your team complete more work in less time."
-            centered={false}
+            label={content.label || '5.2 Productivity TDL'}
+            title={content.title || 'Speed Up Your Daily Tally Operations'}
+            subtitle={
+              content.subtitle ||
+              'Automation and process acceleration to help your team complete more work in less time.'
+            }
+            centered
             as="h1"
-            subtitleClassName="mb-8"
+            inverse
+            subtitleClassName="mb-0"
             dataAos="fade-up"
           />
 
-          <div data-aos="fade-up" className="mb-6 rounded-2xl border border-primary/20 bg-primary/5 p-5 dark:border-secondary/30 dark:bg-secondary/10">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
-              Ideal for businesses handling high daily voucher volumes and teams that need speed without sacrificing control.
+          <div
+            data-aos="fade-up"
+            className="hero-glass-panel mb-6 rounded-2xl p-5"
+          >
+            <p className="text-sm font-medium text-white/95">
+              {content.introText ||
+                'Ideal for businesses handling high daily voucher volumes and teams that need speed without sacrificing control.'}
             </p>
           </div>
+          </div>
+        </div>
 
+        <div className="mx-auto mt-10 max-w-5xl px-5">
           <div data-aos="fade-up" className="grid gap-4 md:grid-cols-3">
-            {PRODUCTIVITY_PILLARS.map((pillar) => {
-              const PillarIcon = pillar.icon;
+            {productivityPillars.map((pillar, idx) => {
+              const PillarIcon = FALLBACK_PILLAR_ICONS[idx % FALLBACK_PILLAR_ICONS.length];
               return (
                 <article
-                  key={pillar.title}
+                  key={`${pillar.title}-${idx}`}
                   className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"
                 >
                   <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary dark:bg-secondary/20 dark:text-secondary">
@@ -70,23 +79,26 @@ export default function TdlProductivity() {
             })}
           </div>
 
-          <div data-aos="fade-up" className="mt-5 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 sm:p-8">
+          <div
+            data-aos="fade-up"
+            className="mt-5 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 sm:p-8"
+          >
             <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">Key Features</h3>
             <ul className="list-disc pl-5 space-y-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
-              {POINTS.map((p) => (
-                <li key={p}>{p}</li>
+              {points.map((p, i) => (
+                <li key={`${p}-${i}`}>{p}</li>
               ))}
             </ul>
           </div>
 
           <div data-aos="fade-up" className="mt-8">
             <Button
-              to="/contact"
+              to={content.ctaPath || '/contact'}
               fullWidth={false}
               state={{ enquiryType: 'tdl', tdlType: 'productivity' }}
               className="px-6"
             >
-              Request Productivity TDL
+              {content.ctaText || 'Request Productivity TDL'}
             </Button>
           </div>
         </div>

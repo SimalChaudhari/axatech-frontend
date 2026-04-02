@@ -1,4 +1,6 @@
-import { PageMeta, SectionHeader } from '../../components/common';
+import { useEffect, useState } from 'react';
+import api from '../../api';
+import { PageMeta, SectionHeader, Loader, Button } from '../../components/common';
 import {
   CodeSquareIcon,
   CogLoopIcon,
@@ -11,180 +13,98 @@ import {
   WhatsappIcon,
 } from '../../components/icons';
 
-const HIGHLIGHTS = [
-  {
-    title: 'End-to-End Delivery',
-    description: 'From strategy and UI to deployment, monitoring, and support under one team.',
-    Icon: CodeSquareIcon,
-  },
-  {
-    title: 'Built for Scale',
-    description: 'Architecture-first approach to keep your product fast, stable, and future-ready.',
-    Icon: CogLoopIcon,
-  },
-  {
-    title: 'Business-First Outcomes',
-    description: 'Every feature is aligned with growth, operations, and measurable business impact.',
-    Icon: RocketIcon,
-  },
-];
-
-const OFFERINGS = [
-  {
-    label: '1. Frontend Development',
-    title: "Your users' first impression — made to last.",
-    icon: HtmlIcon,
-    points: [
-      'Pixel-perfect, responsive UI/UX design',
-      'Cross-browser and cross-device compatibility',
-      'Performance-optimized for fast load times',
-      'Accessibility and SEO-friendly markup',
-    ],
-  },
-  {
-    label: '2. Backend Development',
-    title: 'Robust, secure, and scalable server-side systems.',
-    icon: DataConfigurationIcon,
-    points: [
-      'RESTful API design and development',
-      'Authentication, authorization and session management',
-      'Database architecture and query optimization',
-      'Microservices and monolith architectures',
-    ],
-  },
-  {
-    label: '3. JavaScript Technologies',
-    title: 'Full-stack JavaScript expertise — one language, end to end.',
-    icon: JavascriptIcon,
-    points: [
-      'Unified codebase across frontend and backend',
-      'Real-time features with WebSockets and event-driven architecture',
-      'Faster development cycles with shared libraries and tooling',
-    ],
-  },
-  {
-    label: '4. API Development',
-    title: 'Connect everything — internal systems, third parties, and mobile apps.',
-    icon: ShieldAltIcon,
-    points: [
-      'REST and GraphQL API design',
-      'API documentation with Swagger/Postman',
-      'Rate limiting, versioning and security best practices',
-      'Webhook integrations and event-driven APIs',
-    ],
-  },
-  {
-    label: '5. Mobile App Development',
-    title: 'Native-quality apps on Android and iOS — built once, deployed everywhere.',
-    icon: RocketIcon,
-    points: [
-      'Cross-platform apps with React Native',
-      'Tally-connected mobile apps (your business data on phone)',
-      'Push notifications, offline support and device integrations',
-      'Play Store and App Store deployment support',
-    ],
-  },
-  {
-    label: '6. Cloud Solutions',
-    title: 'Deploy, scale, and manage your apps without infrastructure headaches.',
-    icon: CloudIbmIcon,
-    points: [
-      'Cloud hosting on AWS, Azure, or DigitalOcean',
-      'CI/CD pipelines for automated deployments',
-      'Docker/container-based architecture',
-      'Monitoring, logging and auto-scaling setup',
-    ],
-  },
-  {
-    label: '7. ERP / Business Software Development',
-    title: 'Custom ERP tailored for Indian SMEs.',
-    icon: CogLoopIcon,
-    points: [
-      'Inventory, billing, HR, and payroll modules',
-      'Naturally connects to your Tally expertise',
-    ],
-  },
-  {
-    label: '8. SaaS Product Development',
-    title: 'Help clients build and launch their own SaaS.',
-    icon: RocketIcon,
-    points: [
-      'Subscription billing via Razorpay',
-      'Multi-tenant architecture',
-      'Strong upsell from regular web development',
-    ],
-  },
-  {
-    label: '9. Tally-Connected Web Apps',
-    title: 'Your biggest differentiator — Tally + web/app in one solution.',
-    icon: CodeSquareIcon,
-    points: [
-      'Web dashboards pulling live data from Tally',
-      'Customer portals showing outstanding and invoices',
-      'Salesperson apps connected to Tally stock and pricing',
-    ],
-  },
-  {
-    label: '10. WhatsApp Business Automation',
-    title: 'Automate sales follow-ups and customer communication.',
-    icon: WhatsappIcon,
-    points: [
-      'Chatbot for order status and invoice sharing',
-      'Automated follow-ups and payment reminders',
-      'Works as a standalone offering too',
-    ],
-  },
-  {
-    label: '11. Digital Marketing / SEO',
-    title: 'Natural add-on service for every website project.',
-    icon: RocketIcon,
-    points: [
-      'Website SEO for small businesses',
-      'Google My Business setup',
-    ],
-  },
+const HIGHLIGHT_ICONS = [CodeSquareIcon, CogLoopIcon, RocketIcon];
+const OFFERING_ICONS = [
+  HtmlIcon,
+  DataConfigurationIcon,
+  JavascriptIcon,
+  ShieldAltIcon,
+  RocketIcon,
+  CloudIbmIcon,
+  CogLoopIcon,
+  RocketIcon,
+  CodeSquareIcon,
+  WhatsappIcon,
+  RocketIcon,
 ];
 
 export default function WebAppDevelopment() {
+  const [content, setContent] = useState(null);
+
+  useEffect(() => {
+    api.webAppDevelopmentContent
+      .get()
+      .then(setContent)
+      .catch(console.error);
+  }, []);
+
+  if (!content) return <Loader className="min-h-screen" />;
+
+  const highlights = Array.isArray(content.highlights) ? content.highlights : [];
+  const offerings = Array.isArray(content.offerings) ? content.offerings : [];
+
   return (
     <>
       <PageMeta
-        title="Web & App Development | Axatech"
-        description="End-to-end web and app development services by Axatech including frontend, backend, APIs, cloud, ERP, SaaS, and Tally-connected solutions."
+        title={content.metaTitle || 'Web & App Development | Axatech'}
+        description={
+          content.metaDescription ||
+          'End-to-end web and app development services by Axatech including frontend, backend, APIs, cloud, ERP, SaaS, and Tally-connected solutions.'
+        }
+        keywords={content.metaKeywords}
       />
 
-      <section className="bg-linear-to-b from-slate-50 to-white py-20 dark:from-gray-900 dark:to-gray-900/90">
-        <div className="mx-auto max-w-6xl px-5">
+      <section className="bg-linear-to-b from-slate-50 to-white pb-20 dark:from-gray-900 dark:to-gray-900/90">
+        <div className="hero-gradient-section py-20">
+          <div className="mx-auto max-w-4xl px-5">
           <SectionHeader
-            label="Web & App Development"
-            title="Build Digital. Build Smart. Build with Axatech."
-            subtitle="From dynamic websites to enterprise-grade mobile apps, Axatech delivers end-to-end digital solutions that are fast, scalable, and built for Indian businesses."
-            centered={false}
+            label={content.label || 'Web & App Development'}
+            title={content.title || 'Build Digital. Build Smart. Build with Axatech.'}
+            subtitle={
+              content.subtitle ||
+              'From dynamic websites to enterprise-grade mobile apps, Axatech delivers end-to-end digital solutions that are fast, scalable, and built for Indian businesses.'
+            }
+            centered
             as="h1"
-            subtitleClassName="mb-8"
+            inverse
+            subtitleClassName="mb-0"
           />
 
+          <div className="hero-glass-panel mt-6 rounded-2xl p-5">
+            <p className="text-sm font-medium text-white/95">
+              {content.introText ||
+                'We design and build secure, scalable web and mobile solutions that align with your workflows and growth goals.'}
+            </p>
+          </div>
+          </div>
+        </div>
+
+        <div className="mx-auto mt-10 max-w-6xl px-5">
           <div className="mb-10 grid gap-4 md:grid-cols-3">
-            {HIGHLIGHTS.map(({ title, description, Icon }) => (
-              <article
-                key={title}
+            {highlights.map((item, i) => {
+              const Icon = HIGHLIGHT_ICONS[i % HIGHLIGHT_ICONS.length];
+              return (
+                <article
+                  key={`${item.title}-${i}`}
                 className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"
               >
                 <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary dark:bg-secondary/20 dark:text-secondary">
                   <Icon className="text-xl" />
                 </div>
-                <h2 className="mb-2 text-base font-semibold text-gray-900 dark:text-white">{title}</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{description}</p>
-              </article>
-            ))}
+                  <h2 className="mb-2 text-base font-semibold text-gray-900 dark:text-white">{item.title}</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">{item.description}</p>
+                </article>
+              );
+            })}
           </div>
 
           <div className="grid gap-5 lg:grid-cols-2">
-            {OFFERINGS.map((item) => {
-              const ItemIcon = item.icon;
+            {offerings.map((item, i) => {
+              const ItemIcon = OFFERING_ICONS[i % OFFERING_ICONS.length];
+              const points = Array.isArray(item.points) ? item.points : [];
               return (
                 <article
-                  key={item.label}
+                  key={`${item.label}-${i}`}
                   className="rounded-2xl border border-gray-200/80 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
                 >
                   <div className="mb-3 flex items-start justify-between gap-3">
@@ -201,13 +121,18 @@ export default function WebAppDevelopment() {
                     </div>
                   </div>
                   <ul className="list-disc pl-5 space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                    {item.points.map((point) => (
+                    {points.map((point) => (
                       <li key={point}>{point}</li>
                     ))}
                   </ul>
                 </article>
               );
             })}
+          </div>
+          <div className="mt-10">
+            <Button to={content.ctaPath || '/contact'} fullWidth={false} className="px-6">
+              {content.ctaText || 'Talk To Our Team'}
+            </Button>
           </div>
         </div>
       </section>

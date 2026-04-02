@@ -94,16 +94,27 @@ export default function ProjectsSection({ projects = [], loading }) {
   }, [activeCategory, page, loading, projects]);
 
   return (
-    <section className="py-20 md:py-24 bg-white dark:bg-gray-900 border-y border-gray-100 dark:border-gray-800">
-      <div className="max-w-6xl mx-auto px-5">
-        <SectionHeader
-          label="Projects"
-          title="Our Featured Projects"
-          subtitle="Discover our portfolio of innovative solutions across various industries."
-          centered={false}
-          subtitleClassName="mb-6"
-          dataAos="fade-up"
-        />
+    <section className="bg-white pb-20 md:pb-24 dark:bg-gray-900 border-y border-gray-100 dark:border-gray-800">
+      <div className="hero-gradient-section py-20 md:py-24">
+        <div className="max-w-4xl mx-auto px-5">
+          <SectionHeader
+            label="Projects"
+            title="Our Featured Projects"
+            subtitle={null}
+            centered
+            inverse
+            subtitleClassName="mb-0"
+            dataAos="fade-up"
+          />
+          <div className="hero-glass-panel mt-6 rounded-2xl p-5" data-aos="fade-up">
+            <p className="text-sm font-medium text-white/95">
+              Discover our portfolio of innovative solutions across various industries.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto mt-10 px-5">
 
         {/* Category pills */}
         {!loading && projects.length > 0 && (

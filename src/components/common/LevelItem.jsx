@@ -123,6 +123,7 @@ export default function LevelItem({
   contentClassName = '',
   floating = false,
   collapsed = false,
+  vertical = false,
 }) {
   const { pathname } = useLocation();
 
@@ -191,7 +192,7 @@ export default function LevelItem({
   const open = isControlled ? isOpen : internalOpen;
   const panelOpen = collapsed ? hoverOpen : open;
   const collapsedContentClass = collapsed
-    ? 'absolute left-full top-0 ml-1 z-[130] overflow-visible'
+    ? 'absolute left-full top-0 ml-2 z-90 overflow-visible'
     : '';
   const resolvedLabel = LabelIcon || labelText ? (
     <span className={`inline-flex items-center ${collapsed ? 'flex-col gap-1' : 'gap-2'}`}>
@@ -364,9 +365,11 @@ export default function LevelItem({
       className={
         collapsed
           ? `w-max min-w-[180px] space-y-1 rounded-xl border border-slate-200 bg-slate-100 p-2 shadow-lg backdrop-blur-sm dark:border-gray-600 dark:bg-gray-800 ${
-              depth > 0 ? 'absolute z-120' : 'relative z-120'
+              depth > 0 ? 'absolute z-90' : 'relative z-70'
             }`
-          : 'level-tree-ul'
+          : vertical && depth > 0
+            ? 'level-tree-ul absolute left-full top-0 z-90 ml-2 w-max min-w-[180px] space-y-1 rounded-xl border border-slate-200 bg-slate-100 p-2 shadow-lg dark:border-gray-600 dark:bg-gray-800'
+            : 'level-tree-ul'
       }
     >
       {list.map((item, index) => {
@@ -603,16 +606,16 @@ export default function LevelItem({
         aria-labelledby={`${id}-trigger`}
         style={collapsed && menuPlacement.root ? menuPlacement.root : undefined}
         className={`${
-          floating ? 'overflow-visible' : 'overflow-hidden'
+          floating || (vertical && !collapsed) ? 'overflow-visible' : 'overflow-hidden'
         } transition-[height] duration-200 ease-out ${
-          collapsed
+          collapsed || !vertical
             ? ''
             : '[&_ul]:space-y-1 [&_ul]:pl-4 [&_ul]:pt-2 [&_ul]:text-sm [&_ul]:text-slate-700 dark:[&_ul]:text-gray-200 [&_li]:leading-6'
         } ${collapsedContentClass} ${panelOpen ? 'visible' : 'invisible h-0'} ${contentClassName}`.trim()}
       >
         {panelOpen && (
           <>
-            {!collapsed && <style>{LEVEL_TREE_STYLES}</style>}
+            {!collapsed && vertical && <style>{LEVEL_TREE_STYLES}</style>}
             <div
               ref={treeWrapperRef}
               className={` ${collapsed ? 'level-tree-wrapper-collapsed' : 'level-tree-wrapper'} h-fit min-h-0 w-full max-w-full self-start ${collapsed ? 'max-w-[180px]' : ''}`}

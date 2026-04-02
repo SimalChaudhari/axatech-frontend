@@ -1,62 +1,65 @@
-import { Button, PageMeta, SectionHeader } from '../../components/common';
+import { useEffect, useState } from 'react';
+import api from '../../api';
+import { Button, Loader, PageMeta, SectionHeader } from '../../components/common';
 import { CheckCircleOutlineIcon, CogLoopIcon, RocketIcon } from '../../components/icons';
 
-const POINTS = [
-  'Sales, purchase, journal and payment vouchers from Excel',
-  'Master data import: ledgers, stock items, parties',
-  'Configurable templates for your existing Excel formats',
-  'One-click recurring imports',
-];
-
-const HIGHLIGHTS = [
-  {
-    title: 'Bulk Import Efficiency',
-    description: 'Move large volumes of voucher and master data into Tally in minutes instead of manual hours.',
-    icon: RocketIcon,
-  },
-  {
-    title: 'Template-Based Accuracy',
-    description: 'Use structured mapping templates to reduce errors and keep imports consistent across teams.',
-    icon: CheckCircleOutlineIcon,
-  },
-  {
-    title: 'Repeatable Workflows',
-    description: 'Standardize recurring import operations for faster monthly processes and better control.',
-    icon: CogLoopIcon,
-  },
-];
+const FALLBACK_ICONS = [RocketIcon, CheckCircleOutlineIcon, CogLoopIcon];
 
 export default function IntegrationExcelImport() {
+  const [content, setContent] = useState(null);
+
+  useEffect(() => {
+    api.integrationExcelImportContent
+      .get()
+      .then(setContent)
+      .catch(console.error);
+  }, []);
+
+  if (!content) return <Loader className="min-h-screen" />;
+
+  const highlights = Array.isArray(content.highlights) ? content.highlights : [];
+  const points = Array.isArray(content.points) ? content.points : [];
+
   return (
     <>
       <PageMeta
-        title="Excel Import Integration | Axatech"
-        description="Import bulk vouchers and master data into Tally directly from Excel."
+        title={content.metaTitle || 'Excel Import Integration | Axatech'}
+        description={content.metaDescription || 'Import bulk vouchers and master data into Tally directly from Excel.'}
+        keywords={content.metaKeywords}
       />
-      <section className="bg-linear-to-b from-slate-50 to-white py-20 md:py-24 dark:from-gray-900 dark:to-gray-900/90">
-        <div className="mx-auto max-w-5xl px-5">
+      <section className="bg-linear-to-b from-slate-50 to-white pb-20 md:pb-24 dark:from-gray-900 dark:to-gray-900/90">
+        <div className="hero-gradient-section py-20 md:py-24">
+          <div className="mx-auto max-w-4xl px-5">
           <SectionHeader
-            label="6.1 Excel Import"
-            title="Bulk Data Import from Excel to Tally"
-            subtitle="Eliminate manual entry and move your Excel data into Tally in a structured, repeatable way."
-            centered={false}
+            label={content.label || '6.1 Excel Import'}
+            title={content.title || 'Bulk Data Import from Excel to Tally'}
+            subtitle={
+              content.subtitle || 'Eliminate manual entry and move your Excel data into Tally in a structured, repeatable way.'
+            }
+            centered
             as="h1"
-            subtitleClassName="mb-8"
+            inverse
+            subtitleClassName="mb-0"
             dataAos="fade-up"
           />
 
-          <div data-aos="fade-up" className="mb-6 rounded-2xl border border-primary/20 bg-primary/5 p-5 dark:border-secondary/30 dark:bg-secondary/10">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
-              Best for teams handling frequent Excel-based accounting data who want faster throughput and cleaner books.
+          <div data-aos="fade-up" className="hero-glass-panel mb-6 rounded-2xl p-5">
+            <p className="text-sm font-medium text-white/95">
+              {content.introText ||
+                'Best for teams handling frequent Excel-based accounting data who want faster throughput and cleaner books.'}
             </p>
           </div>
+          </div>
+        </div>
+
+        <div className="mx-auto mt-10 max-w-5xl px-5">
 
           <div data-aos="fade-up" className="grid gap-4 md:grid-cols-3">
-            {HIGHLIGHTS.map((item) => {
-              const ItemIcon = item.icon;
+            {highlights.map((item, idx) => {
+              const ItemIcon = FALLBACK_ICONS[idx % FALLBACK_ICONS.length];
               return (
                 <article
-                  key={item.title}
+                  key={`${item.title}-${idx}`}
                   className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"
                 >
                   <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary dark:bg-secondary/20 dark:text-secondary">
@@ -72,17 +75,19 @@ export default function IntegrationExcelImport() {
           <div data-aos="fade-up" className="mt-5 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 sm:p-8">
             <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">Key Features</h3>
             <ul className="list-disc pl-5 space-y-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
-              {POINTS.map((p) => <li key={p}>{p}</li>)}
+              {points.map((p) => (
+                <li key={p}>{p}</li>
+              ))}
             </ul>
           </div>
           <div className="mt-8">
             <Button
-              to="/contact"
+              to={content.ctaPath || '/contact'}
               fullWidth={false}
               state={{ enquiryType: 'integration', integrationType: 'excel-import' }}
               className="px-6"
             >
-              Request Excel Import Setup
+              {content.ctaText || 'Request Excel Import Setup'}
             </Button>
           </div>
         </div>

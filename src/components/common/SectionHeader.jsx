@@ -12,6 +12,7 @@
  * @param {string} [labelClassName] - Label (p) class
  * @param {string} [titleClassName] - Title class
  * @param {string} [subtitleClassName] - Subtitle class
+ * @param {boolean} [inverse=false] - Use white text/lines for dark or gradient backgrounds
  * @param {string} [dataAos] - Optional data-aos value for all elements
  */
 export default function SectionHeader({
@@ -25,6 +26,7 @@ export default function SectionHeader({
   labelClassName = '',
   titleClassName = '',
   subtitleClassName = '',
+  inverse = false,
   dataAos,
 }) {
   const position = centered === true ? 'center' : centered === false ? 'left' : positionProp;
@@ -49,9 +51,14 @@ export default function SectionHeader({
 
   const pos = positionClasses[position] || positionClasses.center;
 
-  const labelClasses = `items-center gap-2 text-xs font-semibold tracking-[0.2em] uppercase text-secondary dark:text-accent mb-4 ${pos.label} ${labelClassName}`.trim();
-  const titleClasses = `text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight leading-tight mb-3 ${pos.text} ${titleClassName}`.trim();
-  const subtitleClasses = `text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-2xl leading-relaxed ${pos.subtitle} ${subtitleClassName}`.trim();
+  const labelTone = inverse ? 'text-white/90 dark:text-white/90' : 'text-secondary dark:text-accent';
+  const titleTone = inverse ? 'text-white dark:text-white' : 'text-gray-900 dark:text-white';
+  const subtitleTone = inverse ? 'text-white/90 dark:text-white/90' : 'text-gray-600 dark:text-gray-400';
+  const lineTone = inverse ? 'bg-white/60 dark:bg-white/60' : 'bg-secondary/60 dark:bg-accent/60';
+
+  const labelClasses = `items-center gap-2 text-xs font-semibold tracking-[0.2em] uppercase mb-4 ${labelTone} ${pos.label} ${labelClassName}`.trim();
+  const titleClasses = `text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight leading-tight mb-3 ${titleTone} ${pos.text} ${titleClassName}`.trim();
+  const subtitleClasses = `text-base md:text-lg max-w-2xl leading-relaxed ${subtitleTone} ${pos.subtitle} ${subtitleClassName}`.trim();
 
   const aosAttr = dataAos ? { 'data-aos': dataAos } : {};
 
@@ -59,9 +66,9 @@ export default function SectionHeader({
     <div className={className}>
       {label != null && label !== '' && (
         <p className={labelClasses} {...aosAttr}>
-          <span className="w-8 h-px bg-secondary/60 dark:bg-accent/60" aria-hidden />
+          <span className={`w-8 h-px ${lineTone}`} aria-hidden />
           {label}
-          <span className="w-8 h-px bg-secondary/60 dark:bg-accent/60" aria-hidden />
+          <span className={`w-8 h-px ${lineTone}`} aria-hidden />
         </p>
       )}
       {title != null && title !== '' && (
