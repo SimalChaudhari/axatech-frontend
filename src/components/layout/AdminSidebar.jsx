@@ -1,11 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeftIcon, ChevronRightIcon, CloseIcon } from '../icons';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ChevronLeftIcon, ChevronRightIcon, CloseIcon } from '../icons';
 import { LevelItem } from '../common';
-import { ADMIN_NAV, withCloseMenu } from '../routes';
 import { ADMIN_NAV, withCloseMenu } from '../routes';
 
 const SIDEBAR_BG_IMAGE =
@@ -13,40 +9,6 @@ const SIDEBAR_BG_IMAGE =
 
 export default function AdminSidebar({ open, onClose, onNavigate }) {
   const [collapsed, setCollapsed] = useState(false);
-
-  const handleNavClick = useCallback(() => {
-    onNavigate?.();
-  }, [onNavigate]);
-
-  const levelItemsWithClose = useMemo(() => {
-    const map = {};
-    for (const item of ADMIN_NAV.items) {
-      if (item.type === 'level') {
-        map[item.key] = withCloseMenu(item.levelItems, handleNavClick);
-      }
-    }
-    return map;
-  }, [handleNavClick]);
-
-  const linkItemsWithClose = useMemo(() => {
-    const map = {};
-    for (const item of ADMIN_NAV.items) {
-      if (item.type === 'link') {
-        map[item.key] = withCloseMenu(
-          [
-            {
-              label: item.label,
-              to: item.to,
-              navEnd: item.end === true,
-              Icon: item.Icon,
-            },
-          ],
-          handleNavClick
-        );
-      }
-    }
-    return map;
-  }, [handleNavClick]);
 
   const handleNavClick = useCallback(() => {
     onNavigate?.();
@@ -151,11 +113,6 @@ export default function AdminSidebar({ open, onClose, onNavigate }) {
               ? item.triggerClassName
               : ADMIN_NAV.sidebar.levelTriggerClass;
 
-            const contentClassName =
-              effectiveCollapsed && ADMIN_NAV.sidebar.levelContentCollapsedClass
-                ? ADMIN_NAV.sidebar.levelContentCollapsedClass
-                : ADMIN_NAV.sidebar.levelContentClass;
-
             return (
               <div
                 key={item.key}
@@ -170,7 +127,7 @@ export default function AdminSidebar({ open, onClose, onNavigate }) {
                   floating={linkCollapsed ? true : effectiveCollapsed}
                   items={navItems}
                   className="w-full"
-                  contentClassName={contentClassName}
+                  contentClassName={ADMIN_NAV.sidebar.levelContentClass}
                   triggerClassName={`${triggerBase} ${triggerAlign}`.trim()}
                 />
               </div>

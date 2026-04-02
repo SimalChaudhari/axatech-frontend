@@ -9,7 +9,7 @@ export default function LicenseCard({ plan, index = 0 }) {
     >
       <div className="flex items-start justify-between gap-3 mb-4">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          {plan.planName || plan.title}
+          {plan.planName}
         </h2>
         <span className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 dark:bg-secondary/20 text-primary dark:text-secondary text-sm font-bold transition-all duration-200 group-hover:bg-primary/15 dark:group-hover:bg-secondary/30 group-hover:scale-105">
           {String(index + 1).padStart(2, '0')}
@@ -35,11 +35,7 @@ export default function LicenseCard({ plan, index = 0 }) {
       )}
       <Button
         to="/contact"
-        state={{
-          enquiryType: plan.enquiryType || 'license',
-          licensePlan: plan._id,
-          planName: plan.planName || plan.title,
-        }}
+        state={{ enquiryType: 'license', licensePlan: plan._id, planName: plan.planName }}
         variant="primary"
         fullWidth
         className="mt-6"
