@@ -78,7 +78,9 @@ function buildNavItems(paths, order, header) {
 }
 
 const header = {
-  levelContentClass: '!left-0 !top-full !ml-0 !mt-1',
+  /** Anchored under trigger (same containing block as Technologies mega-menu). */
+  levelContentClass:
+    '!absolute !left-0 !top-full !z-50 !ml-0 !mt-1 w-max min-w-[min(100%,12rem)] max-w-[min(100vw-1.5rem,24rem)] rounded-xl border border-slate-200 bg-slate-100 p-2 shadow-lg backdrop-blur-sm dark:border-gray-600 dark:bg-gray-800',
   levelTriggerClass:
     '!justify-between !gap-2 !px-3 !py-2.5 !text-[0.9375rem] !font-medium !normal-case !tracking-normal !text-gray-700 dark:!text-gray-300 hover:!text-primary dark:hover:!text-secondary hover:!bg-primary/5 dark:hover:!bg-secondary/15',
   get levelTriggerClassTally() {

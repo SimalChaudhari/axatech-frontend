@@ -10,8 +10,6 @@ export default function ProductsModal({
   setForm,
   imageFiles,
   setImageFiles,
-  videoFile,
-  setVideoFile,
   categories = [],
   onSave,
   onClose,
@@ -71,8 +69,6 @@ export default function ProductsModal({
         setForm={setForm}
         imageFiles={imageFiles}
         setImageFiles={setImageFiles}
-        videoFile={videoFile}
-        setVideoFile={setVideoFile}
         categories={categories}
         errors={errors}
         onValidateField={validateField}

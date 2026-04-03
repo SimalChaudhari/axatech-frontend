@@ -9,10 +9,27 @@ function getVideoUrl(demoVideoLink) {
   return `${base}/uploads/${demoVideoLink.replace(/^[/\\]+/, '')}`;
 }
 
-function getYouTubeEmbedUrl(url) {
+/** Extract YouTube video id from watch, youtu.be, embed, or shorts URLs. */
+function getYouTubeVideoId(url) {
   if (!url || typeof url !== 'string') return null;
-  const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
-  return m ? `https://www.youtube.com/embed/${m[1]}?autoplay=0` : null;
+  const u = url.trim();
+  const id = '([a-zA-Z0-9_-]{11})';
+  let m = u.match(new RegExp(`youtu\\.be\\/${id}(?:[?#]|$)`));
+  if (m) return m[1];
+  m = u.match(new RegExp(`youtube\\.com\\/embed\\/${id}(?:[?#]|$)`));
+  if (m) return m[1];
+  m = u.match(new RegExp(`youtube\\.com\\/shorts\\/${id}(?:[?#]|$)`));
+  if (m) return m[1];
+  if (/youtube\.com/i.test(u)) {
+    m = u.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+    if (m) return m[1];
+  }
+  return null;
+}
+
+function getYouTubeEmbedUrl(url) {
+  const id = getYouTubeVideoId(url);
+  return id ? `https://www.youtube.com/embed/${id}?autoplay=0` : null;
 }
 
 const HIDE_ICON_AFTER_MS = 1000;

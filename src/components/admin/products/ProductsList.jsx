@@ -28,7 +28,6 @@ export default function ProductsList() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(initialForm);
   const [imageFiles, setImageFiles] = useState([]);
-  const [videoFile, setVideoFile] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -105,7 +104,6 @@ export default function ProductsList() {
     setEditing('new');
     setForm(initialForm);
     setImageFiles([]);
-    setVideoFile(null);
   };
 
   const openEdit = (p) => {
@@ -122,7 +120,6 @@ export default function ProductsList() {
       isActive: p.isActive !== false,
     });
     setImageFiles([]);
-    setVideoFile(null);
   };
 
   const save = async () => {
@@ -142,22 +139,13 @@ export default function ProductsList() {
     }
     const allImages = [...existingFilenames, ...newFilenames];
 
-    let demoVideoPath = form.demoVideoLink;
-    if (videoFile) {
-      try {
-        demoVideoPath = await api.upload(videoFile);
-      } catch (e) {
-        toast.error('Video upload failed: ' + e.message);
-        return;
-      }
-    }
     const payload = {
       name: form.name,
       slug: form.slug || undefined,
       description: form.description || undefined,
       shortDescription: form.shortDescription || undefined,
       category: form.category || undefined,
-      demoVideoLink: demoVideoPath || undefined,
+      demoVideoLink: (form.demoVideoLink || '').trim() || null,
       featured: form.featured,
       isActive: form.isActive,
     };
@@ -237,8 +225,6 @@ export default function ProductsList() {
           setForm={setForm}
           imageFiles={imageFiles}
           setImageFiles={setImageFiles}
-          videoFile={videoFile}
-          setVideoFile={setVideoFile}
           categories={categories}
           onSave={save}
           onClose={() => setEditing(null)}

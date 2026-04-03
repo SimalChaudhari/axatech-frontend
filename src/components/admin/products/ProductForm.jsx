@@ -9,8 +9,6 @@ export default function ProductForm({
   setForm,
   imageFiles = [],
   setImageFiles,
-  videoFile,
-  setVideoFile,
   categories = [],
   errors = {},
   onValidateField,
@@ -106,16 +104,17 @@ export default function ProductForm({
       </div>
       </div>
 
-      
-      <div>
-          <Upload
-            label="Demo video"
-            accept="video/*"
-            file={videoFile}
-            onFileChange={setVideoFile}
-            existingUrl={!videoFile && form.demoVideoLink?.trim() ? form.demoVideoLink.trim() : undefined}
-          />
-        </div>
+      <Input
+        label="Demo video (YouTube)"
+        type="url"
+        value={form.demoVideoLink || ''}
+        onChange={(e) => setForm((f) => ({ ...f, demoVideoLink: e.target.value }))}
+        placeholder="https://www.youtube.com/watch?v=… or https://youtu.be/…"
+        className="mb-0"
+      />
+      <p className="text-xs text-slate-500 dark:text-gray-400 -mt-2">
+        Paste a YouTube watch or share link. Old uploaded video files are no longer used; replace with a link or clear the field.
+      </p>
 
       <div>
         {existingImageUrls.length > 0 && (

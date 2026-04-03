@@ -2,6 +2,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { ShieldAccountIcon, AccountCircleIcon, LogoutIcon, LoginIcon, CartOutlineIcon, CloseIcon } from '../../icons';
 import { Button, LevelItem, ThemeToggleButton } from '../../common';
 import TechnologiesDropdown from '../TechnologiesDropdown';
+import { ADMIN_NAV } from '../../routes';
 import { actionBtnBase } from './headerConstants';
 
 export default function HeaderMobileDrawer({
@@ -39,13 +40,13 @@ export default function HeaderMobileDrawer({
           </div>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto">
-          <nav className="py-4">
+        <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          <nav data-mobile-nav-scroll className="py-4">
             <p className="mb-2 px-4 text-[0.7rem] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">Menu</p>
             <div className="space-y-1 px-3">
               {publicNav.items.map((item) =>
                 item.type === 'dropdown' ? (
-                  <div key={item.key} className="flex min-w-0 flex-col">
+                  <div key={item.key} className="flex flex-col min-w-0 w-full">
                     <TechnologiesDropdown
                       technologies={technologies}
                       onClose={closeMenu}
@@ -53,13 +54,17 @@ export default function HeaderMobileDrawer({
                     />
                   </div>
                 ) : (
-                  <div key={item.key} className="flex flex-col">
+                  <div key={item.key} className="flex flex-col min-w-0 w-full">
                     <LevelItem
                       id={`header-${item.key}-mobile`}
                       label={item.label}
+                      vertical
+                      inFlowNestedVertical
                       defaultOpen={false}
                       items={levelItemsWithClose[item.key]}
-                      className="w-full"
+                      className="w-full min-w-0"
+                      contentClassName={ADMIN_NAV.sidebar.levelContentClass}
+                      triggerClassName={`${ADMIN_NAV.sidebar.levelTriggerClass} !justify-start`.trim()}
                     />
                   </div>
                 ),

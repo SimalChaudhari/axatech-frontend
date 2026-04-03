@@ -1,5 +1,6 @@
 import { ChevronDownIcon } from '../icons';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { NavLink, useLocation } from 'react-router-dom';
 
 /** Vertical spine per <ul>: only between direct sibling rows (not nested subtrees). */
@@ -35,11 +36,23 @@ function measureLevelTreeGuides(rootEl) {
   });
 }
 
+/** Submenu <ul> paths that are open in expanded vertical mode (for fixed + portal placement). */
+function collectOpenExpandedFlyoutPaths(list, openNodesMap, pathPrefix = 'root') {
+  const paths = [];
+  if (!Array.isArray(list) || list.length === 0) return paths;
+  list.forEach((item, index) => {
+    const nodePath = `${pathPrefix}-${index}`;
+    if (Array.isArray(item.children) && item.children.length > 0 && openNodesMap[nodePath]) {
+      paths.push(nodePath);
+      paths.push(...collectOpenExpandedFlyoutPaths(item.children, openNodesMap, nodePath));
+    }
+  });
+  return paths;
+}
 
 const SIDEBAR_BG_IMAGE =
   'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSJ1cmwoI3BhaW50MF9yYWRpYWxfNDQ2NF81NTMzOCkiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CjxkZWZzPgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50MF9yYWRpYWxfNDQ2NF81NTMzOCIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgxMjAgMS44MTgxMmUtMDUpIHJvdGF0ZSgtNDUpIHNjYWxlKDEyMy4yNSkiPgo8c3RvcCBzdG9wLWNvbG9yPSIjMDBCOEQ5Ii8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzAwQjhEOSIgc3RvcC1vcGFjaXR5PSIwIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==), url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSJ1cmwoI3BhaW50MF9yYWRpYWxfNDQ2NF81NTMzNykiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CjxkZWZzPgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50MF9yYWRpYWxfNDQ2NF81NTMzNyIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgwIDEyMCkgcm90YXRlKDEzNSkgc2NhbGUoMTIzLjI1KSI+CjxzdG9wIHN0b3AtY29sb3I9IiNGRjU2MzAiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRkY1NjMwIiBzdG9wLW9wYWNpdHk9IjAiLz4KPC9yYWRpYWxHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4K)';
 
-  
 const sidebarBgStyle = {
   backgroundImage: SIDEBAR_BG_IMAGE,
   backgroundSize: '50%, 50%',
@@ -57,7 +70,8 @@ const LEVEL_TREE_STYLES = `
     max-width: 100%;
   }
 
-  .level-tree-wrapper ul.level-tree-ul {
+  /* Admin / mobile vertical tree only — do not style horizontal header flyouts */
+  .level-tree-vertical ul.level-tree-ul {
     position: relative;
     padding-left: 2rem;
     width: 100%;
@@ -66,30 +80,27 @@ const LEVEL_TREE_STYLES = `
     min-height: 0;
   }
 
-  .level-tree-wrapper ul.level-tree-ul::before {
+  .level-tree-vertical ul.level-tree-ul::before {
     content: "";
     position: absolute;
     left: 14px;
     width: 2px;
-    // top: var(--tree-guide-top, 0px);
     top: 0px;
     height: var(--tree-guide-height, 0px);
     bottom: auto;
-    // background-color: #E5E7EB;
     background-color: #CBCBCB;
   }
 
-  .dark .level-tree-wrapper ul.level-tree-ul::before,
-  [data-theme="dark"] .level-tree-wrapper ul.level-tree-ul::before {
+  .dark .level-tree-vertical ul.level-tree-ul::before,
+  [data-theme="dark"] .level-tree-vertical ul.level-tree-ul::before {
     background-color: #282F37;
   }
 
-  .level-tree-wrapper li {
+  .level-tree-vertical li {
     position: relative;
-    
   }
 
-  .level-tree-wrapper li::before {
+  .level-tree-vertical li::before {
     content: "";
     position: absolute;
     top: 0;
@@ -102,8 +113,8 @@ const LEVEL_TREE_STYLES = `
     transform: translate(calc(16px * -1), 8px);
   }
 
-  .dark .level-tree-wrapper li::before,
-  [data-theme="dark"] .level-tree-wrapper li::before {
+  .dark .level-tree-vertical li::before,
+  [data-theme="dark"] .level-tree-vertical li::before {
     background-color: #282F37;
   }
 `;
@@ -124,6 +135,10 @@ export default function LevelItem({
   floating = false,
   collapsed = false,
   vertical = false,
+  /** Desktop header: open panel on hover (matches public site); still allows click to toggle when hover is awkward. */
+  openOnHover = false,
+  /** Vertical nav in drawer/mobile: keep nested <ul> in the scroll area with tree guides (no body portal). Admin sidebar uses portal when false. */
+  inFlowNestedVertical = false,
 }) {
   const { pathname } = useLocation();
 
@@ -188,12 +203,14 @@ export default function LevelItem({
   const [hoverOpen, setHoverOpen] = useState(false);
   const [hoverPath, setHoverPath] = useState('');
   const [menuPlacement, setMenuPlacement] = useState({});
+  /** Fixed viewport positions for expanded (non-collapsed) flyout <ul>s so they are not clipped by scrolling <nav>. */
+  const [expandedFlyoutStyle, setExpandedFlyoutStyle] = useState({});
+  const [navScrollRev, setNavScrollRev] = useState(0);
   const isControlled = typeof isOpen === 'boolean';
   const open = isControlled ? isOpen : internalOpen;
-  const panelOpen = collapsed ? hoverOpen : open;
-  const collapsedContentClass = collapsed
-    ? 'absolute left-full top-0 ml-2 z-90 overflow-visible'
-    : '';
+  const panelOpen = collapsed ? hoverOpen : openOnHover ? hoverOpen : open;
+  /** Collapsed rail or desktop header: subtree open state follows hover trail (flyouts to the side). */
+  const useHoverTree = collapsed || (openOnHover && !vertical && !collapsed);
   const resolvedLabel = LabelIcon || labelText ? (
     <span className={`inline-flex items-center ${collapsed ? 'flex-col gap-1' : 'gap-2'}`}>
       {LabelIcon ? <LabelIcon className="text-[1.1rem] shrink-0" /> : null}
@@ -223,6 +240,24 @@ export default function LevelItem({
   const menuRefs = useRef({});
   const parentTriggerRefs = useRef({});
   const closeDelayTimeoutRef = useRef(null);
+
+  const holdHoverOpen = useCallback(() => {
+    if (closeDelayTimeoutRef.current) {
+      clearTimeout(closeDelayTimeoutRef.current);
+      closeDelayTimeoutRef.current = null;
+    }
+    setHoverOpen(true);
+  }, []);
+
+  const releaseHoverOpen = useCallback(() => {
+    if (closeDelayTimeoutRef.current) clearTimeout(closeDelayTimeoutRef.current);
+    const delayMs = openOnHover ? 200 : 100;
+    closeDelayTimeoutRef.current = setTimeout(() => {
+      setHoverOpen(false);
+      setHoverPath('');
+      closeDelayTimeoutRef.current = null;
+    }, delayMs);
+  }, [openOnHover]);
 
   const updateTreeGuides = useCallback(() => {
     requestAnimationFrame(() => measureLevelTreeGuides(treeWrapperRef.current));
@@ -257,6 +292,8 @@ export default function LevelItem({
     const nextPlacement = {};
     const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
+    const pad = 12;
+    const gap = 8;
 
     for (const path of visiblePaths) {
       const menuEl = menuRefs.current[path];
@@ -266,33 +303,96 @@ export default function LevelItem({
       const menuRect = menuEl.getBoundingClientRect();
       const triggerRect = triggerEl.getBoundingClientRect();
 
-      const openUp = triggerRect.top + menuRect.height > viewportHeight - 12;
-      const placement = {
-        top: openUp ? 'auto' : '0px',
-        bottom: openUp ? '0px' : 'auto',
-      };
-
-      if (path !== 'root') {
-        const offsetParentRect = menuEl.offsetParent?.getBoundingClientRect();
-        if (offsetParentRect) {
-          const alignedTop = triggerRect.top - offsetParentRect.top;
-          const minTop = 12 - offsetParentRect.top;
-          const maxTop = viewportHeight - 12 - offsetParentRect.top - menuRect.height;
-          const clampedTop = Math.min(Math.max(alignedTop, minTop), maxTop);
-          placement.top = `${clampedTop}px`;
-          placement.bottom = 'auto';
+      let top = triggerRect.top;
+      if (triggerRect.top + menuRect.height > viewportHeight - pad) {
+        top = Math.max(pad, viewportHeight - pad - menuRect.height);
+      }
+      let left = triggerRect.right + gap;
+      if (left + menuRect.width > viewportWidth - pad) {
+        const leftPreferred = triggerRect.left - gap - menuRect.width;
+        if (leftPreferred >= pad) {
+          left = leftPreferred;
+        } else {
+          left = Math.max(pad, viewportWidth - pad - menuRect.width);
         }
-
-        const openLeft = triggerRect.right + menuRect.width > viewportWidth - 12;
-        placement.left = openLeft ? 'auto' : '106%';
-        placement.right = openLeft ? '100%' : 'auto';
       }
 
-      nextPlacement[path] = placement;
+      nextPlacement[path] = {
+        position: 'fixed',
+        left: `${left}px`,
+        top: `${top}px`,
+        right: 'auto',
+        bottom: 'auto',
+        maxHeight: `${viewportHeight - 24}px`,
+        overflowY: 'auto',
+        zIndex: 200,
+      };
     }
 
     setMenuPlacement(nextPlacement);
-  }, [collapsed, panelOpen, hoverPath]);
+  }, [collapsed, panelOpen, hoverPath, navScrollRev]);
+
+  useLayoutEffect(() => {
+    if (collapsed || !vertical || !open || !panelOpen || inFlowNestedVertical) {
+      setExpandedFlyoutStyle({});
+      return;
+    }
+
+    const paths = collectOpenExpandedFlyoutPaths(items || [], openNodes);
+    const next = {};
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const pad = 12;
+    const gap = 8;
+
+    for (const path of paths) {
+      const menuEl = menuRefs.current[path];
+      const triggerEl = parentTriggerRefs.current[path];
+      if (!menuEl || !triggerEl) continue;
+
+      const menuRect = menuEl.getBoundingClientRect();
+      const triggerRect = triggerEl.getBoundingClientRect();
+
+      let top = triggerRect.top;
+      if (triggerRect.top + menuRect.height > viewportHeight - pad) {
+        top = Math.max(pad, viewportHeight - pad - menuRect.height);
+      }
+      let left = triggerRect.right + gap;
+      if (left + menuRect.width > viewportWidth - pad) {
+        const leftPreferred = triggerRect.left - gap - menuRect.width;
+        if (leftPreferred >= pad) {
+          left = leftPreferred;
+        } else {
+          left = Math.max(pad, viewportWidth - pad - menuRect.width);
+        }
+      }
+
+      next[path] = {
+        position: 'fixed',
+        left: `${left}px`,
+        top: `${top}px`,
+        right: 'auto',
+        bottom: 'auto',
+        maxHeight: `${viewportHeight - 24}px`,
+        overflowY: 'auto',
+        zIndex: 200,
+      };
+    }
+
+    setExpandedFlyoutStyle(next);
+  }, [collapsed, vertical, open, panelOpen, openNodes, items, navScrollRev, inFlowNestedVertical]);
+
+  useEffect(() => {
+    if (!panelOpen) return;
+    const scrollRoot = rootTriggerRef.current?.closest('[data-admin-nav-scroll]');
+    const bump = () => setNavScrollRev((n) => n + 1);
+    scrollRoot?.addEventListener('scroll', bump, { passive: true });
+    window.addEventListener('resize', bump);
+    return () => {
+      scrollRoot?.removeEventListener('scroll', bump);
+      window.removeEventListener('resize', bump);
+    };
+  }, [panelOpen]);
 
   useEffect(() => {
     return () => {
@@ -331,12 +431,13 @@ export default function LevelItem({
     } no-underline ${item.image || item.Icon ? 'justify-start gap-2.5' : ''}`.trim();
 
   const renderLeafInner = (item) => {
+    const labelWrap = collapsed ? 'min-w-0 flex-1 whitespace-normal wrap-break-word' : 'min-w-0 flex-1 truncate';
     if (item.Icon) {
       const LeafIcon = item.Icon;
       return (
         <>
           <LeafIcon className="nav-icon text-[1.35rem] shrink-0" />
-          <span className="min-w-0 flex-1 truncate">{item.label}</span>
+          <span className={labelWrap}>{item.label}</span>
         </>
       );
     }
@@ -344,35 +445,15 @@ export default function LevelItem({
       return (
         <>
           <img src={item.image} alt="" className="h-7 w-7 shrink-0 object-contain rounded" />
-          <span className="min-w-0 flex-1 truncate">{item.label}</span>
+          <span className={labelWrap}>{item.label}</span>
         </>
       );
     }
     return item.label;
   };
 
-  const renderItems = (list = [], path = 'root', depth = 0) => (
-    <ul
-      ref={(el) => {
-        if (el) menuRefs.current[path] = el;
-        else delete menuRefs.current[path];
-      }}
-      style={
-        collapsed
-          ? { ...sidebarBgStyle, ...(menuPlacement[path] || {}) }
-          : undefined
-      }
-      className={
-        collapsed
-          ? `w-max min-w-[180px] space-y-1 rounded-xl border border-slate-200 bg-slate-100 p-2 shadow-lg backdrop-blur-sm dark:border-gray-600 dark:bg-gray-800 ${
-              depth > 0 ? 'absolute z-90' : 'relative z-70'
-            }`
-          : vertical && depth > 0
-            ? 'level-tree-ul absolute left-full top-0 z-90 ml-2 w-max min-w-[180px] space-y-1 rounded-xl border border-slate-200 bg-slate-100 p-2 shadow-lg dark:border-gray-600 dark:bg-gray-800'
-            : 'level-tree-ul'
-      }
-    >
-      {list.map((item, index) => {
+  const renderItems = (list = [], path = 'root', depth = 0) => {
+    const listContent = list.map((item, index) => {
         const nodePath = `${path}-${index}`;
         const hasChildren = Array.isArray(item.children) && item.children.length > 0;
         const soleChild =
@@ -383,23 +464,25 @@ export default function LevelItem({
           !(Array.isArray(soleChild.children) && soleChild.children.length > 0) &&
           ((soleChild.to != null && soleChild.to !== '') ||
             (soleChild.href != null && soleChild.href !== ''));
-        const nodeOpen = collapsed ? hoverPath.startsWith(nodePath) : !!openNodes[nodePath];
+        const nodeOpen = useHoverTree
+          ? hoverPath === nodePath || hoverPath.startsWith(`${nodePath}-`)
+          : !!openNodes[nodePath];
         const nodeHasActiveDescendant = hasChildren ? hasActiveDescendant(item.children) : false;
+        const needsHorizontalFlyoutLi = !vertical && !collapsed && hasChildren && !soleChildIsNavLeaf;
+        const sideChevron = collapsed || needsHorizontalFlyoutLi;
 
         return (
           <li
             key={nodePath}
+            className={needsHorizontalFlyoutLi ? 'relative' : undefined}
             onMouseEnter={
-              collapsed
+              useHoverTree
                 ? () => {
                     if (hasChildren && !soleChildIsNavLeaf) {
-                      // Show only the currently hovered parent's submenu.
                       setHoverPath(nodePath);
                     } else if (path === 'root') {
-                      // Root leaf hovered -> hide any sibling submenu.
                       setHoverPath('');
                     } else {
-                      // Nested leaf hovered -> keep its parent submenu visible.
                       setHoverPath(path);
                     }
                   }
@@ -433,16 +516,24 @@ export default function LevelItem({
               <>
                 <div className="level-tree-node-head">
                   <button
-                    ref={
-                      collapsed
-                        ? (el) => {
-                            if (el) parentTriggerRefs.current[nodePath] = el;
-                            else delete parentTriggerRefs.current[nodePath];
-                          }
-                        : undefined
-                    }
+                    ref={(el) => {
+                      if (hasChildren && !soleChildIsNavLeaf) {
+                        if (el) parentTriggerRefs.current[nodePath] = el;
+                        else delete parentTriggerRefs.current[nodePath];
+                      }
+                    }}
                     type="button"
-                    onClick={() => (collapsed ? setHoverPath(nodePath) : toggleNode(nodePath))}
+                    onClick={() => {
+                      if (collapsed) {
+                        setHoverPath(nodePath);
+                        return;
+                      }
+                      if (openOnHover && !vertical) {
+                        if (hasChildren && !soleChildIsNavLeaf) setHoverPath(nodePath);
+                        return;
+                      }
+                      toggleNode(nodePath);
+                    }}
                     aria-expanded={nodeOpen}
                     aria-controls={`${id}-${nodePath}-content`}
                     id={`${id}-${nodePath}-trigger`}
@@ -458,25 +549,53 @@ export default function LevelItem({
                           : ''
                     }`.trim()}
                   >
-                    {item.label}
+                    {collapsed ? (
+                      <span className="min-w-0 flex-1 whitespace-normal wrap-break-word text-left">
+                        {item.label}
+                      </span>
+                    ) : (
+                      item.label
+                    )}
                     <ChevronDownIcon
                       className={`shrink-0 text-base transition-transform duration-200 ${
-                        collapsed ? '-rotate-90' : nodeOpen ? 'rotate-180' : ''
+                        sideChevron ? '-rotate-90' : nodeOpen ? 'rotate-180' : ''
                       }`}
                       aria-hidden
                     />
                   </button>
                 </div>
-                {nodeOpen && (
-                  <div
-                    id={`${id}-${nodePath}-content`}
-                    role="region"
-                    aria-labelledby={`${id}-${nodePath}-trigger`}
-                    className={collapsed ? 'relative' : ''}
-                  >
-                    {renderItems(item.children, nodePath, depth + 1)}
-                  </div>
-                )}
+                {nodeOpen &&
+                  (collapsed ? (
+                    <div
+                      id={`${id}-${nodePath}-content`}
+                      role="region"
+                      aria-labelledby={`${id}-${nodePath}-trigger`}
+                      className="relative"
+                    >
+                      {renderItems(item.children, nodePath, depth + 1)}
+                    </div>
+                  ) : vertical && inFlowNestedVertical ? (
+                    <div
+                      id={`${id}-${nodePath}-content`}
+                      role="region"
+                      aria-labelledby={`${id}-${nodePath}-trigger`}
+                      className="relative min-w-0"
+                    >
+                      {renderItems(item.children, nodePath, depth + 1)}
+                    </div>
+                  ) : vertical ? (
+                    renderItems(item.children, nodePath, depth + 1)
+                  ) : (
+                    <div
+                      id={`${id}-${nodePath}-content`}
+                      role="region"
+                      aria-labelledby={`${id}-${nodePath}-trigger`}
+                      className="absolute left-full top-0 ml-3 mt-0 min-w-[12rem] w-max max-w-[calc(100vw-2rem)] space-y-1 rounded-xl border border-slate-200 bg-slate-100 p-2 dark:border-gray-600 dark:bg-gray-800"
+                      style={{ ...sidebarBgStyle, zIndex: 50 + depth * 6 }}
+                    >
+                      {renderItems(item.children, nodePath, depth + 1)}
+                    </div>
+                  ))}
               </>
             ) : (
               <div className="level-tree-node-head w-full min-w-0">
@@ -508,9 +627,78 @@ export default function LevelItem({
             )}
           </li>
         );
-      })}
-    </ul>
-  );
+      });
+
+    const collapsedNestedPortal = collapsed && depth > 0 && typeof document !== 'undefined';
+
+    if (collapsedNestedPortal) {
+      return createPortal(
+        <ul
+          ref={(el) => {
+            if (el) menuRefs.current[path] = el;
+            else delete menuRefs.current[path];
+          }}
+          id={`${id}-${path}-flyout`}
+          style={{
+            ...sidebarBgStyle,
+            ...(menuPlacement[path] || {}),
+          }}
+          className="level-tree-ul list-none w-max min-w-[min(100%,16rem)] max-w-[calc(100vw-24px)] space-y-1 rounded-xl border border-slate-200 bg-slate-100 p-2 shadow-lg backdrop-blur-sm dark:border-gray-600 dark:bg-gray-800 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {listContent}
+        </ul>,
+        document.body
+      );
+    }
+
+    const expandedFlyoutToBody =
+      !collapsed &&
+      vertical &&
+      depth > 0 &&
+      !inFlowNestedVertical &&
+      typeof document !== 'undefined';
+
+    if (expandedFlyoutToBody) {
+      return createPortal(
+        <ul
+          ref={(el) => {
+            if (el) menuRefs.current[path] = el;
+            else delete menuRefs.current[path];
+          }}
+          id={`${id}-${path}-flyout`}
+          style={expandedFlyoutStyle[path]}
+          className="level-tree-ul list-none w-max min-w-[min(100%,16rem)] max-w-[calc(100vw-24px)] space-y-1 rounded-xl border border-slate-200 bg-slate-100 p-2 shadow-lg dark:border-gray-600 dark:bg-gray-800 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {listContent}
+        </ul>,
+        document.body
+      );
+    }
+
+    return (
+      <ul
+        ref={(el) => {
+          if (el) menuRefs.current[path] = el;
+          else delete menuRefs.current[path];
+        }}
+        style={
+          collapsed
+            ? {
+                ...sidebarBgStyle,
+                ...(path !== 'root' ? menuPlacement[path] || {} : {}),
+              }
+            : undefined
+        }
+        className={
+          collapsed
+            ? 'list-none w-max min-w-[min(100%,16rem)] max-w-[calc(100vw-24px)] space-y-1 rounded-xl border border-slate-200 bg-slate-100 p-2 shadow-lg backdrop-blur-sm dark:border-gray-600 dark:bg-gray-800 relative z-70'
+            : `level-tree-ul list-none pl-0 ${vertical ? '' : '[&_ul]:list-none'}`.trim()
+        }
+      >
+        {listContent}
+      </ul>
+    );
+  };
 
   const rootLinkBaseClass =
     'cursor-pointer flex w-full items-center justify-start rounded-lg text-left font-semibold capitalize text-[0.8375rem] text-gray-500 no-underline transition-colors duration-200 dark:text-gray-200 hover:bg-gray-200 hover:dark:bg-gray-700/50';
@@ -552,29 +740,47 @@ export default function LevelItem({
     );
   }
 
+  const collapsedFlyoutPortal =
+    collapsed &&
+    panelOpen &&
+    typeof document !== 'undefined' &&
+    createPortal(
+      <div
+        style={menuPlacement.root}
+        onMouseEnter={holdHoverOpen}
+        onMouseLeave={releaseHoverOpen}
+        className="z-200 w-max min-w-0 max-w-[calc(100vw-24px)] overflow-x-visible overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+      >
+        <div
+          ref={treeWrapperRef}
+          className="level-tree-wrapper-collapsed h-fit min-h-0 w-max max-w-full self-start"
+        >
+          {items ? renderItems(items, 'root', 0) : children}
+        </div>
+      </div>,
+      document.body
+    );
+
+  const rootHoverHandlers =
+    collapsed || openOnHover
+      ? { onMouseEnter: holdHoverOpen, onMouseLeave: releaseHoverOpen }
+      : {};
+
+  const handleRootClick = () => {
+    if (collapsed) return;
+    if (openOnHover) {
+      if (!isControlled) setHoverOpen((p) => !p);
+      return;
+    }
+    handleToggle();
+  };
+
   return (
-    <div
-      className={className}
-      onMouseEnter={collapsed ? () => {
-        if (closeDelayTimeoutRef.current) {
-          clearTimeout(closeDelayTimeoutRef.current);
-          closeDelayTimeoutRef.current = null;
-        }
-        setHoverOpen(true);
-      } : undefined}
-      onMouseLeave={collapsed ? () => {
-        if (closeDelayTimeoutRef.current) clearTimeout(closeDelayTimeoutRef.current);
-        closeDelayTimeoutRef.current = setTimeout(() => {
-          setHoverOpen(false);
-          setHoverPath('');
-          closeDelayTimeoutRef.current = null;
-        }, 100);
-      } : undefined}
-    >
+    <div className={className} {...rootHoverHandlers}>
       <button
         ref={rootTriggerRef}
         type="button"
-        onClick={collapsed ? undefined : handleToggle}
+        onClick={collapsed ? undefined : handleRootClick}
         aria-expanded={panelOpen}
         aria-controls={`${id}-content`}
         id={`${id}-trigger`}
@@ -600,31 +806,49 @@ export default function LevelItem({
           aria-hidden
         />
       </button>
-      <div
-        id={`${id}-content`}
-        role="region"
-        aria-labelledby={`${id}-trigger`}
-        style={collapsed && menuPlacement.root ? menuPlacement.root : undefined}
-        className={`${
-          floating || (vertical && !collapsed) ? 'overflow-visible' : 'overflow-hidden'
-        } transition-[height] duration-200 ease-out ${
-          collapsed || !vertical
-            ? ''
-            : '[&_ul]:space-y-1 [&_ul]:pl-4 [&_ul]:pt-2 [&_ul]:text-sm [&_ul]:text-slate-700 dark:[&_ul]:text-gray-200 [&_li]:leading-6'
-        } ${collapsedContentClass} ${panelOpen ? 'visible' : 'invisible h-0'} ${contentClassName}`.trim()}
-      >
-        {panelOpen && (
-          <>
-            {!collapsed && vertical && <style>{LEVEL_TREE_STYLES}</style>}
-            <div
-              ref={treeWrapperRef}
-              className={` ${collapsed ? 'level-tree-wrapper-collapsed' : 'level-tree-wrapper'} h-fit min-h-0 w-full max-w-full self-start ${collapsed ? 'max-w-[180px]' : ''}`}
-            >
-              {items ? renderItems(items) : children}
-            </div>
-          </>
-        )}
-      </div>
+      {collapsed ? (
+        <>
+          <div
+            id={`${id}-content`}
+            role="region"
+            aria-labelledby={`${id}-trigger`}
+            className={
+              panelOpen
+                ? 'pointer-events-none h-0 w-0 overflow-hidden p-0'
+                : 'invisible h-0 w-0 overflow-hidden p-0'
+            }
+          />
+          {collapsedFlyoutPortal}
+        </>
+      ) : (
+        <div
+          id={`${id}-content`}
+          role="region"
+          aria-labelledby={`${id}-trigger`}
+          onMouseEnter={openOnHover ? holdHoverOpen : undefined}
+          onMouseLeave={openOnHover ? releaseHoverOpen : undefined}
+          style={!vertical ? { ...sidebarBgStyle } : undefined}
+          className={`${
+            panelOpen ? 'overflow-visible' : 'overflow-hidden'
+          } transition-[height] duration-200 ease-out ${
+            vertical
+              ? '[&_ul]:space-y-1 [&_ul]:pl-4 [&_ul]:pt-2 [&_ul]:text-sm [&_ul]:text-slate-700 dark:[&_ul]:text-gray-200 [&_li]:leading-6'
+              : ''
+          } ${panelOpen ? 'visible' : 'invisible h-0'} ${contentClassName}`.trim()}
+        >
+          {panelOpen && (
+            <>
+              {vertical && <style>{LEVEL_TREE_STYLES}</style>}
+              <div
+                ref={treeWrapperRef}
+                className={`level-tree-wrapper h-fit min-h-0 w-full max-w-full self-start ${vertical ? 'level-tree-vertical' : ''}`.trim()}
+              >
+                {items ? renderItems(items, 'root', 0) : children}
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -138,7 +138,7 @@ export default function HeaderDesktopNav({
           item.type === 'dropdown' ? (
             <div
               key={item.key}
-              className="relative overflow-visible"
+              className="relative w-max max-w-full shrink-0 overflow-visible"
               onMouseEnter={openTechMenu}
               onMouseLeave={scheduleCloseTechMenu}
             >
@@ -173,15 +173,17 @@ export default function HeaderDesktopNav({
           ) : (
             <div
               key={item.key}
-              className={`relative ${item.type === 'level' ? item.desktopMinWidth : 'min-w-[72px]'}`}
+              className={`relative w-max max-w-full shrink-0 ${item.type === 'level' ? item.desktopMinWidth : 'min-w-[72px]'}`}
             >
               <LevelItem
                 id={`header-${item.key}-desktop`}
                 label={item.label}
+                vertical={false}
                 collapsed={isDesktopLevelCollapsed}
-                defaultOpen
+                openOnHover
+                defaultOpen={false}
                 items={levelItemsWithClose[item.key]}
-                className="w-full"
+                className="w-full min-w-0"
                 contentClassName={publicNav.header.levelContentClass}
                 triggerClassName={item.type === 'level' ? item.triggerClassName : publicNav.header.levelTriggerClass}
               />

@@ -74,11 +74,11 @@ function buildAdminNavItems(paths, order, sidebar) {
 const sidebar = {
   // For expanded sidebar: dropdown opens just below the trigger
   levelContentClass: '!left-0 !top-full !ml-0 !mt-1',
-  // For collapsed sidebar: flyout should align vertically with the trigger button
-  levelContentCollapsedClass: '!left-full !top-1/2 !-translate-y-1/2 !ml-0',
+  // Collapsed flyout is portaled with position:fixed + inline coords in LevelItem — do not add !left/!top here (they override JS and hide the menu).
+  levelContentCollapsedClass: '',
   /** Horizontal align is set in AdminSidebar from `effectiveCollapsed` (`!justify-center` vs `!justify-start`). */
   levelTriggerClass:
-    '!gap-2 !rounded-lg !py-2.5 !px-1 !text-[0.925rem] !font-medium !normal-case !tracking-normal !text-gray-700 dark:!text-gray-300 hover:!bg-gray-100 dark:hover:!bg-gray-700/50 !w-full',
+    '!gap-2 !rounded-lg !py-2.5 !px-2 !text-[0.925rem] !font-medium !normal-case !tracking-normal !text-gray-700 dark:!text-gray-300 hover:!bg-gray-100 dark:hover:!bg-gray-700/50 !w-full',
 };
 
 const order = [

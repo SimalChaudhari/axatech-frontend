@@ -13,7 +13,8 @@ export default function Header({ menuOpen, onMenuToggle, closeMenu, user, logout
   const { theme } = useTheme();
   const [techMenuOpen, setTechMenuOpen] = useState(false);
   const [technologies, setTechnologies] = useState([]);
-  const isDesktopLevelCollapsed = true;
+  /** false = horizontal dropdowns under each nav item; true = portaled flyouts (sidebar-style). */
+  const isDesktopLevelCollapsed = false;
 
   const levelItemsWithClose = useMemo(() => {
     const map = {};
